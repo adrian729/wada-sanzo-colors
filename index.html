@@ -12,9 +12,13 @@
       --line: #e3e3dd;
       --info: calc(32ch + 1rem); /* widest info row: "OKLCH" + gap + oklch(0.5579 0.1582 357.38) */
     }
+    /* DM Mono (SIL Open Font License, fonts/OFL.txt), from github.com/google/fonts/tree/main/ofl/dmmono.
+       It has no bold: Medium (500) is the heaviest weight. */
+    @font-face { font-family: "DM Mono"; src: url("fonts/DMMono-Regular.ttf") format("truetype"); font-weight: 400; }
+    @font-face { font-family: "DM Mono"; src: url("fonts/DMMono-Medium.ttf") format("truetype"); font-weight: 500; }
     * { box-sizing: border-box; margin: 0; }
     [hidden] { display: none !important; }
-    body { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: var(--bg); color: var(--fg); }
+    body { font-family: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: var(--bg); color: var(--fg); }
 
     nav {
       position: sticky; top: 0; z-index: 3;
@@ -23,6 +27,7 @@
       background: var(--bg);
       border-bottom: 1px solid var(--line);
     }
+    nav strong { font-weight: 500; }
     nav span { color: var(--muted); }
     .views { display: flex; gap: 1rem; }
     .views a { color: var(--muted); text-decoration: none; }
@@ -62,12 +67,13 @@
     .wheel { position: relative; width: min(100%, calc(100vh - 8rem)); aspect-ratio: 1; }
     .wheel-panel {
       position: fixed; left: 1.5rem; top: 50%; transform: translateY(-50%); z-index: 2;
-      width: calc(var(--info) + 2.5rem); pointer-events: none;
-      background: var(--bg); border-radius: 6px; overflow: hidden; box-shadow: 0 2px 12px rgb(0 0 0 / 0.15);
+      width: 26ch; /* widest line: OKLCH 0.5579 0.1582 357.38 */
+      line-height: 1.5; white-space: nowrap; font-variant-numeric: tabular-nums; pointer-events: none;
       opacity: 0; transition: opacity 0.6s ease; /* fade out */
     }
     .wheel-panel.show { opacity: 1; transition-duration: 0.12s; /* fade in */ }
-    .wheel-panel .detail-swatch { height: 8rem; }
+    .wheel-panel .detail-swatch { height: auto; aspect-ratio: 2; margin-bottom: 0.75rem; }
+    .wheel-panel h2 { font: inherit; }
     .wheel svg { display: block; width: 100%; height: 100%; }
     .wheel .segment { stroke: var(--bg); stroke-width: 0.004; cursor: pointer; outline: none; }
     .wheel-bg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.35; pointer-events: none; }
@@ -78,13 +84,13 @@
     dialog {
       width: min(calc(var(--info) + 2.5rem), calc(100% - 2rem));
       margin: auto;
-      padding: 0; border: 0; border-radius: 6px;
+      padding: 0; border: 0;
       background: var(--bg); color: var(--fg);
     }
     dialog::backdrop { background: rgb(0 0 0 / 0.4); }
     .detail-swatch { height: 12rem; background: var(--color); }
     .detail-body { padding: 1.25rem; }
-    .detail-body h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+    .detail-body h2 { font-size: 1.25rem; font-weight: 500; margin-bottom: 0.75rem; }
     dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; }
     dt { color: var(--muted); }
     dd { font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -105,13 +111,9 @@
     <section id="wheel-view" hidden>
       <aside class="wheel-panel" aria-live="polite">
         <div class="detail-swatch"></div>
-        <div class="detail-body">
-          <h2></h2>
-          <dl>
-            <dt>CMYK</dt><dd data-field="cmyk"></dd>
-            <dt>OKLCH</dt><dd data-field="oklch"></dd>
-          </dl>
-        </div>
+        <h2></h2>
+        <p data-field="cmyk"></p>
+        <p data-field="oklch-values"></p>
       </aside>
       <div class="wheel">
         <canvas class="wheel-bg" aria-hidden="true"></canvas>
@@ -152,12 +154,16 @@
     addEventListener("hashchange", showView);
     showView();
 
-    // Fills a block that has .detail-swatch, h2 and the cmyk/oklch fields (the dialog and the wheel panel).
+    // Fills a block that has .detail-swatch, h2 and data-field elements (the dialog and the wheel panel).
     function fillDetails(root, color) {
       root.querySelector(".detail-swatch").style.setProperty("--color", color.css);
       root.querySelector("h2").textContent = color.name;
-      root.querySelector('[data-field="cmyk"]').textContent = cmykText(color.cmyk);
-      root.querySelector('[data-field="oklch"]').textContent = color.css;
+      const fields = {
+        cmyk: cmykText(color.cmyk),
+        oklch: color.css, // dialog: the CSS value
+        "oklch-values": `OKLCH ${color.oklch.join(" ")}`, // wheel panel
+      };
+      for (const el of root.querySelectorAll("[data-field]")) el.textContent = fields[el.dataset.field];
     }
 
     function showDetail(color) {

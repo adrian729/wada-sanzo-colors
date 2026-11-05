@@ -1,0 +1,9 @@
+JapanColor2011Coated.icc
+
+Source: ICC Profile Registry, https://registry.color.org/profile-registry/JapanColor2011Coated
+Provider: Japan Printing Machinery Association (JPMA). Copyright X-Rite, Inc.
+Printing condition: ISO 12647-2:2004 offset, paper type 1 (coated), TAC 350%, characterization data JCS2011.
+SHA-256: 73202ea802e57a63a0be05ed993fde8e4d51cc436120e6c47815ce785ff42916
+
+Licence (as stated on the registry page):
+This profile is made available by JPMA, with permission of X-Rite, Incorporated and may be used, embedded, exchanged, and shared without restriction. However, it may not be altered, or sold (whether standing alone or incorporated into commercial products) without written permission of X-Rite.

@@ -10,6 +10,7 @@
       --fg: #1d1d1b;
       --muted: #6e6e68;
       --line: #e3e3dd;
+      --info: calc(32ch + 1rem); /* widest info row: "OKLCH" + gap + oklch(0.5579 0.1582 357.38) */
     }
     * { box-sizing: border-box; margin: 0; }
     [hidden] { display: none !important; }
@@ -55,29 +56,27 @@
     }
     .swatch:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; }
 
-    /* Wheel: a donut of hue slices; each slice stacks its colours light (inside) to dark (outside). */
-    #wheel-view { display: grid; place-items: center; }
+    /* Wheel view: wheel (angle = hue, distance from centre = chroma) centred on the page; the info panel
+       floats at the left middle of the screen, outside the layout, so it never moves the wheel. */
+    #wheel-view { display: grid; justify-items: center; }
     .wheel { position: relative; width: min(100%, calc(100vh - 8rem)); aspect-ratio: 1; }
+    .wheel-panel {
+      position: fixed; left: 1.5rem; top: 50%; transform: translateY(-50%); z-index: 2;
+      width: calc(var(--info) + 2.5rem); pointer-events: none;
+      background: var(--bg); border-radius: 6px; overflow: hidden; box-shadow: 0 2px 12px rgb(0 0 0 / 0.15);
+      opacity: 0; transition: opacity 0.6s ease; /* fade out */
+    }
+    .wheel-panel.show { opacity: 1; transition-duration: 0.12s; /* fade in */ }
+    .wheel-panel .detail-swatch { height: 8rem; }
     .wheel svg { display: block; width: 100%; height: 100%; }
     .wheel .segment { stroke: var(--bg); stroke-width: 0.004; cursor: pointer; outline: none; }
     .wheel-bg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.35; pointer-events: none; }
     .wheel svg { position: relative; }
     .wheel .highlight { fill: none; stroke: var(--fg); stroke-width: 0.008; pointer-events: none; }
-    .wheel-info {
-      position: absolute; inset: 0;
-      display: grid; place-items: center;
-      pointer-events: none;
-    }
-    .wheel-info span {
-      opacity: 0;
-      transition: opacity 0.6s ease; /* fade out */
-      white-space: pre; line-height: 1.35; font-variant-numeric: tabular-nums;
-    }
-    .wheel-info.show span { opacity: 1; transition-duration: 0.12s; /* fade in */ }
-    @media (prefers-reduced-motion: reduce) { .swatch span, .wheel-info span { transition: none; } }
+    @media (prefers-reduced-motion: reduce) { .swatch span, .wheel-panel { transition: none !important; } }
 
     dialog {
-      width: min(22rem, calc(100% - 2rem));
+      width: min(calc(var(--info) + 2.5rem), calc(100% - 2rem));
       margin: auto;
       padding: 0; border: 0; border-radius: 6px;
       background: var(--bg); color: var(--fg);
@@ -88,7 +87,7 @@
     .detail-body h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
     dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; }
     dt { color: var(--muted); }
-    dd { font-variant-numeric: tabular-nums; }
+    dd { font-variant-numeric: tabular-nums; white-space: nowrap; }
     .error { color: var(--muted); }
   </style>
 </head>
@@ -104,10 +103,19 @@
   <main>
     <section id="families-view"></section>
     <section id="wheel-view" hidden>
+      <aside class="wheel-panel" aria-live="polite">
+        <div class="detail-swatch"></div>
+        <div class="detail-body">
+          <h2></h2>
+          <dl>
+            <dt>CMYK</dt><dd data-field="cmyk"></dd>
+            <dt>OKLCH</dt><dd data-field="oklch"></dd>
+          </dl>
+        </div>
+      </aside>
       <div class="wheel">
         <canvas class="wheel-bg" aria-hidden="true"></canvas>
         <svg viewBox="-1.02 -1.02 2.04 2.04" role="group" aria-label="Colour wheel"></svg>
-        <div class="wheel-info" aria-hidden="true"><span></span></div>
       </div>
     </section>
   </main>
@@ -144,11 +152,16 @@
     addEventListener("hashchange", showView);
     showView();
 
+    // Fills a block that has .detail-swatch, h2 and the cmyk/oklch fields (the dialog and the wheel panel).
+    function fillDetails(root, color) {
+      root.querySelector(".detail-swatch").style.setProperty("--color", color.css);
+      root.querySelector("h2").textContent = color.name;
+      root.querySelector('[data-field="cmyk"]').textContent = cmykText(color.cmyk);
+      root.querySelector('[data-field="oklch"]').textContent = color.css;
+    }
+
     function showDetail(color) {
-      detail.querySelector(".detail-swatch").style.setProperty("--color", color.css);
-      detail.querySelector("h2").textContent = color.name;
-      detail.querySelector('[data-field="cmyk"]').textContent = cmykText(color.cmyk);
-      detail.querySelector('[data-field="oklch"]').textContent = color.css;
+      fillDetails(detail, color);
       detail.showModal();
     }
     // Clicking the backdrop (outside the dialog's content) closes it.
@@ -196,7 +209,7 @@
       const SLICE = 10, BANDS = 8, NEUTRAL_C = 0.02;
       const RING = [0.25, 1], GREYS = [0.13, 0.23];
       const svg = views.wheel.querySelector("svg");
-      const info = views.wheel.querySelector(".wheel-info");
+      const panel = views.wheel.querySelector(".wheel-panel");
       const NS = "http://www.w3.org/2000/svg";
       const highlight = document.createElementNS(NS, "path");
       highlight.classList.add("highlight");
@@ -222,10 +235,10 @@
         const color = { ...c, css: oklchText(c.oklch) };
         const show = () => {
           highlight.setAttribute("d", d);
-          info.querySelector("span").textContent = c.cmyk.map((v, j) => `${"CMYK"[j]} ${v}`).join("\n");
-          info.classList.add("show");
+          fillDetails(panel, color);
+          panel.classList.add("show");
         };
-        const hide = () => { highlight.removeAttribute("d"); info.classList.remove("show"); };
+        const hide = () => { highlight.removeAttribute("d"); panel.classList.remove("show"); };
         path.addEventListener("pointerenter", show);
         path.addEventListener("focus", show);
         path.addEventListener("pointerleave", hide);

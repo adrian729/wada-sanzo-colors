@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Convert the book's CMYK values to OKLCH and write oklch.json.
+"""Compute each colour's OKLCH from its CMYK and store it in colors.json.
 
     python3 scripts/cmyk_to_oklch.py
 
-oklch.json is an array aligned with colors.json: entry i is [L, C, h] for colors[i],
-usable in CSS as oklch(L C h).
+Sets the `oklch` field of every colour to [L, C, h], usable in CSS as oklch(L C h).
+Re-run it after changing any CMYK value.
 
 Pipeline (standard library only):
 
@@ -32,7 +32,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PROFILE = ROOT / "profiles" / "JapanColor2011Coated.icc"
 COLORS = ROOT / "colors.json"
-OUT = ROOT / "oklch.json"
 
 
 # --- 1. CMYK -> Lab (D50) through the ICC profile's A2B1 lookup table ------------------------
@@ -178,9 +177,10 @@ def lab_to_oklch(lab):
 def main():
     lut = load_a2b1(PROFILE)
     colors = json.loads(COLORS.read_text())
-    oklch = [lab_to_oklch(cmyk_to_lab(lut, c["cmyk"])) for c in colors]
-    OUT.write_text("[\n" + ",\n".join(f"  {json.dumps(v)}" for v in oklch) + "\n]\n")
-    print(f"wrote {len(oklch)} colours to {OUT.relative_to(ROOT)}")
+    for c in colors:
+        c["oklch"] = lab_to_oklch(cmyk_to_lab(lut, c["cmyk"]))
+    COLORS.write_text(json.dumps(colors, indent=2, ensure_ascii=False) + "\n")
+    print(f"updated oklch for {len(colors)} colours in {COLORS.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

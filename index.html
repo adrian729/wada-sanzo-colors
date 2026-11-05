@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wada Sanzo | A Dictionary of Color Combinations</title>
+  <style>
+    :root {
+      --bg: #fafaf7;
+      --fg: #1d1d1b;
+      --muted: #6e6e68;
+      --line: #e3e3dd;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    [hidden] { display: none !important; }
+    body { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: var(--bg); color: var(--fg); }
+
+    nav {
+      position: sticky; top: 0; z-index: 3;
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      padding: 1rem 1.5rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    nav span { color: var(--muted); }
+    .views { display: flex; gap: 1rem; }
+    .views a { color: var(--muted); text-decoration: none; }
+    .views a[aria-current] { color: var(--fg); text-decoration: underline; text-underline-offset: 0.25em; }
+
+    main { padding: 1.5rem; }
+    #families-view { display: grid; gap: 1rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+      padding: 0;
+      list-style: none;
+    }
+    .swatch {
+      display: grid; place-items: center;
+      width: 100%; aspect-ratio: 1;
+      border: 0;
+      background: var(--color);
+      color: var(--ink);
+      font: inherit; font-size: 0.8rem; font-variant-numeric: tabular-nums;
+      cursor: pointer;
+    }
+    .swatch span {
+      opacity: 0; transform: translateY(4px);
+      transition: opacity 0.6s ease, transform 0.6s ease; /* fade out */
+      white-space: pre; text-align: left; line-height: 1.35;
+    }
+    .swatch:hover span, .swatch:focus-visible span {
+      opacity: 1; transform: none;
+      transition-duration: 0.12s; /* fade in */
+    }
+    .swatch:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; }
+
+    /* Wheel: a donut of hue slices; each slice stacks its colours light (inside) to dark (outside). */
+    #wheel-view { display: grid; place-items: center; }
+    .wheel { position: relative; width: min(100%, calc(100vh - 8rem)); aspect-ratio: 1; }
+    .wheel svg { display: block; width: 100%; height: 100%; }
+    .wheel .segment { stroke: var(--bg); stroke-width: 0.004; cursor: pointer; outline: none; }
+    .wheel-bg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.35; pointer-events: none; }
+    .wheel svg { position: relative; }
+    .wheel .highlight { fill: none; stroke: var(--fg); stroke-width: 0.008; pointer-events: none; }
+    .wheel-info {
+      position: absolute; inset: 0;
+      display: grid; place-items: center;
+      pointer-events: none;
+    }
+    .wheel-info span {
+      opacity: 0;
+      transition: opacity 0.6s ease; /* fade out */
+      white-space: pre; line-height: 1.35; font-variant-numeric: tabular-nums;
+    }
+    .wheel-info.show span { opacity: 1; transition-duration: 0.12s; /* fade in */ }
+    @media (prefers-reduced-motion: reduce) { .swatch span, .wheel-info span { transition: none; } }
+
+    dialog {
+      width: min(22rem, calc(100% - 2rem));
+      margin: auto;
+      padding: 0; border: 0; border-radius: 6px;
+      background: var(--bg); color: var(--fg);
+    }
+    dialog::backdrop { background: rgb(0 0 0 / 0.4); }
+    .detail-swatch { height: 12rem; background: var(--color); }
+    .detail-body { padding: 1.25rem; }
+    .detail-body h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+    dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; }
+    dt { color: var(--muted); }
+    dd { font-variant-numeric: tabular-nums; }
+    .error { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <nav>
+    <div><strong>Wada Sanzo</strong> <span>| A Dictionary of Color Combinations</span></div>
+    <div class="views">
+      <a href="#families">Families</a>
+      <a href="#wheel">Wheel</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="families-view"></section>
+    <section id="wheel-view" hidden>
+      <div class="wheel">
+        <canvas class="wheel-bg" aria-hidden="true"></canvas>
+        <svg viewBox="-1.02 -1.02 2.04 2.04" role="group" aria-label="Colour wheel"></svg>
+        <div class="wheel-info" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="detail">
+    <div class="detail-swatch"></div>
+    <div class="detail-body">
+      <h2></h2>
+      <dl>
+        <dt>CMYK</dt><dd data-field="cmyk"></dd>
+        <dt>OKLCH</dt><dd data-field="oklch"></dd>
+      </dl>
+    </div>
+  </dialog>
+
+  <script type="module">
+    const views = {
+      families: document.getElementById("families-view"),
+      wheel: document.getElementById("wheel-view"),
+    };
+    const detail = document.getElementById("detail");
+
+    const cmykText = ([c, m, y, k]) => `C ${c} M ${m} Y ${y} K ${k}`;
+    const oklchText = ([l, c, h]) => `oklch(${l} ${c} ${h})`;
+
+    function showView() {
+      const name = location.hash.slice(1) in views ? location.hash.slice(1) : "families";
+      for (const [key, el] of Object.entries(views)) el.hidden = key !== name;
+      for (const a of document.querySelectorAll(".views a")) {
+        if (a.hash === `#${name}`) a.setAttribute("aria-current", "page");
+        else a.removeAttribute("aria-current");
+      }
+    }
+    addEventListener("hashchange", showView);
+    showView();
+
+    function showDetail(color) {
+      detail.querySelector(".detail-swatch").style.setProperty("--color", color.css);
+      detail.querySelector("h2").textContent = color.name;
+      detail.querySelector('[data-field="cmyk"]').textContent = cmykText(color.cmyk);
+      detail.querySelector('[data-field="oklch"]').textContent = color.css;
+      detail.showModal();
+    }
+    // Clicking the backdrop (outside the dialog's content) closes it.
+    detail.addEventListener("click", (e) => { if (e.target === detail) detail.close(); });
+
+    try {
+      const [colors, families] = await Promise.all(
+        ["colors.json", "families.json"].map((f) => fetch(f).then((r) => r.json()))
+      );
+
+      // Families: one grid per colour family (the book groups its colours by hue), in book order.
+      for (const family of families) {
+        const ul = document.createElement("ul");
+        ul.className = "grid";
+        ul.append(...family.map((i) => swatchItem(colors[i])));
+        views.families.append(ul);
+      }
+
+      buildWheel(colors);
+    } catch {
+      document.querySelector("main").innerHTML = `<p class="error">Couldn't load the colour data. Serve this folder over HTTP, e.g. <code>python3 -m http.server</code>.</p>`;
+    }
+
+    function swatchItem(c) {
+      const color = { ...c, css: oklchText(c.oklch) };
+      const button = document.createElement("button");
+      button.className = "swatch";
+      button.style.setProperty("--color", color.css);
+      button.style.setProperty("--ink", c.oklch[0] > 0.6 ? "rgb(0 0 0 / 0.75)" : "rgb(255 255 255 / 0.9)");
+      button.setAttribute("aria-label", color.name);
+      const values = document.createElement("span");
+      values.textContent = c.cmyk.map((v, j) => `${"CMYK"[j]} ${v}`).join("\n");
+      button.append(values);
+      button.addEventListener("click", () => showDetail(color));
+      const li = document.createElement("li");
+      li.append(button);
+      return li;
+    }
+
+    // Donut wheel on a polar grid: angle = OKLCH hue (counter-clockwise from the right, 10° slices),
+    // distance from the centre = chroma (8 rings, spaced by the square root of chroma so the many
+    // muted colours get room). Colours sharing a cell split it side by side, in hue order; empty
+    // cells stay as gaps. Near-neutral colours (no meaningful hue) form the inner ring, light to dark.
+    function buildWheel(colors) {
+      const SLICE = 10, BANDS = 8, NEUTRAL_C = 0.02;
+      const RING = [0.25, 1], GREYS = [0.13, 0.23];
+      const svg = views.wheel.querySelector("svg");
+      const info = views.wheel.querySelector(".wheel-info");
+      const NS = "http://www.w3.org/2000/svg";
+      const highlight = document.createElementNS(NS, "path");
+      highlight.classList.add("highlight");
+
+      // Screen point for a hue angle: 0° to the right, increasing counter-clockwise.
+      const pt = (r, deg) => {
+        const a = (deg * Math.PI) / 180;
+        return `${(r * Math.cos(a)).toFixed(5)} ${(-r * Math.sin(a)).toFixed(5)}`;
+      };
+      const arc = (r0, r1, d0, d1) => {
+        const large = d1 - d0 > 180 ? 1 : 0;
+        return `M ${pt(r1, d0)} A ${r1} ${r1} 0 ${large} 0 ${pt(r1, d1)} L ${pt(r0, d1)} A ${r0} ${r0} 0 ${large} 1 ${pt(r0, d0)} Z`;
+      };
+
+      const segment = (c, d) => {
+        const path = document.createElementNS(NS, "path");
+        path.classList.add("segment");
+        path.setAttribute("d", d);
+        path.setAttribute("fill", oklchText(c.oklch));
+        path.setAttribute("tabindex", "0");
+        path.setAttribute("role", "button");
+        path.setAttribute("aria-label", c.name);
+        const color = { ...c, css: oklchText(c.oklch) };
+        const show = () => {
+          highlight.setAttribute("d", d);
+          info.querySelector("span").textContent = c.cmyk.map((v, j) => `${"CMYK"[j]} ${v}`).join("\n");
+          info.classList.add("show");
+        };
+        const hide = () => { highlight.removeAttribute("d"); info.classList.remove("show"); };
+        path.addEventListener("pointerenter", show);
+        path.addEventListener("focus", show);
+        path.addEventListener("pointerleave", hide);
+        path.addEventListener("blur", hide);
+        path.addEventListener("click", () => showDetail(color));
+        path.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showDetail(color); }
+        });
+        svg.append(path);
+      };
+
+      const chromatic = colors.filter((c) => c.oklch[1] >= NEUTRAL_C);
+      const greys = colors.filter((c) => c.oklch[1] < NEUTRAL_C);
+      const lo = Math.sqrt(NEUTRAL_C), hi = Math.sqrt(Math.max(...chromatic.map((c) => c.oklch[1])));
+      const bandWidth = (RING[1] - RING[0]) / BANDS;
+
+      // Background: the continuous wheel on the same mapping, faded, repainted when the size changes.
+      const canvas = views.wheel.querySelector(".wheel-bg");
+      new ResizeObserver(() => paintWheel(canvas, RING, lo, hi)).observe(canvas);
+
+      const cells = new Map();
+      for (const c of chromatic) {
+        const s = Math.floor(c.oklch[2] / SLICE);
+        const b = Math.min(Math.floor(((Math.sqrt(c.oklch[1]) - lo) / (hi - lo)) * BANDS), BANDS - 1);
+        const key = `${s},${b}`;
+        if (!cells.has(key)) cells.set(key, { s, b, list: [] });
+        cells.get(key).list.push(c);
+      }
+      for (const { s, b, list } of cells.values()) {
+        list.sort((x, y) => x.oklch[2] - y.oklch[2]);
+        const r0 = RING[0] + b * bandWidth, w = SLICE / list.length;
+        list.forEach((c, k) => segment(c, arc(r0, r0 + bandWidth, s * SLICE + k * w, s * SLICE + (k + 1) * w)));
+      }
+      greys.sort((a, b) => b.oklch[0] - a.oklch[0]);
+      const step = 360 / greys.length;
+      greys.forEach((c, k) => segment(c, arc(GREYS[0], GREYS[1], k * step, (k + 1) * step)));
+      svg.append(highlight);
+    }
+
+    // Paints the continuous wheel: at each pixel, hue from the angle and chroma from the radius (same
+    // mapping as the segments), at that hue's most vivid lightness, limited to what sRGB can show.
+    function paintWheel(canvas, [R0, R1], lo, hi) {
+      const size = Math.round(canvas.clientWidth * Math.min(devicePixelRatio, 1.5));
+      if (!size) return; // hidden view
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      const img = ctx.createImageData(size, size), px = img.data;
+      const unit = 2.04 / size; // matches the SVG viewBox
+      const encode = (v) => 255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * Math.min(v, 1) ** (1 / 2.4) - 0.055);
+      for (let j = 0; j < size; j++) {
+        const y = (j + 0.5) * unit - 1.02;
+        for (let i = 0; i < size; i++) {
+          const x = (i + 0.5) * unit - 1.02, r = Math.hypot(x, y);
+          const alpha = Math.min(1, (r - R0) / unit, (R1 - r) / unit); // antialiased edges
+          if (alpha <= 0) continue;
+          const h = ((Math.atan2(-y, x) * 180) / Math.PI + 360) % 360;
+          const { L, C: cMax } = cusp(h);
+          const C = Math.min((lo + ((r - R0) / (R1 - R0)) * (hi - lo)) ** 2, cMax);
+          const rgb = oklchToLinearSRGB(L, C, h);
+          const o = (j * size + i) * 4;
+          px[o] = encode(Math.max(rgb[0], 0));
+          px[o + 1] = encode(Math.max(rgb[1], 0));
+          px[o + 2] = encode(Math.max(rgb[2], 0));
+          px[o + 3] = 255 * alpha;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+
+    // OKLCH -> linear sRGB (Ottosson's OKLab matrices).
+    function oklchToLinearSRGB(L, C, h) {
+      const a = C * Math.cos((h * Math.PI) / 180), b = C * Math.sin((h * Math.PI) / 180);
+      const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+      const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+      const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+      return [
+        4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+        -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+        -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+      ];
+    }
+
+    function inSRGB(L, C, h) {
+      return oklchToLinearSRGB(L, C, h).every((v) => v >= -1e-4 && v <= 1 + 1e-4);
+    }
+
+    // Most vivid sRGB colour per hue, { L, C }: computed in half-degree steps, interpolated between.
+    const cuspCache = new Map();
+    function cuspAt(key) {
+      if (!cuspCache.has(key)) {
+        const L = cuspLightness(key / 2);
+        cuspCache.set(key, { L, C: maxChroma(L, key / 2) });
+      }
+      return cuspCache.get(key);
+    }
+    function cusp(h) {
+      const k = h * 2, k0 = Math.floor(k) % 720, t = k - Math.floor(k);
+      const a = cuspAt(k0), b = cuspAt((k0 + 1) % 720);
+      return { L: a.L + (b.L - a.L) * t, C: a.C + (b.C - a.C) * t };
+    }
+
+    // Largest chroma sRGB can show at this lightness and hue.
+    function maxChroma(L, h) {
+      let lo = 0, hi = 0.4;
+      for (let i = 0; i < 24; i++) {
+        const mid = (lo + hi) / 2;
+        if (inSRGB(L, mid, h)) lo = mid; else hi = mid;
+      }
+      return lo;
+    }
+
+    // Lightness at which this hue reaches its most vivid sRGB colour (the gamut "cusp").
+    // Max chroma rises then falls with lightness, so a ternary search finds the peak.
+    function cuspLightness(h) {
+      let lo = 0.2, hi = 1;
+      for (let i = 0; i < 40; i++) {
+        const m1 = lo + (hi - lo) / 3, m2 = hi - (hi - lo) / 3;
+        if (maxChroma(m1, h) < maxChroma(m2, h)) lo = m1; else hi = m2;
+      }
+      return (lo + hi) / 2;
+    }
+  </script>
+</body>
+</html>

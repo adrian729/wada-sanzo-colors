@@ -1,0 +1,50 @@
+{
+  "_about": "Visually verified fixes. ocr: OCR text -> the name printed on the card (checked on the scan; see review/labels.jpg). alias: printed name -> the same colour's name in our colors.json (checked in the book, see book.json). variant: name -> which of our two same-name colours the book uses.",
+  "ocr": {
+    "Eeru": "Ecru",
+    "Vhite": "White",
+    "neashelink": "Seashell Pink",
+    "veruean ste": "Cerulean Blue",
+    "-Deen- Indiod": "Deep Indigo",
+    "Grave Green": "Grape Green",
+    "ndienuuake": "Indian Lake",
+    "Pale lurtle Green": "Pale Turtle Green",
+    "aaivia Kiue": "Salvia Blue",
+    "Beuta": "Sepia",
+    "Dark Grecnish Glaucous": "Dark Greenish Glaucous",
+    "Ivory Buft": "Ivory Buff",
+    "Bufly Citrine": "Buffy Citrine",
+    "Pinkinh Cinnamon": "Pinkish Cinnamon",
+    "Light Browish Olive": "Light Brownish Olive",
+    "Raw Sienns": "Raw Sienna",
+    "Sulpur Yellow": "Sulphur Yellow",
+    "Salphur Yellow": "Sulphur Yellow",
+    "Kosine Pink": "Eosine Pink",
+    "Olympie Blue": "Olympic Blue",
+    "Vandyke Browr": "Vandyke Brown",
+    "Pomegranate Purole": "Pomegranate Purple",
+    "Etrusean Red": "Etruscan Red",
+    "rale Lemon Jellow": "Pale Lemon Yellow",
+    "Pale Eeru-Drab": "Pale Ecru-Drab"
+  },
+  "alias": {
+    "Mars Brown": "Mars Brown/Tobacco",
+    "Light Green": "Night Green",
+    "Tawny Olive": "Khaki",
+    "Vandar Poel's Blue": "Vanderpoel's Blue",
+    "Rosolanc Purple": "Rosolane Purple"
+  },
+  "_notes": {
+    "Dark Grecnish Glaucous": "misprint on card 51 (m09_r07); the name is Dark Greenish Glaucous",
+    "Vander Poel's Blue": "the cards spell it Vander Poel's (No. 44, 48) and Vandar Poel's (No. 18, 68); Ridgway's name is Vanderpoel's Blue (after Emily Noyes Vanderpoel), which our data now uses; the book and Volume 1 print Vandar",
+    "Grayish Lavender": "card 16 (m03_r09) has two different chips with this name, but the book gives A's CMYK (28 28 0 0) for No. 1, whose chip looks like B, and its colour index lists only A: use A everywhere; except card 16, which has both chips: there the scan decides (4th B, 6th A), as the book prints them (25 33 20 0, then 28 28 0 0)",
+    "Eugenia Red": "the chips can't tell A from B; the book's colour index lists only A",
+    "Light Green": "card 34 (m06_r09) prints Light Green; the book has Night Green, 52 0 100 0, as ours",
+    "Tawny Olive": "card 32 (m06_r05) prints Tawny Olive; the book has Khaki there, and the chip matches Khaki on cards 9 and 12",
+    "Rosolanc Purple": "card 45 (m08_r07) prints Rosolanc, as does Volume 1; Ridgway's name is Rosolane Purple, which our data now uses"
+  },
+  "variant": {
+    "Grayish Lavender": "Grayish Lavender - A",
+    "Eugenia Red": "Eugenia Red | A"
+  }
+}

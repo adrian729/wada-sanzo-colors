@@ -1,0 +1,8 @@
+# Local working notes (todos, plans)
+/tmp/
+
+# Volume 2 card scans at full resolution (100 MB): download again with vol2/scripts/ndl_fetch.py
+/vol2/scans/cards/
+
+# Compiled from vol2/scripts/ocr.swift (swiftc -O ocr.swift -o ocr)
+/vol2/scripts/ocr

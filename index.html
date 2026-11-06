@@ -33,6 +33,7 @@
     nav strong { font-weight: 500; }
     nav span { color: var(--muted); }
     .views, .subnav { display: flex; gap: 1rem; }
+    .views { flex-wrap: wrap; row-gap: 0.25rem; } /* narrow screens: the links on two lines */
     .subnav { justify-content: flex-end; padding: 0 1.5rem 1rem; font-size: 0.875rem; }
     .views a, .subnav button { color: var(--muted); text-decoration: none; }
     .subnav button { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -74,7 +75,7 @@
     [data-show="rows"] .grid { grid-template-columns: 1fr; }
     [data-show="rows"] .swatch { aspect-ratio: auto; height: 3.5rem; place-items: center start; padding: 0 1.5rem; }
     /* Hover text: grid squares show the CMYK values one per line; rows show name, CMYK and OKLCH on
-       one line, in columns that line up from row to row (widest name: 22 characters, CMYK: 20). */
+       one line, in columns that line up from row to row (widest name: 23 characters, CMYK: 20). */
     .swatch .in-rows, [data-show="rows"] .swatch .in-grid { display: none; }
     [data-show="rows"] .swatch .in-rows { display: grid; grid-template-columns: 26ch 24ch auto; }
 
@@ -110,10 +111,28 @@
     [data-show="3"] .combos:not([data-size="3"]),
     [data-show="4"] .combos:not([data-size="4"]) { display: none; }
 
+    /* Seasonal combinations (Volume 2), as in the book: 3 to 7 colours stacked top to bottom, equal. */
+    .blocks.stack { grid-template-rows: repeat(var(--n), minmax(0, 1fr)); grid-template-columns: minmax(0, 1fr); aspect-ratio: 3 / 4; }
+    #seasons-view { display: grid; gap: 3rem; }
+    .month { margin-bottom: 1rem; font-size: 0.875rem; font-weight: 500; }
+    .combos.seasons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @media (min-width: 40rem) { .combos.seasons { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (min-width: 64rem) { .combos.seasons { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+
     /* One combination: the colours large, each colour's values under it (placed as in the book),
-       then the combinations that share a colour with it. */
-    #combination-view { display: grid; gap: 1.5rem; }
-    #combination-view > .combo-number { margin: 0; }
+       then the combinations that share a colour with it. Stacked colours have their values beside
+       them, one row per colour, level with it. */
+    :is(#combination-view, #season-view) { display: grid; gap: 1.5rem; }
+    :is(#combination-view, #season-view) > .combo-number { margin: 0; }
+    .combo-figure:has(.stack) {
+      display: grid; grid-template-columns: minmax(0, 16rem) minmax(0, 1fr); gap: 0 1.5rem; width: min(100%, 64rem);
+    }
+    .combo-figure:has(.stack) > .actions { grid-column: 1 / -1; }
+    .stack + .color-rows { margin: 0; gap: 0; grid-template-rows: repeat(var(--n), minmax(0, 1fr)); }
+    @media (max-width: 40rem) {
+      .combo-figure:has(.stack) { grid-template-columns: minmax(0, 1fr); }
+      .stack + .color-rows { margin-top: 1.25rem; gap: 0.5rem; grid-template-rows: none; }
+    }
     .combo-figure { width: min(100%, 48rem); }
     .combo-figure:has([data-size="4"]) { width: min(100%, 36rem); }
     .combo-info { display: grid; gap: 1.25rem 1rem; margin-top: 1.25rem; font-size: 0.875rem; line-height: 1.5; }
@@ -134,8 +153,9 @@
     }
     .actions :is(a, button):is(:hover, :focus-visible) { color: var(--fg); text-decoration: underline; }
 
-    /* Create: compose a combination of 2 to 4 colours, laid out as in the book, beside the full set of
-       colours to pick from. On wide screens the composition stays in view while scrolling the colours. */
+    /* Create: compose a combination of 2 to 7 colours, laid out as in the book (2 to 4 as in Volume 1,
+       5 to 7 stacked as the seasonal combinations), beside the full set of colours to pick from. On
+       wide screens the composition stays in view while scrolling the colours. */
     #create-view { display: grid; gap: 2.5rem; align-items: start; }
     @media (min-width: 64rem) {
       #create-view { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 3rem; }
@@ -150,14 +170,14 @@
     .blocks .empty { border: 1px dashed var(--muted); }
     .blocks .empty + .empty { border-left: 0; }
     /* Each colour's values, one row per colour in order (columns line up; OKLCH wraps when narrow). */
-    .create-info {
+    .color-rows {
       display: grid; gap: 0.5rem; margin-top: 1.25rem; padding: 0; list-style: none;
       font-size: 0.8rem; line-height: 1.5; font-variant-numeric: tabular-nums;
     }
-    .create-info li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1.5ch; white-space: nowrap; }
-    .create-info .chip { width: 1rem; height: 1rem; background: var(--color); }
-    .create-info .name { width: 22ch; } /* widest name */
-    .create-info .cmyk { width: 20ch; } /* widest CMYK */
+    .color-rows li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1.5ch; white-space: nowrap; }
+    .color-rows .chip { width: 1rem; height: 1rem; background: var(--color); }
+    .color-rows .name { width: 23ch; } /* widest name */
+    .color-rows .cmyk { width: 20ch; } /* widest CMYK */
     .picker { display: grid; gap: 1rem; }
     .picker .grid { grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr)); }
     .picker .swatch span { opacity: 1; transform: none; } /* a picked colour's place in the combination */
@@ -167,6 +187,8 @@
     .detail-combos { margin-top: 1.25rem; white-space: normal; }
     .detail-combos .section-label { margin: 0 0 0.5rem; }
     .thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; align-items: start; }
+    .thumbs.seasons { grid-template-columns: repeat(6, 1fr); }
+    .thumbs + .section-label { margin-top: 1.25rem; }
     .thumb { display: block; color: var(--muted); font-size: 0.75rem; text-decoration: none; }
     .thumb:hover, .thumb:focus-visible { color: var(--fg); }
     .thumb .blocks { margin-top: 0.25rem; }
@@ -202,6 +224,7 @@
     .detail-body { padding: 1.25rem; line-height: 1.5; white-space: nowrap; font-variant-numeric: tabular-nums; }
     .detail-body h2 { font-size: 1.25rem; font-weight: 500; margin-bottom: 0.5rem; }
     .oklch-line { display: flex; align-items: center; gap: 0.5rem; }
+    .detail-note { margin-top: 0.5rem; color: var(--muted); font-size: 0.8rem; white-space: normal; }
     dialog .detail-combos { padding: 0 1.25rem 1.25rem; margin: 0; }
     .copy {
       display: grid; padding: 0.25rem; margin: -0.25rem 0;
@@ -221,6 +244,7 @@
       <div class="views">
         <a href="#families">Families</a>
         <a href="#combinations">Combinations</a>
+        <a href="#seasons">Seasons</a>
         <a href="#wheel">Wheel</a>
         <a href="#create">Create</a>
       </div>
@@ -241,6 +265,8 @@
     <section id="families-view"></section>
     <section id="combinations-view" hidden></section>
     <section id="combination-view" hidden></section>
+    <section id="seasons-view" hidden></section>
+    <section id="season-view" hidden></section>
     <section id="wheel-view" hidden>
       <aside class="wheel-panel" aria-live="polite">
         <div class="detail-swatch"></div>
@@ -273,6 +299,7 @@
           <svg class="done" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>
         </button>
       </p>
+      <p class="detail-note"></p>
     </div>
     <div class="detail-combos"></div>
   </dialog>
@@ -282,6 +309,8 @@
       families: document.getElementById("families-view"),
       combinations: document.getElementById("combinations-view"),
       combination: document.getElementById("combination-view"),
+      seasons: document.getElementById("seasons-view"),
+      season: document.getElementById("season-view"),
       wheel: document.getElementById("wheel-view"),
       create: document.getElementById("create-view"),
     };
@@ -292,9 +321,12 @@
     const oklchText = ([l, c, h]) => `oklch(${l} ${c} ${h})`;
     const oklchValues = ([l, c, h]) => `OKLCH ${l} ${c} ${h}`;
 
-    // Routes: #families, #combinations, #wheel, #combination/<number> for one combination, and
-    // #create/<colours> for a combination being composed.
+    // Routes: #families, #combinations, #seasons, #wheel, #combination/<number> and #season/<number> for
+    // one combination (Volume 1's, numbered 1-348, or a seasonal one, 1-72), and #create/<colours> for
+    // a combination being composed.
     let data = null; // set once the JSON has loaded
+    const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const MAX_PICKED = 7; // as many colours as the largest combination in the book
     // The combination being composed: its colours in order (a cross: top, left, right, bottom), the slot
     // selected for swapping or replacing, and a one-off message. In the address as colour numbers in book
     // order (#create/1-46-89), so it can be shared; also remembered in this browser.
@@ -303,7 +335,7 @@
     function showView() {
       const [route, arg] = location.hash.slice(1).split("/");
       const name = route in views ? route : "families";
-      const section = name === "combination" ? "combinations" : name; // highlighted in the nav
+      const section = { combination: "combinations", season: "seasons" }[name] ?? name; // highlighted in the nav
       for (const [key, el] of Object.entries(views)) el.hidden = key !== name;
       for (const a of document.querySelectorAll(".views a")) {
         if (a.hash === `#${section}`) a.setAttribute("aria-current", "page");
@@ -311,8 +343,8 @@
       }
       for (const s of subnavs) s.hidden = s.dataset.view !== name;
       if (detail.open) detail.close();
-      if (name === "combination" && data) {
-        renderCombination(Number(arg));
+      if ((name === "combination" || name === "season") && data) {
+        renderCombination(name, Number(arg));
         scrollTo(0, 0);
       } else if (name === "create" && data) {
         openCreate(arg);
@@ -353,26 +385,33 @@
       const copy = detail.querySelector(".copy");
       copy.dataset.css = color.css;
       copy.classList.remove("copied");
-      // The colour's combinations, small; each opens that combination's page.
+      // Only in Volume 2, or misspelled in the book: say so.
+      const note = detail.querySelector(".detail-note");
+      note.textContent = [color.volume === 2 && "From Volume 2", color.bookName && `Printed as ${color.bookName}`].filter(Boolean).join(". ");
+      note.hidden = !note.textContent;
+      // The colour's combinations, small, Volume 1's then the seasonal ones; each opens its page.
       const list = detail.querySelector(".detail-combos");
-      const combos = data.combosOf[color.index];
-      const label = document.createElement("p");
-      label.className = "section-label";
-      label.textContent = `In ${combos.length} combination${combos.length === 1 ? "" : "s"}`;
-      const thumbs = document.createElement("div");
-      thumbs.className = "thumbs";
-      for (const combo of combos) {
-        const a = document.createElement("a");
-        a.className = "thumb";
-        a.href = `#combination/${combo.number}`;
-        a.addEventListener("click", () => detail.close()); // also when it is the page already open
-        a.textContent = comboNumber(combo.number);
-        const blocks = blocksFor(combo, () => document.createElement("div"));
-        blocks.setAttribute("aria-hidden", "true");
-        a.append(blocks);
-        thumbs.append(a);
+      list.replaceChildren();
+      for (const [combos, noun] of [[data.combosOf[color.index], "combination"], [data.seasonsOf[color.index], "seasonal combination"]]) {
+        if (!combos.length) continue;
+        const label = document.createElement("p");
+        label.className = "section-label";
+        label.textContent = `In ${combos.length} ${noun}${combos.length === 1 ? "" : "s"}`;
+        const thumbs = document.createElement("div");
+        thumbs.className = combos[0].kind === "season" ? "thumbs seasons" : "thumbs";
+        for (const combo of combos) {
+          const a = document.createElement("a");
+          a.className = "thumb";
+          a.href = comboHref(combo);
+          a.addEventListener("click", () => detail.close()); // also when it is the page already open
+          a.textContent = comboLabel(combo);
+          const blocks = blocksFor(combo, () => document.createElement("div"));
+          blocks.setAttribute("aria-hidden", "true");
+          a.append(blocks);
+          thumbs.append(a);
+        }
+        list.append(label, thumbs);
       }
-      list.replaceChildren(label, thumbs);
       detail.showModal();
       detail.scrollTop = 0;
     }
@@ -401,16 +440,21 @@
     detail.addEventListener("click", (e) => { if (e.target === detail) detail.close(); });
 
     try {
-      const [colors, families, combinations] = await Promise.all(
-        ["colors.json", "families.json", "combinations.json"].map((f) => fetch(f).then((r) => r.json()))
+      const [colors, families, combinations, seasonal] = await Promise.all(
+        ["colors.json", "families.json", "combinations.json", "seasons.json"].map((f) => fetch(f).then((r) => r.json()))
       );
       colors.forEach((c, i) => Object.assign(c, { index: i, css: oklchText(c.oklch) }));
-      const combos = combinations.map((ids, i) => ({ number: i + 1, colors: ids.map((k) => colors[k]) }));
-      const combosOf = colors.map(() => []); // colour index -> its combinations, in book order
+      const combos = combinations.map((ids, i) => ({ kind: "combination", number: i + 1, colors: ids.map((k) => colors[k]) }));
+      // Seasonal combinations: six a month, January first.
+      const seasons = seasonal.map((ids, i) => ({ kind: "season", number: i + 1, month: MONTHS[Math.floor(i / 6)], colors: ids.map((k) => colors[k]) }));
+      // Colour index -> its combinations, in book order.
+      const combosOf = colors.map(() => []), seasonsOf = colors.map(() => []);
       for (const combo of combos) for (const c of combo.colors) combosOf[c.index].push(combo);
-      data = { colors, combos, combosOf };
+      for (const combo of seasons) for (const c of combo.colors) seasonsOf[c.index].push(combo);
+      data = { colors, combos, combosOf, seasons, seasonsOf };
 
-      // Families: one grid per colour family (the book groups its colours by hue), in book order.
+      // Families: one grid per colour family (the book groups its colours by hue), in book order; the
+      // colours only in Volume 2 last.
       for (const family of families) {
         const ul = document.createElement("ul");
         ul.className = "grid";
@@ -427,11 +471,22 @@
         views.combinations.append(ul);
       }
 
+      // Seasons: month by month, in book order.
+      MONTHS.forEach((month, m) => {
+        const heading = Object.assign(document.createElement("h2"), { className: "month", textContent: month });
+        const ul = document.createElement("ul");
+        ul.className = "combos seasons";
+        ul.append(...seasons.slice(m * 6, m * 6 + 6).map(combinationItem));
+        const section = document.createElement("section");
+        section.append(heading, ul);
+        views.seasons.append(section);
+      });
+
       buildPicker(colors, families);
       buildWheel(colors);
       // Prepare the wheel background's hue table while the page is idle, so opening the wheel is quick.
       (window.requestIdleCallback ?? setTimeout)(() => cuspTable());
-      showView(); // a #combination/<number> link opened directly needs the data
+      showView(); // a #combination/<number> (or #season, #create) link opened directly needs the data
     } catch (error) {
       console.error(error);
       document.querySelector("main").innerHTML = `<p class="error">Couldn't load the colour data. Serve this folder over HTTP, e.g. <code>python3 -m http.server</code>.</p>`;
@@ -448,15 +503,27 @@
       return button;
     }
 
-    function comboNumber(number) {
-      return String(number).padStart(3, "0");
+    // A combination's number as shown (001-348; seasonal ones 01-72) and its page's address.
+    function comboLabel(combo) {
+      return String(combo.number).padStart(combo.kind === "season" ? 2 : 3, "0");
+    }
+    function comboHref(combo) {
+      return `#${combo.kind}/${combo.number}`;
+    }
+
+    // Blocks for n colours laid out as in the book: Volume 1's layouts for 2 to 4 (see the CSS),
+    // stacked for seasonal combinations and for more than 4.
+    function emptyBlocks(n, stacked) {
+      const blocks = document.createElement("div");
+      blocks.className = stacked ? "blocks stack" : "blocks";
+      if (stacked) blocks.style.setProperty("--n", n);
+      else blocks.dataset.size = n;
+      return blocks;
     }
 
     // The combination's colours laid out as in the book; make(colour) creates each block.
     function blocksFor(combo, make) {
-      const blocks = document.createElement("div");
-      blocks.className = "blocks";
-      blocks.dataset.size = combo.colors.length;
+      const blocks = emptyBlocks(combo.colors.length, combo.kind === "season");
       for (const c of combo.colors) {
         const block = make(c);
         block.style.setProperty("--color", c.css);
@@ -478,12 +545,36 @@
     function combinationItem(combo) {
       const link = document.createElement("a");
       link.className = "combo-number";
-      link.href = `#combination/${combo.number}`;
-      link.textContent = comboNumber(combo.number);
+      link.href = comboHref(combo);
+      link.textContent = comboLabel(combo);
       const li = document.createElement("li");
-      li.setAttribute("aria-label", `Combination ${combo.number}`);
+      li.setAttribute("aria-label", `${combo.kind === "season" ? "Seasonal combination" : "Combination"} ${combo.number}`);
       li.append(link, blocksFor(combo, (c) => namedColorButton(c)));
       return li;
+    }
+
+    // Each colour's chip, name, CMYK and OKLCH (with a copy button), one row per colour in order.
+    function colorRows(colors) {
+      const rows = document.createElement("ol");
+      rows.className = "color-rows";
+      rows.style.setProperty("--n", colors.length);
+      for (const c of colors) {
+        const li = document.createElement("li");
+        const chip = document.createElement("span");
+        chip.className = "chip";
+        chip.style.setProperty("--color", c.css);
+        const oklch = document.createElement("span");
+        oklch.className = "oklch-line";
+        oklch.append(oklchValues(c.oklch), copyButtonFor(c.css));
+        li.append(
+          chip,
+          Object.assign(document.createElement("span"), { className: "name", textContent: c.name }),
+          Object.assign(document.createElement("span"), { className: "cmyk", textContent: cmykText(c.cmyk) }),
+          oklch,
+        );
+        rows.append(li);
+      }
+      return rows;
     }
 
     // Each colour's name, CMYK and OKLCH (with a copy button), placed like the colours themselves.
@@ -516,7 +607,7 @@
       const colors = [];
       for (const part of text.split("-")) {
         const c = /^\d+$/.test(part) ? data.colors[Number(part) - 1] : undefined;
-        if (c && !colors.includes(c) && colors.length < 4) colors.push(c);
+        if (c && !colors.includes(c) && colors.length < MAX_PICKED) colors.push(c);
       }
       return colors;
     }
@@ -547,58 +638,42 @@
       }
     }
 
-    // The composition: the colours laid out as in the book (2 to 4; empty slots until there are 2),
+    // The composition: the colours laid out as in the book (2 to 7; empty slots until there are 2),
     // each colour's values, a message, and actions.
     function renderStage(focusSlot) {
       const { picked, active } = create;
       const size = Math.max(2, picked.length);
-      const blocks = document.createElement("div");
-      blocks.className = "blocks";
-      blocks.dataset.size = size;
+      const blocks = emptyBlocks(size, size > 4);
       for (let i = 0; i < size; i++) {
         if (i < picked.length) blocks.append(slotButton(picked[i], i));
         else blocks.append(Object.assign(document.createElement("div"), { className: "empty" }));
       }
       const figure = document.createElement("div");
       figure.className = "combo-figure";
-      const info = document.createElement("ol");
-      info.className = "create-info";
-      for (const c of picked) {
-        const li = document.createElement("li");
-        const chip = document.createElement("span");
-        chip.className = "chip";
-        chip.style.setProperty("--color", c.css);
-        const oklch = document.createElement("span");
-        oklch.className = "oklch-line";
-        oklch.append(oklchValues(c.oklch), copyButtonFor(c.css));
-        li.append(
-          chip,
-          Object.assign(document.createElement("span"), { className: "name", textContent: c.name }),
-          Object.assign(document.createElement("span"), { className: "cmyk", textContent: cmykText(c.cmyk) }),
-          oklch,
-        );
-        info.append(li);
-      }
-      figure.append(blocks, info);
+      figure.append(blocks, colorRows(picked));
 
       const note = document.createElement("p");
       note.className = "section-label";
       note.setAttribute("aria-live", "polite");
       if (create.note) note.textContent = create.note;
       else if (active !== null) note.textContent = "Pick a colour to replace it, or select another to swap them.";
-      else if (picked.length < 2) note.textContent = "Pick 2 to 4 colours.";
+      else if (picked.length < 2) note.textContent = `Pick 2 to ${MAX_PICKED} colours.`;
       else {
-        // Book combinations that have all these colours.
-        const together = data.combos.filter((combo) => picked.every((c) => combo.colors.includes(c)));
-        if (!together.length) note.textContent = "Not together in the book.";
+        // Book combinations (Volume 1's and the seasonal ones) that have all these colours.
+        const has = (combo) => picked.every((c) => combo.colors.includes(c));
+        const groups = [["", data.combos.filter(has)], ["Seasons:", data.seasons.filter(has)]].filter(([, list]) => list.length);
+        if (!groups.length) note.textContent = "Not together in the book.";
         else {
           note.append("Together in the book:");
-          for (const combo of together) {
-            const a = document.createElement("a");
-            a.href = `#combination/${combo.number}`;
-            a.textContent = comboNumber(combo.number);
-            note.append(" ", a);
-          }
+          groups.forEach(([title, list], g) => {
+            if (title) note.append(g ? " · " : " ", title);
+            for (const combo of list) {
+              const a = document.createElement("a");
+              a.href = comboHref(combo);
+              a.textContent = comboLabel(combo);
+              note.append(" ", a);
+            }
+          });
         }
       }
 
@@ -703,8 +778,8 @@
       create.note = "";
       if (at >= 0) picked.splice(at, 1);
       else if (create.active !== null) picked[create.active] = c;
-      else if (picked.length < 4) picked.push(c);
-      else create.note = "4 colours at most: click a picked colour to remove it, or select one in the combination to replace it.";
+      else if (picked.length < MAX_PICKED) picked.push(c);
+      else create.note = `${MAX_PICKED} colours at most: click a picked colour to remove it, or select one in the combination to replace it.`;
       create.active = null;
       updateCreate();
     }
@@ -743,22 +818,24 @@
       updateCreate(focusSlot);
     });
 
-    // One combination's page: number, colours, each colour's values, and related combinations
-    // (those sharing a colour with it: most shared colours first, then in book order).
-    function renderCombination(number) {
-      const view = views.combination;
-      const combo = data.combos[number - 1];
+    // One combination's page (kind "combination" or "season"): number, colours, each colour's values,
+    // and related combinations of both kinds, its own kind first (those sharing a colour with it:
+    // most shared colours first, then in book order).
+    function renderCombination(kind, number) {
+      const view = views[kind];
+      const combo = (kind === "season" ? data.seasons : data.combos)[number - 1];
       if (!combo) {
         view.replaceChildren(Object.assign(document.createElement("p"), { className: "error", textContent: "No such combination." }));
         return;
       }
+      const name = combo.month ? `${comboLabel(combo)} · ${combo.month}` : comboLabel(combo);
       const title = document.createElement("h1");
       title.className = "combo-number";
-      title.textContent = comboNumber(number);
+      title.textContent = name;
 
       const figure = document.createElement("div");
       figure.className = "combo-figure";
-      figure.append(blocksFor(combo, (c) => namedColorButton(c)), infoFor(combo.colors));
+      figure.append(blocksFor(combo, (c) => namedColorButton(c)), combo.month ? colorRows(combo.colors) : infoFor(combo.colors));
       const edit = document.createElement("a");
       edit.href = `#create/${colorsCode(combo.colors)}`;
       edit.textContent = "Edit in Create";
@@ -766,20 +843,25 @@
       actions.className = "actions";
       actions.append(edit);
       figure.append(actions);
+      view.replaceChildren(title, figure);
 
       const shared = (other) => other.colors.filter((c) => combo.colors.includes(c)).length;
-      const related = data.combos
-        .filter((other) => other !== combo && shared(other) > 0)
-        .sort((a, b) => shared(b) - shared(a) || a.number - b.number);
-      const label = document.createElement("p");
-      label.className = "section-label";
-      label.textContent = `${related.length} related combination${related.length === 1 ? "" : "s"}`;
-      const list = document.createElement("ul");
-      list.className = "combos";
-      list.append(...related.map(combinationItem));
-
-      view.replaceChildren(title, figure, label, list);
-      document.title = `${comboNumber(number)} | Wada Sanzo`;
+      const lists = [[data.combos, "combination"], [data.seasons, "seasonal combination"]];
+      if (combo.month) lists.reverse();
+      for (const [all, noun] of lists) {
+        const related = all
+          .filter((other) => other !== combo && shared(other) > 0)
+          .sort((a, b) => shared(b) - shared(a) || a.number - b.number);
+        if (!related.length) continue;
+        const label = document.createElement("p");
+        label.className = "section-label";
+        label.textContent = `${related.length} related ${noun}${related.length === 1 ? "" : "s"}`;
+        const list = document.createElement("ul");
+        list.className = all === data.seasons ? "combos seasons" : "combos";
+        list.append(...related.map(combinationItem));
+        view.append(label, list);
+      }
+      document.title = `${name} | Wada Sanzo`;
     }
 
     function swatchItem(c) {

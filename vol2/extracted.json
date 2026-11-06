@@ -1,0 +1,5834 @@
+[
+ {
+  "number": 1,
+  "month": 1,
+  "file": "m01_r03.jpg",
+  "colors": [
+   {
+    "printed": "Seashell Pink",
+    "ocr": "Seashell Pink",
+    "ocr_conf": 1,
+    "match": 42,
+    "band": [
+     0.2,
+     0.656
+    ],
+    "scan_rgb": [
+     249,
+     217,
+     190
+    ],
+    "scan_distance": 0.011
+   },
+   {
+    "printed": "White",
+    "ocr": "White",
+    "ocr_conf": 1,
+    "match": 153,
+    "band": [
+     0.676,
+     0.725
+    ],
+    "scan_rgb": [
+     251,
+     247,
+     244
+    ],
+    "scan_distance": 0.022
+   },
+   {
+    "printed": "Sulphur Yellow",
+    "ocr": "Sulphur Yellow",
+    "ocr_conf": 1,
+    "match": 38,
+    "band": [
+     0.725,
+     0.774
+    ],
+    "scan_rgb": [
+     250,
+     239,
+     177
+    ],
+    "scan_distance": 0.028
+   },
+   {
+    "printed": "Glaucous Green",
+    "ocr": "Glaucous Green",
+    "ocr_conf": 1,
+    "match": 88,
+    "band": [
+     0.774,
+     0.823
+    ],
+    "scan_rgb": [
+     155,
+     184,
+     160
+    ],
+    "scan_distance": 0.093
+   },
+   {
+    "printed": "Grayish Lavender",
+    "ocr": "Grayish Lavender",
+    "ocr_conf": 1,
+    "match": 133,
+    "band": [
+     0.823,
+     0.871
+    ],
+    "scan_rgb": [
+     179,
+     167,
+     181
+    ],
+    "same_name": [
+     "Grayish Lavender - A",
+     "Grayish Lavender - B"
+    ],
+    "scan_distance": 0.068
+   }
+  ]
+ },
+ {
+  "number": 2,
+  "month": 1,
+  "file": "m01_r05.jpg",
+  "colors": [
+   {
+    "printed": "Citron Yellow",
+    "ocr": "Citron Yellow",
+    "ocr_conf": 1,
+    "match": 70,
+    "band": [
+     0.2,
+     0.545
+    ],
+    "scan_rgb": [
+     176,
+     175,
+     52
+    ],
+    "scan_distance": 0.035
+   },
+   {
+    "printed": "Light Pinkish Cinnamon",
+    "ocr": "Light Pinkish Cinnamon",
+    "ocr_conf": 1,
+    "match": 43,
+    "band": [
+     0.565,
+     0.617
+    ],
+    "scan_rgb": [
+     252,
+     203,
+     140
+    ],
+    "scan_distance": 0.028
+   },
+   {
+    "printed": "Naples Yellow",
+    "ocr": "Naples Yellow",
+    "ocr_conf": 1,
+    "match": 40,
+    "band": [
+     0.617,
+     0.668
+    ],
+    "scan_rgb": [
+     245,
+     211,
+     112
+    ],
+    "scan_distance": 0.074
+   },
+   {
+    "printed": "Pale Burnt Lake",
+    "ocr": "Pale Burnt Lake",
+    "ocr_conf": 0.5,
+    "match": 35,
+    "band": [
+     0.668,
+     0.719
+    ],
+    "scan_rgb": [
+     114,
+     41,
+     45
+    ],
+    "scan_distance": 0.072
+   },
+   {
+    "printed": "Raw Sienna",
+    "ocr": "Raw Sienna",
+    "ocr_conf": 1,
+    "match": 13,
+    "band": [
+     0.719,
+     0.77
+    ],
+    "scan_rgb": [
+     178,
+     121,
+     59
+    ],
+    "scan_distance": 0.03
+   },
+   {
+    "printed": "Pinkish Cinnamon",
+    "ocr": "Pinkish Cinnamon",
+    "ocr_conf": 1,
+    "match": 44,
+    "band": [
+     0.77,
+     0.821
+    ],
+    "scan_rgb": [
+     245,
+     181,
+     105
+    ],
+    "scan_distance": 0.033
+   },
+   {
+    "printed": "Citrine",
+    "ocr": "Citrine",
+    "ocr_conf": 1,
+    "match": 71,
+    "band": [
+     0.821,
+     0.873
+    ],
+    "scan_rgb": [
+     159,
+     139,
+     79
+    ],
+    "scan_distance": 0.071
+   }
+  ]
+ },
+ {
+  "number": 3,
+  "month": 1,
+  "file": "m01_r07.jpg",
+  "colors": [
+   {
+    "printed": "Vandyke Brown",
+    "ocr": "Vandyke Brown",
+    "ocr_conf": 1,
+    "match": 86,
+    "band": [
+     0.2,
+     0.643
+    ],
+    "scan_rgb": [
+     87,
+     59,
+     44
+    ],
+    "scan_distance": 0.032
+   },
+   {
+    "printed": "Light Porcelain Green",
+    "ocr": "Light Porcelain Green",
+    "ocr_conf": 1,
+    "match": 101,
+    "band": [
+     0.663,
+     0.722
+    ],
+    "scan_rgb": [
+     78,
+     147,
+     140
+    ],
+    "scan_distance": 0.052
+   },
+   {
+    "printed": "Ecru",
+    "ocr": "Eeru",
+    "ocr_conf": 1,
+    "match": 53,
+    "band": [
+     0.722,
+     0.782
+    ],
+    "scan_rgb": [
+     192,
+     162,
+     131
+    ],
+    "scan_distance": 0.062
+   },
+   {
+    "printed": "Dark Citrine",
+    "ocr": "Dark Citrine",
+    "ocr_conf": 1,
+    "match": 73,
+    "band": [
+     0.782,
+     0.841
+    ],
+    "scan_rgb": [
+     122,
+     108,
+     57
+    ],
+    "scan_distance": 0.114
+   },
+   {
+    "printed": "Deep Violet Plumbeous",
+    "ocr": "Deep Violet Plumbeous",
+    "ocr_conf": 1,
+    "match": 144,
+    "band": [
+     0.841,
+     0.9
+    ],
+    "scan_rgb": [
+     109,
+     112,
+     124
+    ],
+    "scan_distance": 0.029
+   }
+  ]
+ },
+ {
+  "number": 4,
+  "month": 1,
+  "file": "m01_r09.jpg",
+  "colors": [
+   {
+    "printed": "Burnt Sienna",
+    "ocr": "Burnt Sienna",
+    "ocr_conf": 1,
+    "match": 19,
+    "band": [
+     0.2,
+     0.588
+    ],
+    "scan_rgb": [
+     142,
+     76,
+     50
+    ],
+    "scan_distance": 0.085
+   },
+   {
+    "printed": "Yellow Orange",
+    "ocr": "Yellow Orange",
+    "ocr_conf": 1,
+    "match": 61,
+    "band": [
+     0.608,
+     0.661
+    ],
+    "scan_rgb": [
+     254,
+     148,
+     49
+    ],
+    "scan_distance": 0.047
+   },
+   {
+    "printed": "Light Pinkish Cinnamon",
+    "ocr": "Light Pinkish Cinnamon",
+    "ocr_conf": 1,
+    "match": 43,
+    "band": [
+     0.661,
+     0.714
+    ],
+    "scan_rgb": [
+     250,
+     195,
+     123
+    ],
+    "scan_distance": 0.048
+   },
+   {
+    "printed": "Old Rose",
+    "ocr": "Old Rose",
+    "ocr_conf": 1,
+    "match": 10,
+    "band": [
+     0.714,
+     0.768
+    ],
+    "scan_rgb": [
+     193,
+     91,
+     99
+    ],
+    "scan_distance": 0.071
+   },
+   {
+    "printed": "Hermosa Pink",
+    "ocr": "Hermosa Pink",
+    "ocr_conf": 1,
+    "match": 0,
+    "band": [
+     0.768,
+     0.821
+    ],
+    "scan_rgb": [
+     251,
+     196,
+     197
+    ],
+    "scan_distance": 0.022
+   },
+   {
+    "printed": "Red",
+    "ocr": "Red",
+    "ocr_conf": 1,
+    "match": 30,
+    "band": [
+     0.821,
+     0.875
+    ],
+    "scan_rgb": [
+     122,
+     37,
+     44
+    ],
+    "scan_distance": 0.109
+   }
+  ]
+ },
+ {
+  "number": 5,
+  "month": 1,
+  "file": "m01_r11.jpg",
+  "colors": [
+   {
+    "printed": "Black",
+    "ocr": "Black",
+    "ocr_conf": 1,
+    "match": 158,
+    "band": [
+     0.2,
+     0.586
+    ],
+    "scan_rgb": [
+     31,
+     26,
+     29
+    ],
+    "scan_distance": 0.065
+   },
+   {
+    "printed": "Spectrum Red",
+    "ocr": "Spectrum Red",
+    "ocr_conf": 1,
+    "match": 16,
+    "band": [
+     0.606,
+     0.658
+    ],
+    "scan_rgb": [
+     213,
+     35,
+     51
+    ],
+    "scan_distance": 0.018
+   },
+   {
+    "printed": "Ivory Buff",
+    "ocr": "Ivory Buft",
+    "ocr_conf": 1,
+    "match": 41,
+    "band": [
+     0.658,
+     0.709
+    ],
+    "scan_rgb": [
+     229,
+     203,
+     149
+    ],
+    "scan_distance": 0.04
+   },
+   {
+    "printed": "Dark Tyrian Blue",
+    "ocr": "Dark Tyrian Blue",
+    "ocr_conf": 1,
+    "match": 129,
+    "band": [
+     0.709,
+     0.76
+    ],
+    "scan_rgb": [
+     56,
+     68,
+     89
+    ],
+    "scan_distance": 0.024
+   },
+   {
+    "printed": "Cobalt Green",
+    "ocr": "Cobalt Green",
+    "ocr_conf": 0.5,
+    "match": 114,
+    "band": [
+     0.76,
+     0.811
+    ],
+    "scan_rgb": [
+     106,
+     211,
+     160
+    ],
+    "scan_distance": 0.061
+   },
+   {
+    "printed": "Warm Gray",
+    "ocr": "Warm Gray",
+    "ocr_conf": 1,
+    "match": 156,
+    "band": [
+     0.811,
+     0.862
+    ],
+    "scan_rgb": [
+     166,
+     155,
+     124
+    ],
+    "scan_distance": 0.061
+   }
+  ]
+ },
+ {
+  "number": 6,
+  "month": 1,
+  "file": "m01_r13.jpg",
+  "colors": [
+   {
+    "printed": "Grayish Lavender",
+    "ocr": "Grayish Lavender",
+    "ocr_conf": 1,
+    "match": 133,
+    "band": [
+     0.2,
+     0.595
+    ],
+    "scan_rgb": [
+     174,
+     161,
+     176
+    ],
+    "same_name": [
+     "Grayish Lavender - A",
+     "Grayish Lavender - B"
+    ],
+    "scan_distance": 0.085
+   },
+   {
+    "printed": "Apricot Yellow",
+    "ocr": "Apricot Yellow",
+    "ocr_conf": 1,
+    "match": 56,
+    "band": [
+     0.615,
+     0.668
+    ],
+    "scan_rgb": [
+     254,
+     214,
+     43
+    ],
+    "scan_distance": 0.035
+   },
+   {
+    "printed": "Old Rose",
+    "ocr": "Old Rose",
+    "ocr_conf": 1,
+    "match": 10,
+    "band": [
+     0.668,
+     0.72
+    ],
+    "scan_rgb": [
+     186,
+     94,
+     97
+    ],
+    "scan_distance": 0.077
+   },
+   {
+    "printed": "Deep Violet Plumbeous",
+    "ocr": "Deep Violet Plumbeous",
+    "ocr_conf": 1,
+    "match": 144,
+    "band": [
+     0.72,
+     0.772
+    ],
+    "scan_rgb": [
+     109,
+     112,
+     126
+    ],
+    "scan_distance": 0.028
+   },
+   {
+    "printed": "Violet Blue",
+    "ocr": "Violet Blue",
+    "ocr_conf": 1,
+    "match": 127,
+    "band": [
+     0.772,
+     0.825
+    ],
+    "scan_rgb": [
+     60,
+     55,
+     108
+    ],
+    "scan_distance": 0.063
+   },
+   {
+    "printed": "Maple",
+    "ocr": "Maple",
+    "ocr_conf": 1,
+    "match": 51,
+    "band": [
+     0.825,
+     0.877
+    ],
+    "scan_rgb": [
+     199,
+     155,
+     99
+    ],
+    "scan_distance": 0.049
+   }
+  ]
+ },
+ {
+  "number": 7,
+  "month": 2,
+  "file": "m02_r03.jpg",
+  "colors": [
+   {
+    "printed": "Light Glaucous Blue",
+    "ocr": "Light Glaucous Blue",
+    "ocr_conf": 1,
+    "match": 112,
+    "band": [
+     0.2,
+     0.651
+    ],
+    "scan_rgb": [
+     139,
+     173,
+     189
+    ],
+    "scan_distance": 0.103
+   },
+   {
+    "printed": "Red",
+    "ocr": "Red",
+    "ocr_conf": 1,
+    "match": 30,
+    "band": [
+     0.671,
+     0.723
+    ],
+    "scan_rgb": [
+     114,
+     34,
+     45
+    ],
+    "scan_distance": 0.127
+   },
+   {
+    "printed": "Venice Green",
+    "ocr": "Venice Green",
+    "ocr_conf": 1,
+    "match": 116,
+    "band": [
+     0.723,
+     0.775
+    ],
+    "scan_rgb": [
+     76,
+     191,
+     188
+    ],
+    "scan_distance": 0.03
+   },
+   {
+    "printed": "White",
+    "ocr": "White",
+    "ocr_conf": 1,
+    "match": 153,
+    "band": [
+     0.775,
+     0.827
+    ],
+    "scan_rgb": [
+     251,
+     247,
+     244
+    ],
+    "scan_distance": 0.022
+   },
+   {
+    "printed": "Citrine",
+    "ocr": "Citrine",
+    "ocr_conf": 1,
+    "match": 71,
+    "band": [
+     0.827,
+     0.879
+    ],
+    "scan_rgb": [
+     156,
+     133,
+     72
+    ],
+    "scan_distance": 0.084
+   }
+  ]
+ },
+ {
+  "number": 8,
+  "month": 2,
+  "file": "m02_r05.jpg",
+  "colors": [
+   {
+    "printed": "Lilac",
+    "ocr": "Lilac",
+    "ocr_conf": 0.3,
+    "match": 136,
+    "band": [
+     0.2,
+     0.627
+    ],
+    "scan_rgb": [
+     153,
+     120,
+     155
+    ],
+    "scan_distance": 0.088
+   },
+   {
+    "printed": "Diamine Green",
+    "ocr": "Diamine Green",
+    "ocr_conf": 1,
+    "match": 105,
+    "band": [
+     0.647,
+     0.708
+    ],
+    "scan_rgb": [
+     18,
+     100,
+     67
+    ],
+    "scan_distance": 0.107
+   },
+   {
+    "printed": "Sulphine Yellow",
+    "ocr": "Sulphine Yellow",
+    "ocr_conf": 1,
+    "match": 68,
+    "band": [
+     0.708,
+     0.768
+    ],
+    "scan_rgb": [
+     204,
+     158,
+     57
+    ],
+    "scan_distance": 0.036
+   },
+   {
+    "printed": "Dull Violet Black",
+    "ocr": "Dull Violet Black",
+    "ocr_conf": 1,
+    "match": 130,
+    "band": [
+     0.768,
+     0.828
+    ],
+    "scan_rgb": [
+     39,
+     40,
+     52
+    ],
+    "scan_distance": 0.057
+   },
+   {
+    "printed": "Kronbergs Green",
+    "ocr": "Kronbergs Green",
+    "ocr_conf": 1,
+    "match": 75,
+    "band": [
+     0.828,
+     0.888
+    ],
+    "scan_rgb": [
+     125,
+     116,
+     85
+    ],
+    "scan_distance": 0.079
+   }
+  ]
+ },
+ {
+  "number": 9,
+  "month": 2,
+  "file": "m02_r07.jpg",
+  "colors": [
+   {
+    "printed": "Dull Citrine",
+    "ocr": "Dull Citrine",
+    "ocr_conf": 1,
+    "match": 160,
+    "band": [
+     0.2,
+     0.589
+    ],
+    "scan_rgb": [
+     132,
+     116,
+     83
+    ],
+    "scan_distance": 0.065
+   },
+   {
+    "printed": "Deep Indigo",
+    "ocr": "Deep Indigo",
+    "ocr_conf": 1,
+    "match": 131,
+    "band": [
+     0.609,
+     0.662
+    ],
+    "scan_rgb": [
+     49,
+     36,
+     44
+    ],
+    "scan_distance": 0.048
+   },
+   {
+    "printed": "English Red",
+    "ocr": "English Red",
+    "ocr_conf": 1,
+    "match": 65,
+    "band": [
+     0.662,
+     0.716
+    ],
+    "scan_rgb": [
+     188,
+     77,
+     43
+    ],
+    "scan_distance": 0.09
+   },
+   {
+    "printed": "Khaki",
+    "ocr": "Khaki",
+    "ocr_conf": 1,
+    "match": 69,
+    "band": [
+     0.716,
+     0.769
+    ],
+    "scan_rgb": [
+     170,
+     122,
+     64
+    ],
+    "scan_distance": 0.085
+   },
+   {
+    "printed": "Andover Green",
+    "ocr": "Andover Green",
+    "ocr_conf": 1,
+    "match": 95,
+    "band": [
+     0.769,
+     0.822
+    ],
+    "scan_rgb": [
+     103,
+     113,
+     91
+    ],
+    "scan_distance": 0.072
+   },
+   {
+    "printed": "Yellow Ocher",
+    "ocr": "Yellow Ocher",
+    "ocr_conf": 1,
+    "match": 59,
+    "band": [
+     0.822,
+     0.875
+    ],
+    "scan_rgb": [
+     214,
+     155,
+     49
+    ],
+    "scan_distance": 0.087
+   }
+  ]
+ },
+ {
+  "number": 10,
+  "month": 2,
+  "file": "m02_r09.jpg",
+  "colors": [
+   {
+    "printed": "White",
+    "ocr": "Vhite",
+    "ocr_conf": 0.3,
+    "match": 153,
+    "band": [
+     0.2,
+     0.631
+    ],
+    "scan_rgb": [
+     249,
+     245,
+     240
+    ],
+    "scan_distance": 0.029
+   },
+   {
+    "printed": "Eugenia Red",
+    "ocr": "Eugenia Red",
+    "ocr_conf": 1,
+    "match": 11,
+    "band": [
+     0.651,
+     0.708
+    ],
+    "scan_rgb": [
+     191,
+     66,
+     79
+    ],
+    "same_name": [
+     "Eugenia Red | A",
+     "Eugenia Red | B"
+    ],
+    "scan_distance": 0.107
+   },
+   {
+    "printed": "Vistoris Lake",
+    "ocr": "Vistoris Lake",
+    "ocr_conf": 1,
+    "match": 37,
+    "band": [
+     0.708,
+     0.764
+    ],
+    "scan_rgb": [
+     102,
+     52,
+     54
+    ],
+    "scan_distance": 0.092
+   },
+   {
+    "printed": "Mineral Gray",
+    "ocr": "Mineral Gray",
+    "ocr_conf": 1,
+    "match": 155,
+    "band": [
+     0.764,
+     0.821
+    ],
+    "scan_rgb": [
+     138,
+     135,
+     130
+    ],
+    "scan_distance": 0.151
+   },
+   {
+    "printed": "Maple",
+    "ocr": "Maple",
+    "ocr_conf": 1,
+    "match": 51,
+    "band": [
+     0.821,
+     0.877
+    ],
+    "scan_rgb": [
+     196,
+     154,
+     103
+    ],
+    "scan_distance": 0.053
+   }
+  ]
+ },
+ {
+  "number": 11,
+  "month": 2,
+  "file": "m02_r11.jpg",
+  "colors": [
+   {
+    "printed": "Indian Lake",
+    "ocr": "Indian Lake",
+    "ocr_conf": 1,
+    "match": 23,
+    "band": [
+     0.2,
+     0.58
+    ],
+    "scan_rgb": [
+     161,
+     70,
+     91
+    ],
+    "scan_distance": 0.078
+   },
+   {
+    "printed": "Fawn",
+    "ocr": "Fawn",
+    "ocr_conf": 1,
+    "match": 3,
+    "band": [
+     0.6,
+     0.652
+    ],
+    "scan_rgb": [
+     182,
+     149,
+     132
+    ],
+    "scan_distance": 0.112
+   },
+   {
+    "printed": "Red",
+    "ocr": "Red",
+    "ocr_conf": 1,
+    "match": 30,
+    "band": [
+     0.652,
+     0.704
+    ],
+    "scan_rgb": [
+     116,
+     35,
+     48
+    ],
+    "scan_distance": 0.121
+   },
+   {
+    "printed": "Spinel Red",
+    "ocr": "Spinel Red",
+    "ocr_conf": 1,
+    "match": 9,
+    "band": [
+     0.704,
+     0.756
+    ],
+    "scan_rgb": [
+     217,
+     96,
+     125
+    ],
+    "scan_distance": 0.068
+   },
+   {
+    "printed": "Spectrum Red",
+    "ocr": "Spectrum Red",
+    "ocr_conf": 1,
+    "match": 16,
+    "band": [
+     0.756,
+     0.808
+    ],
+    "scan_rgb": [
+     215,
+     24,
+     51
+    ],
+    "scan_distance": 0.017
+   },
+   {
+    "printed": "Aconite Violet",
+    "ocr": "Aconite Violet",
+    "ocr_conf": 1,
+    "match": 139,
+    "band": [
+     0.808,
+     0.86
+    ],
+    "scan_rgb": [
+     144,
+     104,
+     175
+    ],
+    "scan_distance": 0.052
+   }
+  ]
+ },
+ {
+  "number": 12,
+  "month": 2,
+  "file": "m02_r13.jpg",
+  "colors": [
+   {
+    "printed": "Deep Lyons Blue",
+    "ocr": "Deep Lyons Blue",
+    "ocr_conf": 1,
+    "match": 126,
+    "band": [
+     0.2,
+     0.644
+    ],
+    "scan_rgb": [
+     32,
+     42,
+     134
+    ],
+    "scan_distance": 0.07
+   },
+   {
+    "printed": "Dull Blue Violet",
+    "ocr": "Dull Blue Violet",
+    "ocr_conf": 1,
+    "match": 140,
+    "band": [
+     0.664,
+     0.72
+    ],
+    "scan_rgb": [
+     115,
+     102,
+     150
+    ],
+    "scan_distance": 0.05
+   },
+   {
+    "printed": "Ivory Buff",
+    "ocr": "Ivory Buff",
+    "ocr_conf": 0.5,
+    "match": 41,
+    "band": [
+     0.72,
+     0.777
+    ],
+    "scan_rgb": [
+     230,
+     197,
+     144
+    ],
+    "scan_distance": 0.053
+   },
+   {
+    "printed": "Khaki",
+    "ocr": "Khaki",
+    "ocr_conf": 1,
+    "match": 69,
+    "band": [
+     0.777,
+     0.834
+    ],
+    "scan_rgb": [
+     173,
+     125,
+     68
+    ],
+    "scan_distance": 0.077
+   },
+   {
+    "printed": "Neutral Gray",
+    "ocr": "Neutral Gray",
+    "ocr_conf": 1,
+    "match": 154,
+    "band": [
+     0.834,
+     0.89
+    ],
+    "scan_rgb": [
+     149,
+     146,
+     141
+    ],
+    "scan_distance": 0.16
+   }
+  ]
+ },
+ {
+  "number": 13,
+  "month": 3,
+  "file": "m03_r03.jpg",
+  "colors": [
+   {
+    "printed": "Deep Indigo",
+    "ocr": "Deep Indigo",
+    "ocr_conf": 1,
+    "match": 131,
+    "band": [
+     0.2,
+     0.649
+    ],
+    "scan_rgb": [
+     43,
+     39,
+     42
+    ],
+    "scan_distance": 0.045
+   },
+   {
+    "printed": "Green",
+    "ocr": "Green",
+    "ocr_conf": 1,
+    "match": 102,
+    "band": [
+     0.669,
+     0.72
+    ],
+    "scan_rgb": [
+     18,
+     141,
+     102
+    ],
+    "scan_distance": 0.052
+   },
+   {
+    "printed": "Pale Lemon Yellow",
+    "ocr": "Pale Lemon Yellow",
+    "ocr_conf": 1,
+    "match": 39,
+    "band": [
+     0.72,
+     0.771
+    ],
+    "scan_rgb": [
+     254,
+     235,
+     129
+    ],
+    "scan_distance": 0.057
+   },
+   {
+    "printed": "Peach Red",
+    "ocr": "Peach Red",
+    "ocr_conf": 1,
+    "match": 64,
+    "band": [
+     0.771,
+     0.823
+    ],
+    "scan_rgb": [
+     239,
+     82,
+     58
+    ],
+    "scan_distance": 0.026
+   },
+   {
+    "printed": "Nile Blue",
+    "ocr": "Nile Blue",
+    "ocr_conf": 1,
+    "match": 110,
+    "band": [
+     0.823,
+     0.874
+    ],
+    "scan_rgb": [
+     182,
+     211,
+     207
+    ],
+    "scan_distance": 0.06
+   }
+  ]
+ },
+ {
+  "number": 14,
+  "month": 3,
+  "file": "m03_r05.jpg",
+  "colors": [
+   {
+    "printed": "Seashell Pink",
+    "ocr": "neashelink",
+    "ocr_conf": 0.3,
+    "match": 42,
+    "band": [
+     0.2,
+     0.535
+    ],
+    "scan_rgb": [
+     248,
+     214,
+     179
+    ],
+    "scan_distance": 0.024
+   },
+   {
+    "printed": "Carmine Red",
+    "ocr": "Carmine Red",
+    "ocr_conf": 1,
+    "match": 28,
+    "band": [
+     0.555,
+     0.607
+    ],
+    "scan_rgb": [
+     115,
+     30,
+     44
+    ],
+    "scan_distance": 0.133
+   },
+   {
+    "printed": "Cameo Pink",
+    "ocr": "Cameo Pink",
+    "ocr_conf": 1,
+    "match": 2,
+    "band": [
+     0.607,
+     0.658
+    ],
+    "scan_rgb": [
+     233,
+     187,
+     187
+    ],
+    "scan_distance": 0.01
+   },
+   {
+    "printed": "Buffy Citrine",
+    "ocr": "Bufly Citrine",
+    "ocr_conf": 1,
+    "match": 72,
+    "band": [
+     0.658,
+     0.71
+    ],
+    "scan_rgb": [
+     146,
+     119,
+     74
+    ],
+    "scan_distance": 0.069
+   },
+   {
+    "printed": "Pinkish Cinnamon",
+    "ocr": "Pinkinh Cinnamon",
+    "ocr_conf": 1,
+    "match": 44,
+    "band": [
+     0.71,
+     0.761
+    ],
+    "scan_rgb": [
+     240,
+     176,
+     104
+    ],
+    "scan_distance": 0.04
+   },
+   {
+    "printed": "Nile Blue",
+    "ocr": "Nile Blue",
+    "ocr_conf": 1,
+    "match": 110,
+    "band": [
+     0.761,
+     0.813
+    ],
+    "scan_rgb": [
+     182,
+     212,
+     207
+    ],
+    "scan_distance": 0.058
+   },
+   {
+    "printed": "Deep Slate Green",
+    "ocr": "Deep Slate Green",
+    "ocr_conf": 0.5,
+    "match": 132,
+    "band": [
+     0.813,
+     0.864
+    ],
+    "scan_rgb": [
+     47,
+     62,
+     59
+    ],
+    "scan_distance": 0.009
+   }
+  ]
+ },
+ {
+  "number": 15,
+  "month": 3,
+  "file": "m03_r07.jpg",
+  "colors": [
+   {
+    "printed": "Scarlet",
+    "ocr": "Scarlet",
+    "ocr_conf": 1,
+    "match": 21,
+    "band": [
+     0.2,
+     0.585
+    ],
+    "scan_rgb": [
+     165,
+     36,
+     36
+    ],
+    "scan_distance": 0.095
+   },
+   {
+    "printed": "Cotinga Purple",
+    "ocr": "Cotinga Purple",
+    "ocr_conf": 1,
+    "match": 151,
+    "band": [
+     0.605,
+     0.657
+    ],
+    "scan_rgb": [
+     69,
+     35,
+     52
+    ],
+    "scan_distance": 0.07
+   },
+   {
+    "printed": "Sudan Brown",
+    "ocr": "Sudan Brown",
+    "ocr_conf": 0.5,
+    "match": 78,
+    "band": [
+     0.657,
+     0.71
+    ],
+    "scan_rgb": [
+     151,
+     102,
+     59
+    ],
+    "scan_distance": 0.06
+   },
+   {
+    "printed": "Olive Buff",
+    "ocr": "Olive Buff",
+    "ocr_conf": 1,
+    "match": 52,
+    "band": [
+     0.71,
+     0.762
+    ],
+    "scan_rgb": [
+     213,
+     196,
+     131
+    ],
+    "scan_distance": 0.036
+   },
+   {
+    "printed": "Eupatorium Purple",
+    "ocr": "Eupatorium Purple",
+    "ocr_conf": 1,
+    "match": 137,
+    "band": [
+     0.762,
+     0.815
+    ],
+    "scan_rgb": [
+     170,
+     89,
+     136
+    ],
+    "scan_distance": 0.048
+   },
+   {
+    "printed": "Fresh Color",
+    "ocr": "Fresh Color",
+    "ocr_conf": 1,
+    "match": 6,
+    "band": [
+     0.815,
+     0.867
+    ],
+    "scan_rgb": [
+     240,
+     152,
+     120
+    ],
+    "scan_distance": 0.019
+   }
+  ]
+ },
+ {
+  "number": 16,
+  "month": 3,
+  "file": "m03_r09.jpg",
+  "colors": [
+   {
+    "printed": "Dark Soft Violet",
+    "ocr": "Dark Soft Violet",
+    "ocr_conf": 0.5,
+    "match": 141,
+    "band": [
+     0.2,
+     0.553
+    ],
+    "scan_rgb": [
+     73,
+     80,
+     120
+    ],
+    "scan_distance": 0.094
+   },
+   {
+    "printed": "Light Glaucous Blue",
+    "ocr": "Light Glaucous Blue",
+    "ocr_conf": 1,
+    "match": 112,
+    "band": [
+     0.573,
+     0.624
+    ],
+    "scan_rgb": [
+     146,
+     184,
+     201
+    ],
+    "scan_distance": 0.071
+   },
+   {
+    "printed": "Cerulean Blue",
+    "ocr": "veruean ste",
+    "ocr_conf": 0.3,
+    "match": 117,
+    "band": [
+     0.624,
+     0.675
+    ],
+    "scan_rgb": [
+     16,
+     112,
+     155
+    ],
+    "scan_distance": 0.093
+   },
+   {
+    "printed": "Grayish Lavender",
+    "ocr": "Grayish Lavender",
+    "ocr_conf": 1,
+    "match": 134,
+    "band": [
+     0.675,
+     0.727
+    ],
+    "scan_rgb": [
+     178,
+     160,
+     172
+    ],
+    "same_name": [
+     "Grayish Lavender - B",
+     "Grayish Lavender - A"
+    ],
+    "scan_distance": 0.059
+   },
+   {
+    "printed": "Helvetia Blue",
+    "ocr": "Helvetia Blue",
+    "ocr_conf": 1,
+    "match": 123,
+    "band": [
+     0.727,
+     0.778
+    ],
+    "scan_rgb": [
+     46,
+     83,
+     126
+    ],
+    "scan_distance": 0.057
+   },
+   {
+    "printed": "Grayish Lavender",
+    "ocr": "Grayish Lavender",
+    "ocr_conf": 1,
+    "match": 133,
+    "band": [
+     0.778,
+     0.83
+    ],
+    "scan_rgb": [
+     147,
+     159,
+     222
+    ],
+    "same_name": [
+     "Grayish Lavender - A",
+     "Grayish Lavender - B"
+    ],
+    "scan_distance": 0.099
+   },
+   {
+    "printed": "Deep Lyons Blue",
+    "ocr": "Deep Lyons Blue",
+    "ocr_conf": 1,
+    "match": 126,
+    "band": [
+     0.83,
+     0.881
+    ],
+    "scan_rgb": [
+     35,
+     49,
+     133
+    ],
+    "scan_distance": 0.054
+   }
+  ]
+ },
+ {
+  "number": 17,
+  "month": 3,
+  "file": "m03_r11.jpg",
+  "colors": [
+   {
+    "printed": "Light Glaucous Blue",
+    "ocr": "Light Glaucous Blue",
+    "ocr_conf": 1,
+    "match": 112,
+    "band": [
+     0.2,
+     0.645
+    ],
+    "scan_rgb": [
+     143,
+     183,
+     200
+    ],
+    "scan_distance": 0.075
+   },
+   {
+    "printed": "Ocher Red",
+    "ocr": "Ocher Red",
+    "ocr_conf": 1,
+    "match": 20,
+    "band": [
+     0.665,
+     0.717
+    ],
+    "scan_rgb": [
+     152,
+     90,
+     79
+    ],
+    "scan_distance": 0.053
+   },
+   {
+    "printed": "Dark Medici Blue",
+    "ocr": "Dark Medici Blue",
+    "ocr_conf": 1,
+    "match": 124,
+    "band": [
+     0.717,
+     0.768
+    ],
+    "scan_rgb": [
+     81,
+     97,
+     95
+    ],
+    "scan_distance": 0.072
+   },
+   {
+    "printed": "Vinaceous Cinnamon",
+    "ocr": "Vinaceous Cinnamon",
+    "ocr_conf": 1,
+    "match": 48,
+    "band": [
+     0.768,
+     0.819
+    ],
+    "scan_rgb": [
+     214,
+     151,
+     114
+    ],
+    "scan_distance": 0.082
+   },
+   {
+    "printed": "Deep Indigo",
+    "ocr": "Deep Indigo",
+    "ocr_conf": 1,
+    "match": 131,
+    "band": [
+     0.819,
+     0.871
+    ],
+    "scan_rgb": [
+     44,
+     36,
+     44
+    ],
+    "scan_distance": 0.045
+   }
+  ]
+ },
+ {
+  "number": 18,
+  "month": 3,
+  "file": "m03_r13.jpg",
+  "colors": [
+   {
+    "printed": "Olive Ocher",
+    "ocr": "Olive Ocher",
+    "ocr_conf": 0.5,
+    "match": 58,
+    "band": [
+     0.2,
+     0.583
+    ],
+    "scan_rgb": [
+     190,
+     156,
+     81
+    ],
+    "scan_distance": 0.099
+   },
+   {
+    "printed": "Vandar Poel's Blue",
+    "ocr": "Vandar Poel's Blue",
+    "ocr_conf": 1,
+    "match": 128,
+    "band": [
+     0.603,
+     0.658
+    ],
+    "scan_rgb": [
+     35,
+     67,
+     98
+    ],
+    "scan_distance": 0.05
+   },
+   {
+    "printed": "Chromium Green",
+    "ocr": "Chromium Green",
+    "ocr_conf": 1,
+    "match": 97,
+    "band": [
+     0.658,
+     0.713
+    ],
+    "scan_rgb": [
+     107,
+     125,
+     84
+    ],
+    "scan_distance": 0.096
+   },
+   {
+    "printed": "Eugenia Red",
+    "ocr": "Eugenia Red",
+    "ocr_conf": 1,
+    "match": 11,
+    "band": [
+     0.713,
+     0.768
+    ],
+    "scan_rgb": [
+     201,
+     79,
+     68
+    ],
+    "same_name": [
+     "Eugenia Red | A",
+     "Eugenia Red | B"
+    ],
+    "scan_distance": 0.076
+   },
+   {
+    "printed": "Golden Yellow",
+    "ocr": "Golden Yellow",
+    "ocr_conf": 1,
+    "match": 47,
+    "band": [
+     0.768,
+     0.823
+    ],
+    "scan_rgb": [
+     197,
+     132,
+     47
+    ],
+    "scan_distance": 0.131
+   },
+   {
+    "printed": "Light Brownish Olive",
+    "ocr": "Light Browish Olive",
+    "ocr_conf": 1,
+    "match": 80,
+    "band": [
+     0.823,
+     0.878
+    ],
+    "scan_rgb": [
+     113,
+     95,
+     56
+    ],
+    "scan_distance": 0.093
+   }
+  ]
+ },
+ {
+  "number": 19,
+  "month": 4,
+  "file": "m04_r03.jpg",
+  "colors": [
+   {
+    "printed": "Ivory Buff",
+    "ocr": "Ivory Buff",
+    "ocr_conf": 1,
+    "match": 41,
+    "band": [
+     0.2,
+     0.639
+    ],
+    "scan_rgb": [
+     223,
+     193,
+     138
+    ],
+    "scan_distance": 0.068
+   },
+   {
+    "printed": "Deep Lyons Blue",
+    "ocr": "Deep Lyons Blue",
+    "ocr_conf": 1,
+    "match": 126,
+    "band": [
+     0.659,
+     0.793
+    ],
+    "scan_rgb": [
+     33,
+     45,
+     135
+    ],
+    "scan_distance": 0.063
+   },
+   {
+    "printed": "Grayish Lavender",
+    "ocr": "Grayish Lavender",
+    "ocr_conf": 1,
+    "match": 133,
+    "band": [
+     0.793,
+     0.927
+    ],
+    "scan_rgb": [
+     161,
+     164,
+     214
+    ],
+    "same_name": [
+     "Grayish Lavender - A",
+     "Grayish Lavender - B"
+    ],
+    "scan_distance": 0.074
+   }
+  ]
+ },
+ {
+  "number": 20,
+  "month": 4,
+  "file": "m04_r05.jpg",
+  "colors": [
+   {
+    "printed": "Yellow",
+    "ocr": "Yellow",
+    "ocr_conf": 0.5,
+    "match": 54,
+    "band": [
+     0.2,
+     0.644
+    ],
+    "scan_rgb": [
+     254,
+     218,
+     1
+    ],
+    "scan_distance": 0.064
+   },
+   {
+    "printed": "Cobalt Green",
+    "ocr": "Cobalt Green",
+    "ocr_conf": 1,
+    "match": 114,
+    "band": [
+     0.664,
+     0.717
+    ],
+    "scan_rgb": [
+     115,
+     205,
+     146
+    ],
+    "scan_distance": 0.067
+   },
+   {
+    "printed": "Hermosa Pink",
+    "ocr": "Hermosa Pink",
+    "ocr_conf": 1,
+    "match": 0,
+    "band": [
+     0.717,
+     0.77
+    ],
+    "scan_rgb": [
+     251,
+     198,
+     195
+    ],
+    "scan_distance": 0.024
+   },
+   {
+    "printed": "Calamine Blue",
+    "ocr": "Calamine Blue",
+    "ocr_conf": 1,
+    "match": 115,
+    "band": [
+     0.77,
+     0.823
+    ],
+    "scan_rgb": [
+     86,
+     197,
+     209
+    ],
+    "scan_distance": 0.046
+   },
+   {
+    "printed": "Turquoise Green",
+    "ocr": "Turquoise Green",
+    "ocr_conf": 1,
+    "match": 87,
+    "band": [
+     0.823,
+     0.876
+    ],
+    "scan_rgb": [
+     179,
+     235,
+     193
+    ],
+    "scan_distance": 0.041
+   }
+  ]
+ },
+ {
+  "number": 21,
+  "month": 4,
+  "file": "m04_r07.jpg",
+  "colors": [
+   {
+    "printed": "Helvetia Blue",
+    "ocr": "Helvetia Blue",
+    "ocr_conf": 1,
+    "match": 123,
+    "band": [
+     0.2,
+     0.647
+    ],
+    "scan_rgb": [
+     36,
+     69,
+     121
+    ],
+    "scan_distance": 0.075
+   },
+   {
+    "printed": "Dull Violet Black",
+    "ocr": "Dull Violet Black",
+    "ocr_conf": 1,
+    "match": 130,
+    "band": [
+     0.667,
+     0.723
+    ],
+    "scan_rgb": [
+     38,
+     41,
+     53
+    ],
+    "scan_distance": 0.054
+   },
+   {
+    "printed": "Raw Sienna",
+    "ocr": "Raw Sienns",
+    "ocr_conf": 1,
+    "match": 13,
+    "band": [
+     0.723,
+     0.778
+    ],
+    "scan_rgb": [
+     171,
+     115,
+     54
+    ],
+    "scan_distance": 0.047
+   },
+   {
+    "printed": "Sulphur Yellow",
+    "ocr": "Sulpur Yellow",
+    "ocr_conf": 1,
+    "match": 38,
+    "band": [
+     0.778,
+     0.834
+    ],
+    "scan_rgb": [
+     252,
+     239,
+     170
+    ],
+    "scan_distance": 0.036
+   },
+   {
+    "printed": "Spinel Red",
+    "ocr": "Spinel Red",
+    "ocr_conf": 1,
+    "match": 9,
+    "band": [
+     0.834,
+     0.889
+    ],
+    "scan_rgb": [
+     221,
+     97,
+     124
+    ],
+    "scan_distance": 0.062
+   }
+  ]
+ },
+ {
+  "number": 22,
+  "month": 4,
+  "file": "m04_r09.jpg",
+  "colors": [
+   {
+    "printed": "Cobalt Green",
+    "ocr": "Cobalt Green",
+    "ocr_conf": 1,
+    "match": 114,
+    "band": [
+     0.2,
+     0.707
+    ],
+    "scan_rgb": [
+     112,
+     203,
+     145
+    ],
+    "scan_distance": 0.071
+   },
+   {
+    "printed": "Cinnamon Buff",
+    "ocr": "Cinnamon Buff",
+    "ocr_conf": 1,
+    "match": 45,
+    "band": [
+     0.727,
+     0.777
+    ],
+    "scan_rgb": [
+     246,
+     194,
+     104
+    ],
+    "scan_distance": 0.035
+   },
+   {
+    "printed": "Laelia Pink",
+    "ocr": "Laelia Pink",
+    "ocr_conf": 1,
+    "match": 135,
+    "band": [
+     0.777,
+     0.827
+    ],
+    "scan_rgb": [
+     190,
+     143,
+     163
+    ],
+    "scan_distance": 0.042
+   },
+   {
+    "printed": "Green",
+    "ocr": "Green",
+    "ocr_conf": 1,
+    "match": 102,
+    "band": [
+     0.827,
+     0.876
+    ],
+    "scan_rgb": [
+     16,
+     142,
+     103
+    ],
+    "scan_distance": 0.05
+   }
+  ]
+ },
+ {
+  "number": 23,
+  "month": 4,
+  "file": "m04_r11.jpg",
+  "colors": [
+   {
+    "printed": "Grayish Lavender",
+    "ocr": "Grayish Lavender",
+    "ocr_conf": 1,
+    "match": 133,
+    "band": [
+     0.2,
+     0.655
+    ],
+    "scan_rgb": [
+     166,
+     150,
+     158
+    ],
+    "same_name": [
+     "Grayish Lavender - A",
+     "Grayish Lavender - B"
+    ],
+    "scan_distance": 0.121
+   },
+   {
+    "printed": "Citron Yellow",
+    "ocr": "Citron Yellow",
+    "ocr_conf": 1,
+    "match": 70,
+    "band": [
+     0.675,
+     0.726
+    ],
+    "scan_rgb": [
+     190,
+     168,
+     58
+    ],
+    "scan_distance": 0.052
+   },
+   {
+    "printed": "Pale Lemon Yellow",
+    "ocr": "Pale Lemon Yellow",
+    "ocr_conf": 0.5,
+    "match": 39,
+    "band": [
+     0.726,
+     0.777
+    ],
+    "scan_rgb": [
+     254,
+     238,
+     125
+    ],
+    "scan_distance": 0.061
+   },
+   {
+    "printed": "Light Glaucous Blue",
+    "ocr": "Light Glaucous Blue",
+    "ocr_conf": 1,
+    "match": 112,
+    "band": [
+     0.777,
+     0.828
+    ],
+    "scan_rgb": [
+     152,
+     188,
+     189
+    ],
+    "scan_distance": 0.062
+   },
+   {
+    "printed": "Neutral Gray",
+    "ocr": "Neutral Gray",
+    "ocr_conf": 1,
+    "match": 154,
+    "band": [
+     0.828,
+     0.879
+    ],
+    "scan_rgb": [
+     157,
+     155,
+     146
+    ],
+    "scan_distance": 0.133
+   }
+  ]
+ },
+ {
+  "number": 24,
+  "month": 4,
+  "file": "m04_r13.jpg",
+  "colors": [
+   {
+    "printed": "Eosine Pink",
+    "ocr": "Kosine Pink",
+    "ocr_conf": 0.5,
+    "match": 8,
+    "band": [
+     0.2,
+     0.645
+    ],
+    "scan_rgb": [
+     245,
+     126,
+     130
+    ],
+    "scan_distance": 0.032
+   },
+   {
+    "printed": "Eugenia Red",
+    "ocr": "Eugenia Red",
+    "ocr_conf": 1,
+    "match": 11,
+    "band": [
+     0.665,
+     0.721
+    ],
+    "scan_rgb": [
+     206,
+     81,
+     75
+    ],
+    "same_name": [
+     "Eugenia Red | A",
+     "Eugenia Red | B"
+    ],
+    "scan_distance": 0.064
+   },
+   {
+    "printed": "Fawn",
+    "ocr": "Fawn",
+    "ocr_conf": 1,
+    "match": 3,
+    "band": [
+     0.721,
+     0.778
+    ],
+    "scan_rgb": [
+     186,
+     155,
+     134
+    ],
+    "scan_distance": 0.096
+   },
+   {
+    "printed": "Olympic Blue",
+    "ocr": "Olympie Blue",
+    "ocr_conf": 1,
+    "match": 120,
+    "band": [
+     0.778,
+     0.835
+    ],
+    "scan_rgb": [
+     95,
+     126,
+     148
+    ],
+    "scan_distance": 0.054
+   },
+   {
+    "printed": "Olive Yellow",
+    "ocr": "Olive Yellow",
+    "ocr_conf": 1,
+    "match": 93,
+    "band": [
+     0.835,
+     0.891
+    ],
+    "scan_rgb": [
+     155,
+     138,
+     69
+    ],
+    "scan_distance": 0.084
+   }
+  ]
+ },
+ {
+  "number": 25,
+  "month": 5,
+  "file": "m05_r03.jpg",
+  "colors": [
+   {
+    "printed": "Olympic Blue",
+    "ocr": "Olympic Blue",
+    "ocr_conf": 1,
+    "match": 120,
+    "band": [
+     0.2,
+     0.693
+    ],
+    "scan_rgb": [
+     93,
+     125,
+     152
+    ],
+    "scan_distance": 0.049
+   },
+   {
+    "printed": "Eosine Pink",
+    "ocr": "Eosine Pink",
+    "ocr_conf": 1,
+    "match": 8,
+    "band": [
+     0.713,
+     0.773
+    ],
+    "scan_rgb": [
+     249,
+     119,
+     129
+    ],
+    "scan_distance": 0.039
+   },
+   {
+    "printed": "Seashell Pink",
+    "ocr": "Seashell Pink",
+    "ocr_conf": 0.5,
+    "match": 42,
+    "band": [
+     0.773,
+     0.834
+    ],
+    "scan_rgb": [
+     252,
+     222,
+     192
+    ],
+    "scan_distance": 0.013
+   },
+   {
+    "printed": "Purple Drab",
+    "ocr": "Purple Drab",
+    "ocr_conf": 1,
+    "match": 143,
+    "band": [
+     0.834,
+     0.894
+    ],
+    "scan_rgb": [
+     124,
+     97,
+     96
+    ],
+    "scan_distance": 0.036
+   }
+  ]
+ },
+ {
+  "number": 26,
+  "month": 5,
+  "file": "m05_r05.jpg",
+  "colors": [
+   {
+    "printed": "Dusky Madder Violet",
+    "ocr": "Dusky Madder Violet",
+    "ocr_conf": 1,
+    "match": 152,
+    "band": [
+     0.2,
+     0.703
+    ],
+    "scan_rgb": [
+     51,
+     35,
+     57
+    ],
+    "scan_distance": 0.092
+   },
+   {
+    "printed": "Sulphur Yellow",
+    "ocr": "Sulphur Yellow",
+    "ocr_conf": 1,
+    "match": 38,
+    "band": [
+     0.723,
+     0.776
+    ],
+    "scan_rgb": [
+     250,
+     238,
+     169
+    ],
+    "scan_distance": 0.037
+   },
+   {
+    "printed": "Pyrite Yellow",
+    "ocr": "Pyrite Yellow",
+    "ocr_conf": 0.5,
+    "match": 57,
+    "band": [
+     0.776,
+     0.829
+    ],
+    "scan_rgb": [
+     188,
+     159,
+     67
+    ],
+    "scan_distance": 0.078
+   },
+   {
+    "printed": "Cinnamon Buff",
+    "ocr": "Cinnamon Buff",
+    "ocr_conf": 1,
+    "match": 45,
+    "band": [
+     0.829,
+     0.882
+    ],
+    "scan_rgb": [
+     247,
+     184,
+     90
+    ],
+    "scan_distance": 0.057
+   }
+  ]
+ },
+ {
+  "number": 27,
+  "month": 5,
+  "file": "m05_r07.jpg",
+  "colors": [
+   {
+    "printed": "Pansy Purple",
+    "ocr": "Pansy Purple",
+    "ocr_conf": 1,
+    "match": 34,
+    "band": [
+     0.2,
+     0.654
+    ],
+    "scan_rgb": [
+     116,
+     42,
+     65
+    ],
+    "scan_distance": 0.047
+   },
+   {
+    "printed": "Naples Yellow",
+    "ocr": "Naples Yellow",
+    "ocr_conf": 1,
+    "match": 40,
+    "band": [
+     0.674,
+     0.723
+    ],
+    "scan_rgb": [
+     249,
+     211,
+     110
+    ],
+    "scan_distance": 0.073
+   },
+   {
+    "printed": "Fawn",
+    "ocr": "Fawn",
+    "ocr_conf": 1,
+    "match": 3,
+    "band": [
+     0.723,
+     0.771
+    ],
+    "scan_rgb": [
+     171,
+     141,
+     119
+    ],
+    "scan_distance": 0.143
+   },
+   {
+    "printed": "Corinthian Pink",
+    "ocr": "Corinthian Pink",
+    "ocr_conf": 1,
+    "match": 1,
+    "band": [
+     0.771,
+     0.82
+    ],
+    "scan_rgb": [
+     250,
+     162,
+     145
+    ],
+    "scan_distance": 0.078
+   },
+   {
+    "printed": "Grenadine Pink",
+    "ocr": "Grenadine Pink",
+    "ocr_conf": 1,
+    "match": 7,
+    "band": [
+     0.82,
+     0.868
+    ],
+    "scan_rgb": [
+     251,
+     111,
+     93
+    ],
+    "scan_distance": 0.047
+   }
+  ]
+ },
+ {
+  "number": 28,
+  "month": 5,
+  "file": "m05_r09.jpg",
+  "colors": [
+   {
+    "printed": "Fawn",
+    "ocr": "Fawn",
+    "ocr_conf": 1,
+    "match": 3,
+    "band": [
+     0.2,
+     0.723
+    ],
+    "scan_rgb": [
+     166,
+     139,
+     117
+    ],
+    "scan_distance": 0.152
+   },
+   {
+    "printed": "Vistoris Lake",
+    "ocr": "Vistoris Lake",
+    "ocr_conf": 1,
+    "match": 37,
+    "band": [
+     0.743,
+     0.777
+    ],
+    "scan_rgb": [
+     95,
+     50,
+     49
+    ],
+    "scan_distance": 0.107
+   },
+   {
+    "printed": "Eosine Pink",
+    "ocr": "Eosine Pink",
+    "ocr_conf": 1,
+    "match": 8,
+    "band": [
+     0.777,
+     0.81
+    ],
+    "scan_rgb": [
+     246,
+     108,
+     116
+    ],
+    "scan_distance": 0.061
+   }
+  ]
+ },
+ {
+  "number": 29,
+  "month": 5,
+  "file": "m05_r11.jpg",
+  "colors": [
+   {
+    "printed": "Citrine",
+    "ocr": "Citrine",
+    "ocr_conf": 1,
+    "match": 71,
+    "band": [
+     0.2,
+     0.648
+    ],
+    "scan_rgb": [
+     156,
+     136,
+     73
+    ],
+    "scan_distance": 0.077
+   },
+   {
+    "printed": "Pyrite Yellow",
+    "ocr": "Pyrite Yellow",
+    "ocr_conf": 1,
+    "match": 57,
+    "band": [
+     0.668,
+     0.719
+    ],
+    "scan_rgb": [
+     215,
+     188,
+     53
+    ],
+    "scan_distance": 0.03
+   },
+   {
+    "printed": "Naples Yellow",
+    "ocr": "Naples Yellow",
+    "ocr_conf": 1,
+    "match": 40,
+    "band": [
+     0.719,
+     0.77
+    ],
+    "scan_rgb": [
+     249,
+     214,
+     113
+    ],
+    "scan_distance": 0.067
+   },
+   {
+    "printed": "Blackish Olive",
+    "ocr": "Blackish Olive",
+    "ocr_conf": 1,
+    "match": 108,
+    "band": [
+     0.77,
+     0.821
+    ],
+    "scan_rgb": [
+     78,
+     71,
+     59
+    ],
+    "scan_distance": 0.083
+   },
+   {
+    "printed": "Artemisia Green",
+    "ocr": "Artemisia Green",
+    "ocr_conf": 1,
+    "match": 94,
+    "band": [
+     0.821,
+     0.872
+    ],
+    "scan_rgb": [
+     110,
+     128,
+     112
+    ],
+    "scan_distance": 0.08
+   }
+  ]
+ },
+ {
+  "number": 30,
+  "month": 5,
+  "file": "m05_r13.jpg",
+  "colors": [
+   {
+    "printed": "Cameo Pink",
+    "ocr": "Cameo Pink",
+    "ocr_conf": 1,
+    "match": 2,
+    "band": [
+     0.2,
+     0.586
+    ],
+    "scan_rgb": [
+     235,
+     187,
+     186
+    ],
+    "scan_distance": 0.012
+   },
+   {
+    "printed": "English Red",
+    "ocr": "English Red",
+    "ocr_conf": 1,
+    "match": 65,
+    "band": [
+     0.606,
+     0.664
+    ],
+    "scan_rgb": [
+     191,
+     79,
+     44
+    ],
+    "scan_distance": 0.083
+   },
+   {
+    "printed": "Deep Slate Green",
+    "ocr": "Deep Slate Green",
+    "ocr_conf": 1,
+    "match": 132,
+    "band": [
+     0.664,
+     0.721
+    ],
+    "scan_rgb": [
+     44,
+     53,
+     52
+    ],
+    "scan_distance": 0.036
+   },
+   {
+    "printed": "Artemisia Green",
+    "ocr": "Artemisia Green",
+    "ocr_conf": 1,
+    "match": 94,
+    "band": [
+     0.721,
+     0.779
+    ],
+    "scan_rgb": [
+     109,
+     137,
+     116
+    ],
+    "scan_distance": 0.062
+   },
+   {
+    "printed": "Blackish Olive",
+    "ocr": "Blackish Olive",
+    "ocr_conf": 1,
+    "match": 108,
+    "band": [
+     0.779,
+     0.837
+    ],
+    "scan_rgb": [
+     74,
+     69,
+     58
+    ],
+    "scan_distance": 0.092
+   },
+   {
+    "printed": "Orange Citrine",
+    "ocr": "Orange Citrine",
+    "ocr_conf": 1,
+    "match": 77,
+    "band": [
+     0.837,
+     0.895
+    ],
+    "scan_rgb": [
+     132,
+     104,
+     53
+    ],
+    "scan_distance": 0.081
+   }
+  ]
+ },
+ {
+  "number": 31,
+  "month": 6,
+  "file": "m06_r03.jpg",
+  "colors": [
+   {
+    "printed": "Orange",
+    "ocr": "Orange",
+    "ocr_conf": 1,
+    "match": 63,
+    "band": [
+     0.2,
+     0.701
+    ],
+    "scan_rgb": [
+     250,
+     80,
+     38
+    ],
+    "scan_distance": 0.078
+   },
+   {
+    "printed": "Deep Slate Green",
+    "ocr": "Deep Slate Green",
+    "ocr_conf": 0.5,
+    "match": 132,
+    "band": [
+     0.721,
+     0.772
+    ],
+    "scan_rgb": [
+     41,
+     49,
+     46
+    ],
+    "scan_distance": 0.052
+   },
+   {
+    "printed": "Artemisia Green",
+    "ocr": "Artemisia Green",
+    "ocr_conf": 1,
+    "match": 94,
+    "band": [
+     0.772,
+     0.823
+    ],
+    "scan_rgb": [
+     101,
+     127,
+     110
+    ],
+    "scan_distance": 0.088
+   },
+   {
+    "printed": "Pale King's Blue",
+    "ocr": "Pale King's Blue",
+    "ocr_conf": 1,
+    "match": 111,
+    "band": [
+     0.823,
+     0.874
+    ],
+    "scan_rgb": [
+     168,
+     195,
+     210
+    ],
+    "scan_distance": 0.062
+   }
+  ]
+ },
+ {
+  "number": 32,
+  "month": 6,
+  "file": "m06_r05.jpg",
+  "colors": [
+   {
+    "printed": "Dull Violet Black",
+    "ocr": "Dull Violet Black",
+    "ocr_conf": 1,
+    "match": 130,
+    "band": [
+     0.2,
+     0.647
+    ],
+    "scan_rgb": [
+     38,
+     42,
+     61
+    ],
+    "scan_distance": 0.041
+   },
+   {
+    "printed": "Pale King's Blue",
+    "ocr": "Pale King's Blue",
+    "ocr_conf": 0.5,
+    "match": 111,
+    "band": [
+     0.667,
+     0.749
+    ],
+    "scan_rgb": [
+     167,
+     193,
+     207
+    ],
+    "scan_distance": 0.068
+   },
+   {
+    "printed": "Tawny Olive",
+    "ocr": "Tawny Olive",
+    "ocr_conf": 1,
+    "match": 69,
+    "band": [
+     0.749,
+     0.831
+    ],
+    "scan_rgb": [
+     174,
+     133,
+     79
+    ],
+    "scan_distance": 0.065
+   }
+  ]
+ },
+ {
+  "number": 33,
+  "month": 6,
+  "file": "m06_r07.jpg",
+  "colors": [
+   {
+    "printed": "Vinaceous Cinnamon",
+    "ocr": "Vinaceous Cinnamon",
+    "ocr_conf": 1,
+    "match": 48,
+    "band": [
+     0.2,
+     0.59
+    ],
+    "scan_rgb": [
+     218,
+     150,
+     109
+    ],
+    "scan_distance": 0.082
+   },
+   {
+    "printed": "Lemon Yellow",
+    "ocr": "Lemon Yellow",
+    "ocr_conf": 1,
+    "match": 55,
+    "band": [
+     0.61,
+     0.671
+    ],
+    "scan_rgb": [
+     252,
+     227,
+     50
+    ],
+    "scan_distance": 0.028
+   },
+   {
+    "printed": "Laelia Pink",
+    "ocr": "Laelia Pink",
+    "ocr_conf": 1,
+    "match": 135,
+    "band": [
+     0.671,
+     0.731
+    ],
+    "scan_rgb": [
+     186,
+     138,
+     165
+    ],
+    "scan_distance": 0.055
+   },
+   {
+    "printed": "White",
+    "ocr": "White",
+    "ocr_conf": 1,
+    "match": 153,
+    "band": [
+     0.731,
+     0.791
+    ],
+    "scan_rgb": [
+     251,
+     248,
+     246
+    ],
+    "scan_distance": 0.02
+   },
+   {
+    "printed": "Olive Buff",
+    "ocr": "Olive Buff",
+    "ocr_conf": 1,
+    "match": 52,
+    "band": [
+     0.791,
+     0.851
+    ],
+    "scan_rgb": [
+     217,
+     204,
+     140
+    ],
+    "scan_distance": 0.028
+   },
+   {
+    "printed": "Salvia Blue",
+    "ocr": "Salvia Blue",
+    "ocr_conf": 1,
+    "match": 113,
+    "band": [
+     0.851,
+     0.911
+    ],
+    "scan_rgb": [
+     157,
+     173,
+     214
+    ],
+    "scan_distance": 0.026
+   }
+  ]
+ },
+ {
+  "number": 34,
+  "month": 6,
+  "file": "m06_r09.jpg",
+  "colors": [
+   {
+    "printed": "Vistoris Lake",
+    "ocr": "Vistoris Lake",
+    "ocr_conf": 1,
+    "match": 37,
+    "band": [
+     0.2,
+     0.697
+    ],
+    "scan_rgb": [
+     95,
+     51,
+     51
+    ],
+    "scan_distance": 0.104
+   },
+   {
+    "printed": "Light Green",
+    "ocr": "Light Green",
+    "ocr_conf": 1,
+    "match": 92,
+    "band": [
+     0.717,
+     0.772
+    ],
+    "scan_rgb": [
+     103,
+     181,
+     100
+    ],
+    "scan_distance": 0.071
+   },
+   {
+    "printed": "Seashell Pink",
+    "ocr": "Seashell Pink",
+    "ocr_conf": 1,
+    "match": 42,
+    "band": [
+     0.772,
+     0.828
+    ],
+    "scan_rgb": [
+     248,
+     216,
+     182
+    ],
+    "scan_distance": 0.021
+   },
+   {
+    "printed": "Vandyke Brown",
+    "ocr": "Vandyke Browr",
+    "ocr_conf": 1,
+    "match": 86,
+    "band": [
+     0.828,
+     0.883
+    ],
+    "scan_rgb": [
+     96,
+     63,
+     49
+    ],
+    "scan_distance": 0.021
+   }
+  ]
+ },
+ {
+  "number": 35,
+  "month": 6,
+  "file": "m06_r11.jpg",
+  "colors": [
+   {
+    "printed": "Dull Viridian Green",
+    "ocr": "Dull Viridian Green",
+    "ocr_conf": 1,
+    "match": 103,
+    "band": [
+     0.2,
+     0.646
+    ],
+    "scan_rgb": [
+     44,
+     119,
+     86
+    ],
+    "scan_distance": 0.067
+   },
+   {
+    "printed": "Pomegranate Purple",
+    "ocr": "Pomegranate Purole",
+    "ocr_conf": 1,
+    "match": 25,
+    "band": [
+     0.666,
+     0.717
+    ],
+    "scan_rgb": [
+     170,
+     40,
+     73
+    ],
+    "scan_distance": 0.039
+   },
+   {
+    "printed": "Fresh Color",
+    "ocr": "Fresh Color",
+    "ocr_conf": 1,
+    "match": 6,
+    "band": [
+     0.717,
+     0.768
+    ],
+    "scan_rgb": [
+     243,
+     151,
+     120
+    ],
+    "scan_distance": 0.018
+   },
+   {
+    "printed": "Dark Perilla Purple",
+    "ocr": "Dark Perilla Purple",
+    "ocr_conf": 1,
+    "match": 159,
+    "band": [
+     0.768,
+     0.818
+    ],
+    "scan_rgb": [
+     70,
+     40,
+     47
+    ],
+    "scan_distance": 0.064
+   },
+   {
+    "printed": "Light Brown Drab",
+    "ocr": "Light Brown Drab",
+    "ocr_conf": 1,
+    "match": 4,
+    "band": [
+     0.818,
+     0.869
+    ],
+    "scan_rgb": [
+     169,
+     136,
+     124
+    ],
+    "scan_distance": 0.087
+   }
+  ]
+ },
+ {
+  "number": 36,
+  "month": 6,
+  "file": "m06_r13.jpg",
+  "colors": [
+   {
+    "printed": "Pale Purplish Vinaceous",
+    "ocr": "Pale Purplish Vinaceous",
+    "ocr_conf": 1,
+    "match": 166,
+    "band": [
+     0.2,
+     0.646
+    ],
+    "scan_rgb": [
+     250,
+     229,
+     227
+    ],
+    "scan_distance": 0.006
+   },
+   {
+    "printed": "Calamine Blue",
+    "ocr": "Calamine Blue",
+    "ocr_conf": 1,
+    "match": 115,
+    "band": [
+     0.666,
+     0.718
+    ],
+    "scan_rgb": [
+     74,
+     182,
+     198
+    ],
+    "scan_distance": 0.084
+   },
+   {
+    "printed": "Deep Slate Green",
+    "ocr": "Deep Slate Green",
+    "ocr_conf": 1,
+    "match": 132,
+    "band": [
+     0.718,
+     0.77
+    ],
+    "scan_rgb": [
+     44,
+     54,
+     53
+    ],
+    "scan_distance": 0.033
+   },
+   {
+    "printed": "Citron Yellow",
+    "ocr": "Citron Yellow",
+    "ocr_conf": 1,
+    "match": 70,
+    "band": [
+     0.77,
+     0.822
+    ],
+    "scan_rgb": [
+     180,
+     168,
+     57
+    ],
+    "scan_distance": 0.052
+   },
+   {
+    "printed": "Old Rose",
+    "ocr": "Old Rose",
+    "ocr_conf": 0.5,
+    "match": 10,
+    "band": [
+     0.822,
+     0.874
+    ],
+    "scan_rgb": [
+     185,
+     92,
+     95
+    ],
+    "scan_distance": 0.082
+   }
+  ]
+ },
+ {
+  "number": 37,
+  "month": 7,
+  "file": "m07_r03.jpg",
+  "colors": [
+   {
+    "printed": "Helvetia Blue",
+    "ocr": "Helvetia Blue",
+    "ocr_conf": 1,
+    "match": 123,
+    "band": [
+     0.2,
+     0.635
+    ],
+    "scan_rgb": [
+     35,
+     74,
+     124
+    ],
+    "scan_distance": 0.063
+   },
+   {
+    "printed": "Violet Blue",
+    "ocr": "Violet Blue",
+    "ocr_conf": 1,
+    "match": 127,
+    "band": [
+     0.655,
+     0.776
+    ],
+    "scan_rgb": [
+     47,
+     50,
+     105
+    ],
+    "scan_distance": 0.086
+   },
+   {
+    "printed": "Neutral Gray",
+    "ocr": "Neutral Gray",
+    "ocr_conf": 1,
+    "match": 154,
+    "band": [
+     0.776,
+     0.896
+    ],
+    "scan_rgb": [
+     175,
+     177,
+     176
+    ],
+    "scan_distance": 0.063
+   }
+  ]
+ },
+ {
+  "number": 38,
+  "month": 7,
+  "file": "m07_r05.jpg",
+  "colors": [
+   {
+    "printed": "White",
+    "ocr": "White",
+    "ocr_conf": 1,
+    "match": 153,
+    "band": [
+     0.2,
+     0.608
+    ],
+    "scan_rgb": [
+     252,
+     249,
+     250
+    ],
+    "scan_distance": 0.016
+   },
+   {
+    "printed": "Eosine Pink",
+    "ocr": "Eosine Pink",
+    "ocr_conf": 1,
+    "match": 8,
+    "band": [
+     0.628,
+     0.716
+    ],
+    "scan_rgb": [
+     244,
+     105,
+     114
+    ],
+    "scan_distance": 0.066
+   },
+   {
+    "printed": "Spectrum Red",
+    "ocr": "Spectrum Red",
+    "ocr_conf": 1,
+    "match": 16,
+    "band": [
+     0.716,
+     0.803
+    ],
+    "scan_rgb": [
+     216,
+     30,
+     55
+    ],
+    "scan_distance": 0.015
+   },
+   {
+    "printed": "Deep Indigo",
+    "ocr": "-Deen- Indiod",
+    "ocr_conf": 0.3,
+    "match": 131,
+    "band": [
+     0.803,
+     0.891
+    ],
+    "scan_rgb": [
+     44,
+     37,
+     45
+    ],
+    "scan_distance": 0.043
+   }
+  ]
+ },
+ {
+  "number": 39,
+  "month": 7,
+  "file": "m07_r07.jpg",
+  "colors": [
+   {
+    "printed": "Orange Rufous",
+    "ocr": "Orange Rufous",
+    "ocr_conf": 1,
+    "match": 67,
+    "band": [
+     0.2,
+     0.644
+    ],
+    "scan_rgb": [
+     195,
+     103,
+     49
+    ],
+    "scan_distance": 0.032
+   },
+   {
+    "printed": "Violet Blue",
+    "ocr": "Violet Blue",
+    "ocr_conf": 1,
+    "match": 127,
+    "band": [
+     0.664,
+     0.717
+    ],
+    "scan_rgb": [
+     58,
+     52,
+     110
+    ],
+    "scan_distance": 0.072
+   },
+   {
+    "printed": "Blue Violet",
+    "ocr": "Blue Violet",
+    "ocr_conf": 1,
+    "match": 142,
+    "band": [
+     0.717,
+     0.77
+    ],
+    "scan_rgb": [
+     100,
+     91,
+     158
+    ],
+    "scan_distance": 0.022
+   },
+   {
+    "printed": "Lilac",
+    "ocr": "Lilac",
+    "ocr_conf": 1,
+    "match": 136,
+    "band": [
+     0.77,
+     0.823
+    ],
+    "scan_rgb": [
+     166,
+     127,
+     167
+    ],
+    "scan_distance": 0.056
+   },
+   {
+    "printed": "Grayish Lavender",
+    "ocr": "Grayish Lavender",
+    "ocr_conf": 1,
+    "match": 133,
+    "band": [
+     0.823,
+     0.876
+    ],
+    "scan_rgb": [
+     181,
+     166,
+     182
+    ],
+    "same_name": [
+     "Grayish Lavender - A",
+     "Grayish Lavender - B"
+    ],
+    "scan_distance": 0.068
+   }
+  ]
+ },
+ {
+  "number": 40,
+  "month": 7,
+  "file": "m07_r09.jpg",
+  "colors": [
+   {
+    "printed": "Grape Green",
+    "ocr": "Grave Green",
+    "ocr_conf": 1,
+    "match": 162,
+    "band": [
+     0.2,
+     0.644
+    ],
+    "scan_rgb": [
+     153,
+     154,
+     86
+    ],
+    "scan_distance": 0.06
+   },
+   {
+    "printed": "Sulphur Yellow",
+    "ocr": "Sulphur Yellow",
+    "ocr_conf": 1,
+    "match": 38,
+    "band": [
+     0.664,
+     0.798
+    ],
+    "scan_rgb": [
+     254,
+     248,
+     200
+    ],
+    "scan_distance": 0.022
+   },
+   {
+    "printed": "Sea Green",
+    "ocr": "Sea Green",
+    "ocr_conf": 0.5,
+    "match": 99,
+    "band": [
+     0.798,
+     0.932
+    ],
+    "scan_rgb": [
+     50,
+     165,
+     133
+    ],
+    "scan_distance": 0.034
+   }
+  ]
+ },
+ {
+  "number": 41,
+  "month": 7,
+  "file": "m07_r11.jpg",
+  "colors": [
+   {
+    "printed": "Cobalt Green",
+    "ocr": "Cobalt Green",
+    "ocr_conf": 1,
+    "match": 114,
+    "band": [
+     0.2,
+     0.607
+    ],
+    "scan_rgb": [
+     100,
+     208,
+     155
+    ],
+    "scan_distance": 0.07
+   },
+   {
+    "printed": "Peacock Blue",
+    "ocr": "Peacock Blue",
+    "ocr_conf": 1,
+    "match": 118,
+    "band": [
+     0.627,
+     0.714
+    ],
+    "scan_rgb": [
+     6,
+     127,
+     150
+    ],
+    "scan_distance": 0.07
+   },
+   {
+    "printed": "Sepia",
+    "ocr": "Sepia",
+    "ocr_conf": 1,
+    "match": 83,
+    "band": [
+     0.714,
+     0.802
+    ],
+    "scan_rgb": [
+     89,
+     73,
+     60
+    ],
+    "scan_distance": 0.078
+   },
+   {
+    "printed": "White",
+    "ocr": "White",
+    "ocr_conf": 1,
+    "match": 153,
+    "band": [
+     0.802,
+     0.89
+    ],
+    "scan_rgb": [
+     252,
+     250,
+     249
+    ],
+    "scan_distance": 0.014
+   }
+  ]
+ },
+ {
+  "number": 42,
+  "month": 7,
+  "file": "m07_r13.jpg",
+  "colors": [
+   {
+    "printed": "Cream Yellow",
+    "ocr": "Cream Yellow",
+    "ocr_conf": 1,
+    "match": 46,
+    "band": [
+     0.2,
+     0.689
+    ],
+    "scan_rgb": [
+     254,
+     197,
+     68
+    ],
+    "scan_distance": 0.033
+   },
+   {
+    "printed": "Orange",
+    "ocr": "Orange",
+    "ocr_conf": 1,
+    "match": 63,
+    "band": [
+     0.709,
+     0.77
+    ],
+    "scan_rgb": [
+     249,
+     82,
+     36
+    ],
+    "scan_distance": 0.074
+   },
+   {
+    "printed": "Oil Green",
+    "ocr": "Oil Green",
+    "ocr_conf": 0.5,
+    "match": 104,
+    "band": [
+     0.77,
+     0.831
+    ],
+    "scan_rgb": [
+     108,
+     116,
+     61
+    ],
+    "scan_distance": 0.113
+   },
+   {
+    "printed": "Lincoln Green",
+    "ocr": "Lincoln Green",
+    "ocr_conf": 1,
+    "match": 107,
+    "band": [
+     0.831,
+     0.892
+    ],
+    "scan_rgb": [
+     86,
+     81,
+     57
+    ],
+    "scan_distance": 0.063
+   }
+  ]
+ },
+ {
+  "number": 43,
+  "month": 8,
+  "file": "m08_r03.jpg",
+  "colors": [
+   {
+    "printed": "Night Green",
+    "ocr": "Night Green",
+    "ocr_conf": 1,
+    "match": 92,
+    "band": [
+     0.2,
+     0.699
+    ],
+    "scan_rgb": [
+     99,
+     175,
+     100
+    ],
+    "scan_distance": 0.086
+   },
+   {
+    "printed": "Pale Cinnamon-Pink",
+    "ocr": "Pale Cinnamon-Pink",
+    "ocr_conf": 1,
+    "match": 163,
+    "band": [
+     0.719,
+     0.771
+    ],
+    "scan_rgb": [
+     241,
+     225,
+     199
+    ],
+    "scan_distance": 0.017
+   },
+   {
+    "printed": "Ivory Buff",
+    "ocr": "Ivory Buff",
+    "ocr_conf": 1,
+    "match": 41,
+    "band": [
+     0.771,
+     0.823
+    ],
+    "scan_rgb": [
+     229,
+     194,
+     130
+    ],
+    "scan_distance": 0.066
+   },
+   {
+    "printed": "Laelia Pink",
+    "ocr": "Laelia Pink",
+    "ocr_conf": 1,
+    "match": 135,
+    "band": [
+     0.823,
+     0.875
+    ],
+    "scan_rgb": [
+     191,
+     141,
+     167
+    ],
+    "scan_distance": 0.044
+   }
+  ]
+ },
+ {
+  "number": 44,
+  "month": 8,
+  "file": "m08_r05.jpg",
+  "colors": [
+   {
+    "printed": "Vander Poel's Blue",
+    "ocr": "Vander Poel's Blue",
+    "ocr_conf": 1,
+    "match": 128,
+    "band": [
+     0.2,
+     0.616
+    ],
+    "scan_rgb": [
+     32,
+     75,
+     108
+    ],
+    "scan_distance": 0.028
+   },
+   {
+    "printed": "Light Glaucous Blue",
+    "ocr": "Light Glaucous Blue",
+    "ocr_conf": 1,
+    "match": 112,
+    "band": [
+     0.636,
+     0.736
+    ],
+    "scan_rgb": [
+     155,
+     196,
+     211
+    ],
+    "scan_distance": 0.037
+   },
+   {
+    "printed": "Sea-foam Yellow",
+    "ocr": "Sea-foam Yellow",
+    "ocr_conf": 1,
+    "match": 168,
+    "band": [
+     0.736,
+     0.837
+    ],
+    "scan_rgb": [
+     239,
+     231,
+     186
+    ],
+    "scan_distance": 0.016
+   },
+   {
+    "printed": "Mineral Gray",
+    "ocr": "Mineral Gray",
+    "ocr_conf": 1,
+    "match": 155,
+    "band": [
+     0.837,
+     0.938
+    ],
+    "scan_rgb": [
+     183,
+     169,
+     142
+    ],
+    "scan_distance": 0.057
+   }
+  ]
+ },
+ {
+  "number": 45,
+  "month": 8,
+  "file": "m08_r07.jpg",
+  "colors": [
+   {
+    "printed": "Rosolanc Purple",
+    "ocr": "Rosolanc Purple",
+    "ocr_conf": 1,
+    "match": 24,
+    "band": [
+     0.2,
+     0.698
+    ],
+    "scan_rgb": [
+     170,
+     58,
+     145
+    ],
+    "scan_distance": 0.063
+   },
+   {
+    "printed": "Dull Purplish Black",
+    "ocr": "Dull Purplish Black",
+    "ocr_conf": 1,
+    "match": 161,
+    "band": [
+     0.718,
+     0.769
+    ],
+    "scan_rgb": [
+     49,
+     40,
+     42
+    ],
+    "scan_distance": 0.1
+   },
+   {
+    "printed": "Cinnamon Buff",
+    "ocr": "Cinnamon Buff",
+    "ocr_conf": 1,
+    "match": 45,
+    "band": [
+     0.769,
+     0.82
+    ],
+    "scan_rgb": [
+     247,
+     188,
+     96
+    ],
+    "scan_distance": 0.047
+   },
+   {
+    "printed": "Peacock Blue",
+    "ocr": "Peacock Blue",
+    "ocr_conf": 1,
+    "match": 118,
+    "band": [
+     0.82,
+     0.871
+    ],
+    "scan_rgb": [
+     9,
+     130,
+     151
+    ],
+    "scan_distance": 0.069
+   }
+  ]
+ },
+ {
+  "number": 46,
+  "month": 8,
+  "file": "m08_r09.jpg",
+  "colors": [
+   {
+    "printed": "Pale Ecru-Drab",
+    "ocr": "Pale Ecru-Drab",
+    "ocr_conf": 1,
+    "match": 164,
+    "band": [
+     0.2,
+     0.63
+    ],
+    "scan_rgb": [
+     193,
+     176,
+     163
+    ],
+    "scan_distance": 0.047
+   },
+   {
+    "printed": "Pale King's Blue",
+    "ocr": "Pale King's Blue",
+    "ocr_conf": 1,
+    "match": 111,
+    "band": [
+     0.65,
+     0.71
+    ],
+    "scan_rgb": [
+     240,
+     244,
+     238
+    ],
+    "scan_distance": 0.11
+   },
+   {
+    "printed": "Grape Green",
+    "ocr": "Grape Green",
+    "ocr_conf": 1,
+    "match": 162,
+    "band": [
+     0.71,
+     0.77
+    ],
+    "scan_rgb": [
+     150,
+     150,
+     83
+    ],
+    "scan_distance": 0.072
+   },
+   {
+    "printed": "Pale Methyl Blue",
+    "ocr": "Pale Methyl Blue",
+    "ocr_conf": 1,
+    "match": 165,
+    "band": [
+     0.77,
+     0.83
+    ],
+    "scan_rgb": [
+     104,
+     161,
+     177
+    ],
+    "scan_distance": 0.035
+   },
+   {
+    "printed": "Violet Ultramarine",
+    "ocr": "Violet Ultramarine",
+    "ocr_conf": 1,
+    "match": 169,
+    "band": [
+     0.83,
+     0.89
+    ],
+    "scan_rgb": [
+     62,
+     45,
+     125
+    ],
+    "scan_distance": 0.047
+   }
+  ]
+ },
+ {
+  "number": 47,
+  "month": 8,
+  "file": "m08_r11.jpg",
+  "colors": [
+   {
+    "printed": "Naples Yellow",
+    "ocr": "Naples Yellow",
+    "ocr_conf": 1,
+    "match": 40,
+    "band": [
+     0.2,
+     0.642
+    ],
+    "scan_rgb": [
+     250,
+     216,
+     109
+    ],
+    "scan_distance": 0.066
+   },
+   {
+    "printed": "Pale Methyl Blue",
+    "ocr": "Pale Methyl Blue",
+    "ocr_conf": 1,
+    "match": 165,
+    "band": [
+     0.662,
+     0.718
+    ],
+    "scan_rgb": [
+     103,
+     162,
+     178
+    ],
+    "scan_distance": 0.032
+   },
+   {
+    "printed": "Coral Red",
+    "ocr": "Coral Red",
+    "ocr_conf": 1,
+    "match": 5,
+    "band": [
+     0.718,
+     0.773
+    ],
+    "scan_rgb": [
+     237,
+     112,
+     104
+    ],
+    "scan_distance": 0.084
+   },
+   {
+    "printed": "Eugenia Red",
+    "ocr": "Eugenia Red",
+    "ocr_conf": 1,
+    "match": 11,
+    "band": [
+     0.773,
+     0.829
+    ],
+    "scan_rgb": [
+     208,
+     66,
+     86
+    ],
+    "same_name": [
+     "Eugenia Red | A",
+     "Eugenia Red | B"
+    ],
+    "scan_distance": 0.084
+   },
+   {
+    "printed": "Dull Purplish Black",
+    "ocr": "Dull Purplish Black",
+    "ocr_conf": 1,
+    "match": 161,
+    "band": [
+     0.829,
+     0.884
+    ],
+    "scan_rgb": [
+     46,
+     40,
+     41
+    ],
+    "scan_distance": 0.103
+   }
+  ]
+ },
+ {
+  "number": 48,
+  "month": 8,
+  "file": "m08_r13.jpg",
+  "colors": [
+   {
+    "printed": "White",
+    "ocr": "White",
+    "ocr_conf": 0.5,
+    "match": 153,
+    "band": [
+     0.2,
+     0.612
+    ],
+    "scan_rgb": [
+     252,
+     250,
+     251
+    ],
+    "scan_distance": 0.013
+   },
+   {
+    "printed": "Vander Poel's Blue",
+    "ocr": "Vander Poel's Blue",
+    "ocr_conf": 1,
+    "match": 128,
+    "band": [
+     0.632,
+     0.718
+    ],
+    "scan_rgb": [
+     34,
+     72,
+     110
+    ],
+    "scan_distance": 0.034
+   },
+   {
+    "printed": "Neutral Gray",
+    "ocr": "Neutral Gray",
+    "ocr_conf": 1,
+    "match": 154,
+    "band": [
+     0.718,
+     0.803
+    ],
+    "scan_rgb": [
+     164,
+     166,
+     166
+    ],
+    "scan_distance": 0.097
+   },
+   {
+    "printed": "Corinthian Pink",
+    "ocr": "Corinthian Pink",
+    "ocr_conf": 1,
+    "match": 1,
+    "band": [
+     0.803,
+     0.889
+    ],
+    "scan_rgb": [
+     249,
+     171,
+     165
+    ],
+    "scan_distance": 0.051
+   }
+  ]
+ },
+ {
+  "number": 49,
+  "month": 9,
+  "file": "m09_r03.jpg",
+  "colors": [
+   {
+    "printed": "Pale Ecru-Drab",
+    "ocr": "Pale Eeru-Drab",
+    "ocr_conf": 1,
+    "match": 164,
+    "band": [
+     0.2,
+     0.609
+    ],
+    "scan_rgb": [
+     199,
+     181,
+     172
+    ],
+    "scan_distance": 0.029
+   },
+   {
+    "printed": "Cotinga Purple",
+    "ocr": "Cotinga Purple",
+    "ocr_conf": 1,
+    "match": 151,
+    "band": [
+     0.629,
+     0.721
+    ],
+    "scan_rgb": [
+     77,
+     38,
+     63
+    ],
+    "scan_distance": 0.044
+   },
+   {
+    "printed": "Hermosa Pink",
+    "ocr": "Hermosa Pink",
+    "ocr_conf": 1,
+    "match": 0,
+    "band": [
+     0.721,
+     0.814
+    ],
+    "scan_rgb": [
+     250,
+     195,
+     195
+    ],
+    "scan_distance": 0.025
+   },
+   {
+    "printed": "Hydrangea Red",
+    "ocr": "Hydrangea Red",
+    "ocr_conf": 1,
+    "match": 26,
+    "band": [
+     0.814,
+     0.906
+    ],
+    "scan_rgb": [
+     146,
+     79,
+     83
+    ],
+    "scan_distance": 0.049
+   }
+  ]
+ },
+ {
+  "number": 50,
+  "month": 9,
+  "file": "m09_r05.jpg",
+  "colors": [
+   {
+    "printed": "Olive Buff",
+    "ocr": "Olive Buff",
+    "ocr_conf": 1,
+    "match": 52,
+    "band": [
+     0.2,
+     0.64
+    ],
+    "scan_rgb": [
+     220,
+     206,
+     145
+    ],
+    "scan_distance": 0.028
+   },
+   {
+    "printed": "Dull Citrine",
+    "ocr": "Dull Citrine",
+    "ocr_conf": 1,
+    "match": 160,
+    "band": [
+     0.66,
+     0.797
+    ],
+    "scan_rgb": [
+     141,
+     122,
+     83
+    ],
+    "scan_distance": 0.044
+   },
+   {
+    "printed": "Light Brownish Olive",
+    "ocr": "Light Brownish Olive",
+    "ocr_conf": 1,
+    "match": 80,
+    "band": [
+     0.797,
+     0.933
+    ],
+    "scan_rgb": [
+     114,
+     95,
+     59
+    ],
+    "scan_distance": 0.092
+   }
+  ]
+ },
+ {
+  "number": 51,
+  "month": 9,
+  "file": "m09_r07.jpg",
+  "colors": [
+   {
+    "printed": "Blue",
+    "ocr": "Blue",
+    "ocr_conf": 1,
+    "match": 121,
+    "band": [
+     0.2,
+     0.641
+    ],
+    "scan_rgb": [
+     19,
+     73,
+     185
+    ],
+    "scan_distance": 0.091
+   },
+   {
+    "printed": "Dark Greenish Glaucous",
+    "ocr": "Dark Grecnish Glaucous",
+    "ocr_conf": 1,
+    "match": 89,
+    "band": [
+     0.661,
+     0.716
+    ],
+    "scan_rgb": [
+     125,
+     152,
+     110
+    ],
+    "scan_distance": 0.173
+   },
+   {
+    "printed": "White",
+    "ocr": "White",
+    "ocr_conf": 1,
+    "match": 153,
+    "band": [
+     0.716,
+     0.77
+    ],
+    "scan_rgb": [
+     252,
+     250,
+     248
+    ],
+    "scan_distance": 0.014
+   },
+   {
+    "printed": "Dusky Green",
+    "ocr": "Dusky Green",
+    "ocr_conf": 1,
+    "match": 125,
+    "band": [
+     0.77,
+     0.824
+    ],
+    "scan_rgb": [
+     33,
+     59,
+     61
+    ],
+    "scan_distance": 0.098
+   },
+   {
+    "printed": "Pistachio Green",
+    "ocr": "Pistachio Green",
+    "ocr_conf": 1,
+    "match": 98,
+    "band": [
+     0.824,
+     0.879
+    ],
+    "scan_rgb": [
+     110,
+     138,
+     105
+    ],
+    "scan_distance": 0.034
+   }
+  ]
+ },
+ {
+  "number": 52,
+  "month": 9,
+  "file": "m09_r09.jpg",
+  "colors": [
+   {
+    "printed": "Sulphine Yellow",
+    "ocr": "Sulphine Yellow",
+    "ocr_conf": 1,
+    "match": 68,
+    "band": [
+     0.2,
+     0.699
+    ],
+    "scan_rgb": [
+     197,
+     155,
+     55
+    ],
+    "scan_distance": 0.041
+   },
+   {
+    "printed": "Dull Violet Black",
+    "ocr": "Dull Violet Black",
+    "ocr_conf": 1,
+    "match": 130,
+    "band": [
+     0.719,
+     0.802
+    ],
+    "scan_rgb": [
+     37,
+     42,
+     61
+    ],
+    "scan_distance": 0.041
+   },
+   {
+    "printed": "Blue",
+    "ocr": "Blue",
+    "ocr_conf": 1,
+    "match": 121,
+    "band": [
+     0.802,
+     0.886
+    ],
+    "scan_rgb": [
+     19,
+     75,
+     186
+    ],
+    "scan_distance": 0.086
+   }
+  ]
+ },
+ {
+  "number": 53,
+  "month": 9,
+  "file": "m09_r11.jpg",
+  "colors": [
+   {
+    "printed": "Dusky Green",
+    "ocr": "Dusky Green",
+    "ocr_conf": 1,
+    "match": 125,
+    "band": [
+     0.2,
+     0.608
+    ],
+    "scan_rgb": [
+     33,
+     58,
+     62
+    ],
+    "scan_distance": 0.1
+   },
+   {
+    "printed": "Cossack Green",
+    "ocr": "Cossack Green",
+    "ocr_conf": 1,
+    "match": 106,
+    "band": [
+     0.628,
+     0.718
+    ],
+    "scan_rgb": [
+     79,
+     115,
+     75
+    ],
+    "scan_distance": 0.03
+   },
+   {
+    "printed": "Spectrum Red",
+    "ocr": "Spectrum Red",
+    "ocr_conf": 1,
+    "match": 16,
+    "band": [
+     0.718,
+     0.808
+    ],
+    "scan_rgb": [
+     217,
+     31,
+     52
+    ],
+    "scan_distance": 0.011
+   },
+   {
+    "printed": "Yellow Green",
+    "ocr": "Yellow Green",
+    "ocr_conf": 1,
+    "match": 90,
+    "band": [
+     0.808,
+     0.898
+    ],
+    "scan_rgb": [
+     138,
+     195,
+     47
+    ],
+    "scan_distance": 0.096
+   }
+  ]
+ },
+ {
+  "number": 54,
+  "month": 9,
+  "file": "m09_r13.jpg",
+  "colors": [
+   {
+    "printed": "Buffy Citrine",
+    "ocr": "Buffy Citrine",
+    "ocr_conf": 1,
+    "match": 72,
+    "band": [
+     0.2,
+     0.69
+    ],
+    "scan_rgb": [
+     145,
+     118,
+     71
+    ],
+    "scan_distance": 0.072
+   },
+   {
+    "printed": "Pale Lemon Yellow",
+    "ocr": "Pale Lemon Yellow",
+    "ocr_conf": 1,
+    "match": 39,
+    "band": [
+     0.71,
+     0.765
+    ],
+    "scan_rgb": [
+     255,
+     243,
+     134
+    ],
+    "scan_distance": 0.055
+   },
+   {
+    "printed": "Light Brown Drab",
+    "ocr": "Light Brown Drab",
+    "ocr_conf": 1,
+    "match": 4,
+    "band": [
+     0.765,
+     0.821
+    ],
+    "scan_rgb": [
+     175,
+     142,
+     131
+    ],
+    "scan_distance": 0.067
+   },
+   {
+    "printed": "Light Glaucous Blue",
+    "ocr": "Light Glaucous Blue",
+    "ocr_conf": 1,
+    "match": 112,
+    "band": [
+     0.821,
+     0.876
+    ],
+    "scan_rgb": [
+     147,
+     183,
+     199
+    ],
+    "scan_distance": 0.073
+   }
+  ]
+ },
+ {
+  "number": 55,
+  "month": 10,
+  "file": "m10_r03.jpg",
+  "colors": [
+   {
+    "printed": "Green Blue",
+    "ocr": "Green Blue",
+    "ocr_conf": 1,
+    "match": 119,
+    "band": [
+     0.2,
+     0.528
+    ],
+    "scan_rgb": [
+     3,
+     107,
+     123
+    ],
+    "scan_distance": 0.115
+   },
+   {
+    "printed": "Sulphur Yellow",
+    "ocr": "Sulphur Yellow",
+    "ocr_conf": 1,
+    "match": 38,
+    "band": [
+     0.548,
+     0.635
+    ],
+    "scan_rgb": [
+     254,
+     247,
+     199
+    ],
+    "scan_distance": 0.02
+   },
+   {
+    "printed": "Dull Violet Black",
+    "ocr": "Dull Violet Black",
+    "ocr_conf": 1,
+    "match": 130,
+    "band": [
+     0.635,
+     0.721
+    ],
+    "scan_rgb": [
+     36,
+     40,
+     61
+    ],
+    "scan_distance": 0.044
+   },
+   {
+    "printed": "Vandyke Red",
+    "ocr": "Vandyke Red",
+    "ocr_conf": 1,
+    "match": 33,
+    "band": [
+     0.721,
+     0.808
+    ],
+    "scan_rgb": [
+     125,
+     51,
+     55
+    ],
+    "scan_distance": 0.037
+   },
+   {
+    "printed": "Taupe Brown",
+    "ocr": "Taupe Brown",
+    "ocr_conf": 1,
+    "match": 147,
+    "band": [
+     0.808,
+     0.895
+    ],
+    "scan_rgb": [
+     99,
+     58,
+     69
+    ],
+    "scan_distance": 0.106
+   }
+  ]
+ },
+ {
+  "number": 56,
+  "month": 10,
+  "file": "m10_r05.jpg",
+  "colors": [
+   {
+    "printed": "Ivory Buff",
+    "ocr": "Ivory Buff",
+    "ocr_conf": 0.5,
+    "match": 41,
+    "band": [
+     0.2,
+     0.649
+    ],
+    "scan_rgb": [
+     230,
+     199,
+     144
+    ],
+    "scan_distance": 0.05
+   },
+   {
+    "printed": "Fresh Color",
+    "ocr": "Fresh Color",
+    "ocr_conf": 1,
+    "match": 6,
+    "band": [
+     0.669,
+     0.773
+    ],
+    "scan_rgb": [
+     247,
+     156,
+     122
+    ],
+    "scan_distance": 0.021
+   },
+   {
+    "printed": "Raw Sienna",
+    "ocr": "Raw Sienna",
+    "ocr_conf": 1,
+    "match": 13,
+    "band": [
+     0.773,
+     0.877
+    ],
+    "scan_rgb": [
+     174,
+     114,
+     63
+    ],
+    "scan_distance": 0.049
+   }
+  ]
+ },
+ {
+  "number": 57,
+  "month": 10,
+  "file": "m10_r07.jpg",
+  "colors": [
+   {
+    "printed": "Deep' Slate Olive",
+    "ocr": "Deep' Slate Olive",
+    "ocr_conf": 1,
+    "match": 109,
+    "band": [
+     0.2,
+     0.604
+    ],
+    "scan_rgb": [
+     60,
+     56,
+     51
+    ],
+    "scan_distance": 0.032
+   },
+   {
+    "printed": "Red Orange",
+    "ocr": "Red Orange",
+    "ocr_conf": 1,
+    "match": 17,
+    "band": [
+     0.624,
+     0.725
+    ],
+    "scan_rgb": [
+     202,
+     56,
+     53
+    ],
+    "scan_distance": 0.043
+   },
+   {
+    "printed": "Light Brownish Olive",
+    "ocr": "Light Brownish Olive",
+    "ocr_conf": 1,
+    "match": 80,
+    "band": [
+     0.725,
+     0.825
+    ],
+    "scan_rgb": [
+     107,
+     89,
+     58
+    ],
+    "scan_distance": 0.113
+   },
+   {
+    "printed": "Orange Citrine",
+    "ocr": "Orange Citrine",
+    "ocr_conf": 1,
+    "match": 77,
+    "band": [
+     0.825,
+     0.926
+    ],
+    "scan_rgb": [
+     185,
+     156,
+     116
+    ],
+    "scan_distance": 0.104
+   }
+  ]
+ },
+ {
+  "number": 58,
+  "month": 10,
+  "file": "m10_r09.jpg",
+  "colors": [
+   {
+    "printed": "Vistoris Lake",
+    "ocr": "Vistoris Lake",
+    "ocr_conf": 1,
+    "match": 37,
+    "band": [
+     0.2,
+     0.637
+    ],
+    "scan_rgb": [
+     100,
+     54,
+     57
+    ],
+    "scan_distance": 0.09
+   },
+   {
+    "printed": "Light Glaucous Blue",
+    "ocr": "Light Glaucous Blue",
+    "ocr_conf": 1,
+    "match": 112,
+    "band": [
+     0.657,
+     0.769
+    ],
+    "scan_rgb": [
+     151,
+     185,
+     205
+    ],
+    "scan_distance": 0.065
+   },
+   {
+    "printed": "Deep Indigo",
+    "ocr": "Deep Indigo",
+    "ocr_conf": 1,
+    "match": 131,
+    "band": [
+     0.769,
+     0.881
+    ],
+    "scan_rgb": [
+     48,
+     40,
+     50
+    ],
+    "scan_distance": 0.037
+   }
+  ]
+ },
+ {
+  "number": 59,
+  "month": 10,
+  "file": "m10_r11.jpg",
+  "colors": [
+   {
+    "printed": "Glaucous Green",
+    "ocr": "Glaucous Green",
+    "ocr_conf": 1,
+    "match": 88,
+    "band": [
+     0.2,
+     0.618
+    ],
+    "scan_rgb": [
+     154,
+     182,
+     161
+    ],
+    "scan_distance": 0.097
+   },
+   {
+    "printed": "Light Pinkish Cinnamon",
+    "ocr": "Light Pinkish Cinnamon",
+    "ocr_conf": 1,
+    "match": 43,
+    "band": [
+     0.638,
+     0.721
+    ],
+    "scan_rgb": [
+     250,
+     199,
+     143
+    ],
+    "scan_distance": 0.027
+   },
+   {
+    "printed": "Mars Brown",
+    "ocr": "Mars Brown",
+    "ocr_conf": 1,
+    "match": 85,
+    "band": [
+     0.721,
+     0.805
+    ],
+    "scan_rgb": [
+     108,
+     69,
+     56
+    ],
+    "scan_distance": 0.031
+   },
+   {
+    "printed": "Citron Yellow-",
+    "ocr": "Citron Yellow-",
+    "ocr_conf": 0.5,
+    "match": 70,
+    "band": [
+     0.805,
+     0.888
+    ],
+    "scan_rgb": [
+     181,
+     168,
+     62
+    ],
+    "scan_distance": 0.053
+   }
+  ]
+ },
+ {
+  "number": 60,
+  "month": 10,
+  "file": "m10_r13.jpg",
+  "colors": [
+   {
+    "printed": "Apricot Orange",
+    "ocr": "Apricot Orange",
+    "ocr_conf": 1,
+    "match": 62,
+    "band": [
+     0.2,
+     0.594
+    ],
+    "scan_rgb": [
+     253,
+     131,
+     86
+    ],
+    "scan_distance": 0.038
+   },
+   {
+    "printed": "Seashell Pink",
+    "ocr": "Seashell Pink",
+    "ocr_conf": 1,
+    "match": 42,
+    "band": [
+     0.614,
+     0.666
+    ],
+    "scan_rgb": [
+     252,
+     221,
+     197
+    ],
+    "scan_distance": 0.006
+   },
+   {
+    "printed": "Ochraceous Salmon",
+    "ocr": "Ochraceous Salmon",
+    "ocr_conf": 1,
+    "match": 49,
+    "band": [
+     0.666,
+     0.718
+    ],
+    "scan_rgb": [
+     239,
+     167,
+     107
+    ],
+    "scan_distance": 0.038
+   },
+   {
+    "printed": "Cinnamon Rufous",
+    "ocr": "Cinnamon Rufous",
+    "ocr_conf": 1,
+    "match": 66,
+    "band": [
+     0.718,
+     0.77
+    ],
+    "scan_rgb": [
+     191,
+     117,
+     82
+    ],
+    "scan_distance": 0.029
+   },
+   {
+    "printed": "Fawn",
+    "ocr": "Fawn",
+    "ocr_conf": 1,
+    "match": 3,
+    "band": [
+     0.77,
+     0.822
+    ],
+    "scan_rgb": [
+     180,
+     147,
+     131
+    ],
+    "scan_distance": 0.118
+   },
+   {
+    "printed": "Indian Lake",
+    "ocr": "Indian Lake",
+    "ocr_conf": 1,
+    "match": 23,
+    "band": [
+     0.822,
+     0.874
+    ],
+    "scan_rgb": [
+     169,
+     72,
+     95
+    ],
+    "scan_distance": 0.062
+   }
+  ]
+ },
+ {
+  "number": 61,
+  "month": 11,
+  "file": "m11_r03.jpg",
+  "colors": [
+   {
+    "printed": "Andover Green",
+    "ocr": "Andover Green",
+    "ocr_conf": 1,
+    "match": 95,
+    "band": [
+     0.2,
+     0.653
+    ],
+    "scan_rgb": [
+     103,
+     107,
+     94
+    ],
+    "scan_distance": 0.083
+   },
+   {
+    "printed": "Deep Indigo",
+    "ocr": "Deep Indigo",
+    "ocr_conf": 1,
+    "match": 131,
+    "band": [
+     0.673,
+     0.752
+    ],
+    "scan_rgb": [
+     47,
+     42,
+     49
+    ],
+    "scan_distance": 0.037
+   },
+   {
+    "printed": "Orange Rufous",
+    "ocr": "Orange Rufous",
+    "ocr_conf": 1,
+    "match": 67,
+    "band": [
+     0.752,
+     0.83
+    ],
+    "scan_rgb": [
+     184,
+     103,
+     54
+    ],
+    "scan_distance": 0.042
+   }
+  ]
+ },
+ {
+  "number": 62,
+  "month": 11,
+  "file": "m11_r05.jpg",
+  "colors": [
+   {
+    "printed": "Cameo Pink",
+    "ocr": "Cameo Pink",
+    "ocr_conf": 1,
+    "match": 2,
+    "band": [
+     0.2,
+     0.599
+    ],
+    "scan_rgb": [
+     233,
+     186,
+     182
+    ],
+    "scan_distance": 0.014
+   },
+   {
+    "printed": "Lilac",
+    "ocr": "Lilac",
+    "ocr_conf": 1,
+    "match": 136,
+    "band": [
+     0.619,
+     0.709
+    ],
+    "scan_rgb": [
+     155,
+     118,
+     149
+    ],
+    "scan_distance": 0.092
+   },
+   {
+    "printed": "Dusky Madder Violet",
+    "ocr": "Dusky Madder Violet",
+    "ocr_conf": 1,
+    "match": 152,
+    "band": [
+     0.709,
+     0.798
+    ],
+    "scan_rgb": [
+     59,
+     42,
+     64
+    ],
+    "scan_distance": 0.068
+   },
+   {
+    "printed": "Grayish Lavender",
+    "ocr": "Grayish Lavender",
+    "ocr_conf": 1,
+    "match": 133,
+    "band": [
+     0.798,
+     0.888
+    ],
+    "scan_rgb": [
+     155,
+     162,
+     223
+    ],
+    "same_name": [
+     "Grayish Lavender - A",
+     "Grayish Lavender - B"
+    ],
+    "scan_distance": 0.086
+   }
+  ]
+ },
+ {
+  "number": 63,
+  "month": 11,
+  "file": "m11_r07.jpg",
+  "colors": [
+   {
+    "printed": "Slate Color",
+    "ocr": "Slate Color",
+    "ocr_conf": 1,
+    "match": 157,
+    "band": [
+     0.2,
+     0.636
+    ],
+    "scan_rgb": [
+     67,
+     66,
+     72
+    ],
+    "scan_distance": 0.038
+   },
+   {
+    "printed": "Glaucous Green",
+    "ocr": "Glaucous Green",
+    "ocr_conf": 1,
+    "match": 88,
+    "band": [
+     0.656,
+     0.712
+    ],
+    "scan_rgb": [
+     166,
+     184,
+     166
+    ],
+    "scan_distance": 0.082
+   },
+   {
+    "printed": "Pomegranate Purple",
+    "ocr": "Pomegranate Purple",
+    "ocr_conf": 1,
+    "match": 25,
+    "band": [
+     0.712,
+     0.768
+    ],
+    "scan_rgb": [
+     137,
+     41,
+     64
+    ],
+    "scan_distance": 0.105
+   },
+   {
+    "printed": "Sulphur Yellow",
+    "ocr": "Salphur Yellow",
+    "ocr_conf": 1,
+    "match": 38,
+    "band": [
+     0.768,
+     0.823
+    ],
+    "scan_rgb": [
+     249,
+     241,
+     183
+    ],
+    "scan_distance": 0.022
+   },
+   {
+    "printed": "Pale King's Blue",
+    "ocr": "Pale King's Blue",
+    "ocr_conf": 1,
+    "match": 111,
+    "band": [
+     0.823,
+     0.879
+    ],
+    "scan_rgb": [
+     168,
+     196,
+     211
+    ],
+    "scan_distance": 0.059
+   }
+  ]
+ },
+ {
+  "number": 64,
+  "month": 11,
+  "file": "m11_r09.jpg",
+  "colors": [
+   {
+    "printed": "Red Orange",
+    "ocr": "Red Orange",
+    "ocr_conf": 1,
+    "match": 17,
+    "band": [
+     0.2,
+     0.617
+    ],
+    "scan_rgb": [
+     212,
+     61,
+     53
+    ],
+    "scan_distance": 0.022
+   },
+   {
+    "printed": "Black",
+    "ocr": "Black",
+    "ocr_conf": 1,
+    "match": 158,
+    "band": [
+     0.637,
+     0.713
+    ],
+    "scan_rgb": [
+     39,
+     30,
+     33
+    ],
+    "scan_distance": 0.045
+   },
+   {
+    "printed": "Dark Medici Blue",
+    "ocr": "Dark Medici Blue",
+    "ocr_conf": 0.5,
+    "match": 124,
+    "band": [
+     0.713,
+     0.789
+    ],
+    "scan_rgb": [
+     80,
+     89,
+     93
+    ],
+    "scan_distance": 0.093
+   },
+   {
+    "printed": "Ivory Buff",
+    "ocr": "Ivory Buft",
+    "ocr_conf": 1,
+    "match": 41,
+    "band": [
+     0.789,
+     0.865
+    ],
+    "scan_rgb": [
+     222,
+     192,
+     140
+    ],
+    "scan_distance": 0.07
+   }
+  ]
+ },
+ {
+  "number": 65,
+  "month": 11,
+  "file": "m11_r11.jpg",
+  "colors": [
+   {
+    "printed": "Dull Viridian Green",
+    "ocr": "Dull Viridian Green",
+    "ocr_conf": 1,
+    "match": 103,
+    "band": [
+     0.2,
+     0.584
+    ],
+    "scan_rgb": [
+     60,
+     126,
+     104
+    ],
+    "scan_distance": 0.061
+   },
+   {
+    "printed": "Lincoln Green",
+    "ocr": "Lincoln Green",
+    "ocr_conf": 1,
+    "match": 107,
+    "band": [
+     0.604,
+     0.74
+    ],
+    "scan_rgb": [
+     81,
+     92,
+     69
+    ],
+    "scan_distance": 0.041
+   },
+   {
+    "printed": "Etruscan Red",
+    "ocr": "Etrusean Red",
+    "ocr_conf": 1,
+    "match": 18,
+    "band": [
+     0.74,
+     0.876
+    ],
+    "scan_rgb": [
+     173,
+     88,
+     68
+    ],
+    "scan_distance": 0.053
+   }
+  ]
+ },
+ {
+  "number": 66,
+  "month": 11,
+  "file": "m11_r13.jpg",
+  "colors": [
+   {
+    "printed": "Corinthian Pink",
+    "ocr": "Corinthian Pink",
+    "ocr_conf": 1,
+    "match": 1,
+    "band": [
+     0.2,
+     0.636
+    ],
+    "scan_rgb": [
+     243,
+     166,
+     155
+    ],
+    "scan_distance": 0.068
+   },
+   {
+    "printed": "Spectrum Red",
+    "ocr": "Spectrum Red",
+    "ocr_conf": 1,
+    "match": 16,
+    "band": [
+     0.656,
+     0.713
+    ],
+    "scan_rgb": [
+     209,
+     34,
+     57
+    ],
+    "scan_distance": 0.027
+   },
+   {
+    "printed": "Pale Lemon Yellow",
+    "ocr": "Pale Lemon Yellow",
+    "ocr_conf": 1,
+    "match": 39,
+    "band": [
+     0.713,
+     0.77
+    ],
+    "scan_rgb": [
+     254,
+     238,
+     138
+    ],
+    "scan_distance": 0.048
+   },
+   {
+    "printed": "Pinkish Cinnamon",
+    "ocr": "Pinkish Cinnamon",
+    "ocr_conf": 1,
+    "match": 44,
+    "band": [
+     0.77,
+     0.827
+    ],
+    "scan_rgb": [
+     250,
+     190,
+     119
+    ],
+    "scan_distance": 0.024
+   },
+   {
+    "printed": "Yellow",
+    "ocr": "Yellow",
+    "ocr_conf": 1,
+    "match": 54,
+    "band": [
+     0.827,
+     0.883
+    ],
+    "scan_rgb": [
+     254,
+     229,
+     17
+    ],
+    "scan_distance": 0.039
+   }
+  ]
+ },
+ {
+  "number": 67,
+  "month": 12,
+  "file": "m12_r03.jpg",
+  "colors": [
+   {
+    "printed": "Orange Rufous",
+    "ocr": "Orange Rufous",
+    "ocr_conf": 1,
+    "match": 67,
+    "band": [
+     0.2,
+     0.594
+    ],
+    "scan_rgb": [
+     204,
+     104,
+     56
+    ],
+    "scan_distance": 0.034
+   },
+   {
+    "printed": "Yellow Ocher",
+    "ocr": "Yellow Ocher",
+    "ocr_conf": 1,
+    "match": 59,
+    "band": [
+     0.614,
+     0.701
+    ],
+    "scan_rgb": [
+     220,
+     164,
+     61
+    ],
+    "scan_distance": 0.063
+   },
+   {
+    "printed": "Dull Violet Black",
+    "ocr": "Dull Violet Black",
+    "ocr_conf": 1,
+    "match": 130,
+    "band": [
+     0.701,
+     0.788
+    ],
+    "scan_rgb": [
+     41,
+     47,
+     61
+    ],
+    "scan_distance": 0.039
+   },
+   {
+    "printed": "Artemisia Green",
+    "ocr": "Artemisia Green",
+    "ocr_conf": 1,
+    "match": 94,
+    "band": [
+     0.788,
+     0.876
+    ],
+    "scan_rgb": [
+     115,
+     135,
+     128
+    ],
+    "scan_distance": 0.052
+   }
+  ]
+ },
+ {
+  "number": 68,
+  "month": 12,
+  "file": "m12_r05.jpg",
+  "colors": [
+   {
+    "printed": "Indian Lake",
+    "ocr": "ndienuuake",
+    "ocr_conf": 0.3,
+    "match": 23,
+    "band": [
+     0.2,
+     0.633
+    ],
+    "scan_rgb": [
+     172,
+     73,
+     93
+    ],
+    "scan_distance": 0.058
+   },
+   {
+    "printed": "Vandar Poel's Blue",
+    "ocr": "Vandar Poel's Blue",
+    "ocr_conf": 1,
+    "match": 128,
+    "band": [
+     0.653,
+     0.703
+    ],
+    "scan_rgb": [
+     41,
+     83,
+     116
+    ],
+    "scan_distance": 0.034
+   },
+   {
+    "printed": "Dark Greenish Glaucous",
+    "ocr": "Dark Greenish Glaucous",
+    "ocr_conf": 1,
+    "match": 89,
+    "band": [
+     0.703,
+     0.753
+    ],
+    "scan_rgb": [
+     141,
+     156,
+     129
+    ],
+    "scan_distance": 0.145
+   },
+   {
+    "printed": "Sulphur Yellow",
+    "ocr": "Sulphur Yellow",
+    "ocr_conf": 1,
+    "match": 38,
+    "band": [
+     0.753,
+     0.803
+    ],
+    "scan_rgb": [
+     252,
+     242,
+     196
+    ],
+    "scan_distance": 0.01
+   },
+   {
+    "printed": "Olive Ocher",
+    "ocr": "Olive Ocher",
+    "ocr_conf": 1,
+    "match": 58,
+    "band": [
+     0.803,
+     0.853
+    ],
+    "scan_rgb": [
+     193,
+     163,
+     87
+    ],
+    "scan_distance": 0.082
+   }
+  ]
+ },
+ {
+  "number": 69,
+  "month": 12,
+  "file": "m12_r07.jpg",
+  "colors": [
+   {
+    "printed": "Black",
+    "ocr": "Black",
+    "ocr_conf": 1,
+    "match": 158,
+    "band": [
+     0.2,
+     0.585
+    ],
+    "scan_rgb": [
+     36,
+     30,
+     33
+    ],
+    "scan_distance": 0.047
+   },
+   {
+    "printed": "Jasper Red",
+    "ocr": "Jasper Red",
+    "ocr_conf": 1,
+    "match": 15,
+    "band": [
+     0.605,
+     0.75
+    ],
+    "scan_rgb": [
+     212,
+     81,
+     72
+    ],
+    "scan_distance": 0.054
+   },
+   {
+    "printed": "Pale King's Blue",
+    "ocr": "Pale King's Blue",
+    "ocr_conf": 1,
+    "match": 111,
+    "band": [
+     0.75,
+     0.895
+    ],
+    "scan_rgb": [
+     243,
+     246,
+     245
+    ],
+    "scan_distance": 0.116
+   }
+  ]
+ },
+ {
+  "number": 70,
+  "month": 12,
+  "file": "m12_r09.jpg",
+  "colors": [
+   {
+    "printed": "Sulphine Yellow",
+    "ocr": "Sulphine Yellow",
+    "ocr_conf": 1,
+    "match": 68,
+    "band": [
+     0.2,
+     0.561
+    ],
+    "scan_rgb": [
+     205,
+     160,
+     66
+    ],
+    "scan_distance": 0.037
+   },
+   {
+    "printed": "Cossack Green",
+    "ocr": "Cossack Green",
+    "ocr_conf": 1,
+    "match": 106,
+    "band": [
+     0.581,
+     0.679
+    ],
+    "scan_rgb": [
+     91,
+     116,
+     72
+    ],
+    "scan_distance": 0.031
+   },
+   {
+    "printed": "Dull Violet Black",
+    "ocr": "Dull Violet Black",
+    "ocr_conf": 1,
+    "match": 130,
+    "band": [
+     0.679,
+     0.776
+    ],
+    "scan_rgb": [
+     38,
+     44,
+     56
+    ],
+    "scan_distance": 0.047
+   },
+   {
+    "printed": "Pale Turtle Green",
+    "ocr": "Pale lurtle Green",
+    "ocr_conf": 0.3,
+    "match": 167,
+    "band": [
+     0.776,
+     0.874
+    ],
+    "scan_rgb": [
+     196,
+     208,
+     161
+    ],
+    "scan_distance": 0.011
+   }
+  ]
+ },
+ {
+  "number": 71,
+  "month": 12,
+  "file": "m12_r11.jpg",
+  "colors": [
+   {
+    "printed": "Sudan Brown",
+    "ocr": "Sudan Brown",
+    "ocr_conf": 1,
+    "match": 78,
+    "band": [
+     0.2,
+     0.7
+    ],
+    "scan_rgb": [
+     179,
+     148,
+     133
+    ],
+    "scan_distance": 0.092
+   },
+   {
+    "printed": "Slate Color",
+    "ocr": "Slate Color",
+    "ocr_conf": 1,
+    "match": 157,
+    "band": [
+     0.72,
+     0.75
+    ],
+    "scan_rgb": [
+     56,
+     61,
+     66
+    ],
+    "scan_distance": 0.058
+   },
+   {
+    "printed": "Pale King's Blue",
+    "ocr": "Pale King's Blue",
+    "ocr_conf": 0.5,
+    "match": 111,
+    "band": [
+     0.75,
+     0.78
+    ],
+    "scan_rgb": [
+     176,
+     199,
+     212
+    ],
+    "scan_distance": 0.049
+   },
+   {
+    "printed": "Mineral Gray",
+    "ocr": "Mineral Gray",
+    "ocr_conf": 1,
+    "match": 155,
+    "band": [
+     0.78,
+     0.81
+    ],
+    "scan_rgb": [
+     176,
+     198,
+     211
+    ],
+    "scan_distance": 0.046
+   }
+  ]
+ },
+ {
+  "number": 72,
+  "month": 12,
+  "file": "m12_r13.jpg",
+  "colors": [
+   {
+    "printed": "Salvia Blue",
+    "ocr": "aaivia Kiue",
+    "ocr_conf": 0.3,
+    "match": 113,
+    "band": [
+     0.2,
+     0.625
+    ],
+    "scan_rgb": [
+     153,
+     173,
+     226
+    ],
+    "scan_distance": 0.041
+   },
+   {
+    "printed": "Pale Lemon Yellow",
+    "ocr": "rale Lemon Jellow",
+    "ocr_conf": 0.3,
+    "match": 39,
+    "band": [
+     0.645,
+     0.705
+    ],
+    "scan_rgb": [
+     254,
+     244,
+     154
+    ],
+    "scan_distance": 0.035
+   },
+   {
+    "printed": "Sepia",
+    "ocr": "Beuta",
+    "ocr_conf": 0.3,
+    "match": 83,
+    "band": [
+     0.705,
+     0.766
+    ],
+    "scan_rgb": [
+     110,
+     90,
+     65
+    ],
+    "scan_distance": 0.027
+   },
+   {
+    "printed": "Jasper Red",
+    "ocr": "Jasper Red",
+    "ocr_conf": 1,
+    "match": 15,
+    "band": [
+     0.766,
+     0.827
+    ],
+    "scan_rgb": [
+     211,
+     78,
+     70
+    ],
+    "scan_distance": 0.058
+   },
+   {
+    "printed": "Neutral Gray",
+    "ocr": "Neutral Gray",
+    "ocr_conf": 1,
+    "match": 154,
+    "band": [
+     0.827,
+     0.888
+    ],
+    "scan_rgb": [
+     187,
+     173,
+     161
+    ],
+    "scan_distance": 0.072
+   }
+  ]
+ }
+]

@@ -336,7 +336,8 @@
     ]
   },
   {
-    "name": "Rosolanc Purple",
+    "name": "Rosolane Purple",
+    "bookName": "Rosolanc Purple",
     "cmyk": [
       30,
       90,
@@ -1638,7 +1639,8 @@
     ]
   },
   {
-    "name": "Cerulian Blue",
+    "name": "Cerulean Blue",
+    "bookName": "Cerulian Blue",
     "cmyk": [
       84,
       26,
@@ -1708,7 +1710,8 @@
     ]
   },
   {
-    "name": "Antwarp Blue",
+    "name": "Antwerp Blue",
+    "bookName": "Antwarp Blue",
     "cmyk": [
       100,
       40,
@@ -1792,7 +1795,8 @@
     ]
   },
   {
-    "name": "Vandar Poel's Blue",
+    "name": "Vanderpoel's Blue",
+    "bookName": "Vandar Poel's Blue",
     "cmyk": [
       100,
       73,
@@ -2224,5 +2228,170 @@
       0.0068,
       76.64
     ]
+  },
+  {
+    "name": "Dark Perilla Purple",
+    "cmyk": [
+      77,
+      95,
+      85,
+      20
+    ],
+    "oklch": [
+      0.3815,
+      0.0508,
+      4.98
+    ],
+    "volume": 2
+  },
+  {
+    "name": "Dull Citrine",
+    "cmyk": [
+      52,
+      45,
+      78,
+      0
+    ],
+    "oklch": [
+      0.6272,
+      0.0635,
+      102.43
+    ],
+    "volume": 2
+  },
+  {
+    "name": "Dull Purplish Black",
+    "cmyk": [
+      85,
+      85,
+      90,
+      20
+    ],
+    "oklch": [
+      0.3867,
+      0.0099,
+      76.45
+    ],
+    "volume": 2
+  },
+  {
+    "name": "Grape Green",
+    "cmyk": [
+      41,
+      25,
+      74,
+      0
+    ],
+    "oklch": [
+      0.7295,
+      0.0916,
+      112.31
+    ],
+    "volume": 2
+  },
+  {
+    "name": "Pale Cinnamon-Pink",
+    "cmyk": [
+      3,
+      12,
+      19,
+      0
+    ],
+    "oklch": [
+      0.93,
+      0.0327,
+      67.92
+    ],
+    "volume": 2
+  },
+  {
+    "name": "Pale Ecru-Drab",
+    "cmyk": [
+      23,
+      25,
+      27,
+      0
+    ],
+    "oklch": [
+      0.8135,
+      0.0166,
+      55.38
+    ],
+    "volume": 2
+  },
+  {
+    "name": "Pale Methyl Blue",
+    "cmyk": [
+      65,
+      12,
+      30,
+      0
+    ],
+    "oklch": [
+      0.7031,
+      0.0803,
+      205.87
+    ],
+    "volume": 2
+  },
+  {
+    "name": "Pale Purplish Vinaceous",
+    "cmyk": [
+      0,
+      13,
+      8,
+      0
+    ],
+    "oklch": [
+      0.9432,
+      0.0255,
+      27.47
+    ],
+    "volume": 2
+  },
+  {
+    "name": "Pale Turtle Green",
+    "cmyk": [
+      25,
+      10,
+      45,
+      0
+    ],
+    "oklch": [
+      0.8466,
+      0.0628,
+      116.17
+    ],
+    "volume": 2
+  },
+  {
+    "name": "Sea-foam Yellow",
+    "cmyk": [
+      6,
+      6,
+      29,
+      0
+    ],
+    "oklch": [
+      0.9363,
+      0.0503,
+      98.49
+    ],
+    "volume": 2
+  },
+  {
+    "name": "Violet Ultramarine",
+    "cmyk": [
+      85,
+      100,
+      0,
+      0
+    ],
+    "oklch": [
+      0.3968,
+      0.1404,
+      301.9
+    ],
+    "volume": 2
   }
 ]

@@ -1,0 +1,214 @@
+{
+  "_about": "Checked by hand against the printed book (A Dictionary of Color Combinations Vol. 2, Seigensha), November 2026. The raw answers were in tmp/vol2-to-fill.md.",
+  "checked": {
+    "order": "The first and last combination of each month have the same number and colour order as the 1934–35 cards (extracted.json); the book prints the colours at equal size.",
+    "shared_cmyk": "No. 1's colours have the same CMYK as in our Volume 1 data (Seashell Pink, White, Sulphur Yellow, Glaucous Green; Grayish Lavender is A).",
+    "variants": "Grayish Lavender and Eugenia Red: the book's colour index lists only A's values, so A everywhere (corrections.json \"variant\"). Except No. 16, which has both under the same name, in the book too: the 4th is B (25 33 20 0), the 6th A (28 28 0 0).",
+    "spelling": "The book prints Vandar Poel's Blue (and Volume 1 Cerulian, Antwarp, Rosolanc): misspellings of Ridgway's names, fixed in our colors.json, which keeps the printed spelling as bookName. The book prints Deep Violet / Plumbeous (ours: Deep Violet/Plumbeous)."
+  },
+  "renamed": {
+    "Cerulean Blue": {
+      "as": "Cerulean Blue",
+      "why": "the book gives 84 26 32 0, our colour misspelled Cerulian Blue in Volume 1 (now fixed)"
+    },
+    "Light Green": {
+      "as": "Night Green",
+      "why": "card 34 prints Light Green; the book has Night Green, 52 0 100 0, as ours"
+    },
+    "Tawny Olive": {
+      "as": "Khaki",
+      "why": "card 32 prints Tawny Olive; the book has Khaki there, and the chip matches Khaki on cards 9 and 12"
+    }
+  },
+  "new": [
+    {
+      "name": "Dark Perilla Purple",
+      "cmyk": [
+        77,
+        95,
+        85,
+        20
+      ],
+      "cards": [
+        [
+          35,
+          4
+        ]
+      ]
+    },
+    {
+      "name": "Dull Citrine",
+      "cmyk": [
+        52,
+        45,
+        78,
+        0
+      ],
+      "cards": [
+        [
+          9,
+          1
+        ],
+        [
+          50,
+          2
+        ]
+      ]
+    },
+    {
+      "name": "Dull Purplish Black",
+      "cmyk": [
+        85,
+        85,
+        90,
+        20
+      ],
+      "cards": [
+        [
+          45,
+          2
+        ],
+        [
+          47,
+          5
+        ]
+      ]
+    },
+    {
+      "name": "Grape Green",
+      "cmyk": [
+        41,
+        25,
+        74,
+        0
+      ],
+      "cards": [
+        [
+          40,
+          1
+        ],
+        [
+          46,
+          3
+        ]
+      ]
+    },
+    {
+      "name": "Pale Cinnamon-Pink",
+      "cmyk": [
+        3,
+        12,
+        19,
+        0
+      ],
+      "cards": [
+        [
+          43,
+          2
+        ]
+      ]
+    },
+    {
+      "name": "Pale Ecru-Drab",
+      "cmyk": [
+        23,
+        25,
+        27,
+        0
+      ],
+      "cards": [
+        [
+          46,
+          1
+        ],
+        [
+          49,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "Pale Methyl Blue",
+      "cmyk": [
+        65,
+        12,
+        30,
+        0
+      ],
+      "cards": [
+        [
+          46,
+          4
+        ],
+        [
+          47,
+          2
+        ]
+      ]
+    },
+    {
+      "name": "Pale Purplish Vinaceous",
+      "cmyk": [
+        0,
+        13,
+        8,
+        0
+      ],
+      "cards": [
+        [
+          36,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "Pale Turtle Green",
+      "cmyk": [
+        25,
+        10,
+        45,
+        0
+      ],
+      "cards": [
+        [
+          70,
+          4
+        ]
+      ]
+    },
+    {
+      "name": "Sea-foam Yellow",
+      "cmyk": [
+        6,
+        6,
+        29,
+        0
+      ],
+      "cards": [
+        [
+          44,
+          3
+        ]
+      ]
+    },
+    {
+      "name": "Violet Ultramarine",
+      "cmyk": [
+        85,
+        100,
+        0,
+        0
+      ],
+      "cards": [
+        [
+          46,
+          5
+        ]
+      ]
+    }
+  ],
+  "_new_about": "Colours not in Volume 1, with the CMYK printed in the book; cards: [card number, position from the first colour].",
+  "notes": {
+    "Pale Methyl Blue": "the book prints \"Pale Methy Blue\"; the cards and Ridgway have Methyl, which we use"
+  }
+}

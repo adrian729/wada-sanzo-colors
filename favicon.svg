@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- The book's cover, without its words, in the book's colours closest to the cover's: Light Pinkish
+       Cinnamon (the ground), Vistoris Lake, Cossack Green, Orange Yellow, Sudan Brown and Red Orange. -->
+  <rect width="128" height="128" fill="#fccfa5"/>
+  <rect x="6" y="6" width="45" height="77" fill="#7d4f53"/>
+  <rect x="54" y="6" width="68" height="60" fill="#497c47"/>
+  <rect x="54" y="69" width="43" height="14" fill="#fcbb00"/>
+  <rect x="100" y="69" width="22" height="53" fill="#ac725b"/>
+  <rect x="6" y="86" width="91" height="36" fill="#da452d"/>
+</svg>

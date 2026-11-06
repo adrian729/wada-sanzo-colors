@@ -85,24 +85,91 @@
       display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 2rem 1.5rem;
       padding: 0; list-style: none;
     }
-    .combo-number { display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; }
-    .blocks { display: grid; grid-template-rows: 1fr; }
-    [data-size="2"] .blocks { grid-template-columns: repeat(2, 1fr); aspect-ratio: 12 / 5; }
-    [data-size="3"] .blocks { grid-template-columns: repeat(3, 1fr); aspect-ratio: 3 / 1; }
-    [data-size="4"] .blocks {
-      grid-template: ". top top ." 1fr "left left right right" 1fr ". bottom bottom ." 1fr / 1fr 1fr 1fr 1fr;
-      aspect-ratio: 4 / 3;
+    .combo-number {
+      display: inline-block; margin-bottom: 0.5rem;
+      color: var(--muted); font-size: 0.8rem; text-decoration: none;
     }
-    [data-size="4"] .swatch:nth-child(1) { grid-area: top; }
-    [data-size="4"] .swatch:nth-child(2) { grid-area: left; }
-    [data-size="4"] .swatch:nth-child(3) { grid-area: right; }
-    [data-size="4"] .swatch:nth-child(4) { grid-area: bottom; }
+    a.combo-number:hover, a.combo-number:focus-visible { color: var(--fg); text-decoration: underline; }
+    .blocks { display: grid; grid-template-rows: 1fr; }
+    .blocks[data-size="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); aspect-ratio: 12 / 5; }
+    .blocks[data-size="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); aspect-ratio: 3 / 1; }
+    [data-size="4"]:is(.blocks, .combo-info) {
+      grid-template: ". top top ." auto "left left right right" auto ". bottom bottom ." auto
+        / minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); /* columns never grow to fit a long name */
+    }
+    .blocks[data-size="4"] { grid-template-rows: 1fr 1fr 1fr; aspect-ratio: 4 / 3; }
+    [data-size="4"]:is(.blocks, .combo-info) > :nth-child(1) { grid-area: top; }
+    [data-size="4"]:is(.blocks, .combo-info) > :nth-child(2) { grid-area: left; }
+    [data-size="4"]:is(.blocks, .combo-info) > :nth-child(3) { grid-area: right; }
+    [data-size="4"]:is(.blocks, .combo-info) > :nth-child(4) { grid-area: bottom; }
+    .blocks > * { background: var(--color); }
     .blocks .swatch { aspect-ratio: auto; height: 100%; padding: 0.5rem; }
     .blocks .swatch span { white-space: normal; text-align: center; } /* the colour name */
     /* Sub-navigation choice: only the combinations with that many colours. */
     [data-show="2"] .combos:not([data-size="2"]),
     [data-show="3"] .combos:not([data-size="3"]),
     [data-show="4"] .combos:not([data-size="4"]) { display: none; }
+
+    /* One combination: the colours large, each colour's values under it (placed as in the book),
+       then the combinations that share a colour with it. */
+    #combination-view { display: grid; gap: 1.5rem; }
+    #combination-view > .combo-number { margin: 0; }
+    .combo-figure { width: min(100%, 48rem); }
+    .combo-figure:has([data-size="4"]) { width: min(100%, 36rem); }
+    .combo-info { display: grid; gap: 1.25rem 1rem; margin-top: 1.25rem; font-size: 0.875rem; line-height: 1.5; }
+    .combo-info[data-size="2"] { grid-template-columns: repeat(2, 1fr); }
+    .combo-info[data-size="3"] { grid-template-columns: repeat(3, 1fr); }
+    .combo-info p { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    @media (max-width: 40rem) { /* narrow screens: the values one colour after another */
+      .combo-info[data-size] { grid-template: none; grid-template-columns: minmax(0, 1fr); }
+      .combo-info[data-size] > :nth-child(n) { grid-area: auto; }
+    }
+    .section-label { margin-top: 1.5rem; color: var(--muted); font-size: 0.8rem; }
+    .section-label a { color: inherit; }
+    .section-label a:hover, .section-label a:focus-visible { color: var(--fg); }
+    .actions { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.8rem; }
+    .actions :is(a, button) {
+      padding: 0; border: 0; background: none;
+      color: var(--muted); font: inherit; text-decoration: none; cursor: pointer;
+    }
+    .actions :is(a, button):is(:hover, :focus-visible) { color: var(--fg); text-decoration: underline; }
+
+    /* Create: compose a combination of 2 to 4 colours, laid out as in the book, beside the full set of
+       colours to pick from. On wide screens the composition stays in view while scrolling the colours. */
+    #create-view { display: grid; gap: 2.5rem; align-items: start; }
+    @media (min-width: 64rem) {
+      #create-view { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 3rem; }
+      .create-stage { position: sticky; top: 5rem; } /* below the header */
+    }
+    .create-stage .combo-figure { width: 100%; }
+    .create-stage .blocks[data-size="4"] { width: min(100%, 30rem); }
+    .create-stage .blocks .swatch { touch-action: none; cursor: grab; } /* drag to reorder */
+    /* The colour selected for swapping or replacing, and the one a dragged colour would swap with. */
+    .create-stage .swatch:is([aria-pressed="true"], .drop-target) { box-shadow: inset 0 0 0 0.375rem var(--bg); }
+    .create-stage .dragging { position: relative; z-index: 1; cursor: grabbing; }
+    .blocks .empty { border: 1px dashed var(--muted); }
+    .blocks .empty + .empty { border-left: 0; }
+    /* Each colour's values, one row per colour in order (columns line up; OKLCH wraps when narrow). */
+    .create-info {
+      display: grid; gap: 0.5rem; margin-top: 1.25rem; padding: 0; list-style: none;
+      font-size: 0.8rem; line-height: 1.5; font-variant-numeric: tabular-nums;
+    }
+    .create-info li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1.5ch; white-space: nowrap; }
+    .create-info .chip { width: 1rem; height: 1rem; background: var(--color); }
+    .create-info .name { width: 22ch; } /* widest name */
+    .create-info .cmyk { width: 20ch; } /* widest CMYK */
+    .picker { display: grid; gap: 1rem; }
+    .picker .grid { grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr)); }
+    .picker .swatch span { opacity: 1; transform: none; } /* a picked colour's place in the combination */
+    .picker-status { min-height: 3em; font-size: 0.8rem; line-height: 1.5; white-space: pre; font-variant-numeric: tabular-nums; }
+
+    /* A colour's combinations, in the colour dialog: small, each a link to its page. */
+    .detail-combos { margin-top: 1.25rem; white-space: normal; }
+    .detail-combos .section-label { margin: 0 0 0.5rem; }
+    .thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; align-items: start; }
+    .thumb { display: block; color: var(--muted); font-size: 0.75rem; text-decoration: none; }
+    .thumb:hover, .thumb:focus-visible { color: var(--fg); }
+    .thumb .blocks { margin-top: 0.25rem; }
 
     /* Wheel view: wheel (angle = hue, distance from centre = chroma) centred on the page; the info panel
        floats at the left middle of the screen, outside the layout, so it never moves the wheel. */
@@ -135,6 +202,7 @@
     .detail-body { padding: 1.25rem; line-height: 1.5; white-space: nowrap; font-variant-numeric: tabular-nums; }
     .detail-body h2 { font-size: 1.25rem; font-weight: 500; margin-bottom: 0.5rem; }
     .oklch-line { display: flex; align-items: center; gap: 0.5rem; }
+    dialog .detail-combos { padding: 0 1.25rem 1.25rem; margin: 0; }
     .copy {
       display: grid; padding: 0.25rem; margin: -0.25rem 0;
       border: 0; background: none; color: var(--muted); cursor: pointer;
@@ -154,6 +222,7 @@
         <a href="#families">Families</a>
         <a href="#combinations">Combinations</a>
         <a href="#wheel">Wheel</a>
+        <a href="#create">Create</a>
       </div>
     </nav>
     <div class="subnav" data-view="families" role="group" aria-label="Families layout">
@@ -171,6 +240,7 @@
   <main>
     <section id="families-view"></section>
     <section id="combinations-view" hidden></section>
+    <section id="combination-view" hidden></section>
     <section id="wheel-view" hidden>
       <aside class="wheel-panel" aria-live="polite">
         <div class="detail-swatch"></div>
@@ -181,6 +251,12 @@
       <div class="wheel">
         <canvas class="wheel-bg" aria-hidden="true"></canvas>
         <svg viewBox="-1.02 -1.02 2.04 2.04" role="group" aria-label="Colour wheel"></svg>
+      </div>
+    </section>
+    <section id="create-view" hidden>
+      <div class="create-stage"></div>
+      <div class="picker" role="group" aria-label="Colours">
+        <p class="picker-status" aria-hidden="true"></p>
       </div>
     </section>
   </main>
@@ -198,13 +274,16 @@
         </button>
       </p>
     </div>
+    <div class="detail-combos"></div>
   </dialog>
 
   <script type="module">
     const views = {
       families: document.getElementById("families-view"),
       combinations: document.getElementById("combinations-view"),
+      combination: document.getElementById("combination-view"),
       wheel: document.getElementById("wheel-view"),
+      create: document.getElementById("create-view"),
     };
     const detail = document.getElementById("detail");
     const subnavs = document.querySelectorAll(".subnav");
@@ -213,14 +292,34 @@
     const oklchText = ([l, c, h]) => `oklch(${l} ${c} ${h})`;
     const oklchValues = ([l, c, h]) => `OKLCH ${l} ${c} ${h}`;
 
+    // Routes: #families, #combinations, #wheel, #combination/<number> for one combination, and
+    // #create/<colours> for a combination being composed.
+    let data = null; // set once the JSON has loaded
+    // The combination being composed: its colours in order (a cross: top, left, right, bottom), the slot
+    // selected for swapping or replacing, and a one-off message. In the address as colour numbers in book
+    // order (#create/1-46-89), so it can be shared; also remembered in this browser.
+    const create = { picked: [], active: null, note: "", dragged: false };
+    const pickerButtons = []; // colour index -> its button in the colour picker
     function showView() {
-      const name = location.hash.slice(1) in views ? location.hash.slice(1) : "families";
+      const [route, arg] = location.hash.slice(1).split("/");
+      const name = route in views ? route : "families";
+      const section = name === "combination" ? "combinations" : name; // highlighted in the nav
       for (const [key, el] of Object.entries(views)) el.hidden = key !== name;
       for (const a of document.querySelectorAll(".views a")) {
-        if (a.hash === `#${name}`) a.setAttribute("aria-current", "page");
+        if (a.hash === `#${section}`) a.setAttribute("aria-current", "page");
         else a.removeAttribute("aria-current");
       }
       for (const s of subnavs) s.hidden = s.dataset.view !== name;
+      if (detail.open) detail.close();
+      if (name === "combination" && data) {
+        renderCombination(Number(arg));
+        scrollTo(0, 0);
+      } else if (name === "create" && data) {
+        openCreate(arg);
+        document.title = "Create | Wada Sanzo";
+      } else {
+        document.title = "Wada Sanzo | A Dictionary of Color Combinations";
+      }
     }
     addEventListener("hashchange", showView);
     showView();
@@ -251,22 +350,52 @@
 
     function showDetail(color) {
       fillDetails(detail, color);
-      copyButton.dataset.css = color.css;
-      copyButton.classList.remove("copied");
+      const copy = detail.querySelector(".copy");
+      copy.dataset.css = color.css;
+      copy.classList.remove("copied");
+      // The colour's combinations, small; each opens that combination's page.
+      const list = detail.querySelector(".detail-combos");
+      const combos = data.combosOf[color.index];
+      const label = document.createElement("p");
+      label.className = "section-label";
+      label.textContent = `In ${combos.length} combination${combos.length === 1 ? "" : "s"}`;
+      const thumbs = document.createElement("div");
+      thumbs.className = "thumbs";
+      for (const combo of combos) {
+        const a = document.createElement("a");
+        a.className = "thumb";
+        a.href = `#combination/${combo.number}`;
+        a.addEventListener("click", () => detail.close()); // also when it is the page already open
+        a.textContent = comboNumber(combo.number);
+        const blocks = blocksFor(combo, () => document.createElement("div"));
+        blocks.setAttribute("aria-hidden", "true");
+        a.append(blocks);
+        thumbs.append(a);
+      }
+      list.replaceChildren(label, thumbs);
       detail.showModal();
+      detail.scrollTop = 0;
     }
-    // Copy button: copies the colour as CSS, oklch(L C h); shows a check mark for a moment.
-    const copyButton = detail.querySelector(".copy");
-    let copiedTimer;
-    copyButton.addEventListener("click", async () => {
+
+    // Copy buttons (the dialog's, and the combination page's): copy the colour as CSS, oklch(L C h),
+    // and show a check mark for a moment.
+    const copyTemplate = detail.querySelector(".copy");
+    function copyButtonFor(css) {
+      const button = copyTemplate.cloneNode(true);
+      button.dataset.css = css;
+      return button;
+    }
+    document.addEventListener("click", async (e) => {
+      const button = e.target.closest(".copy");
+      if (!button) return;
       try {
-        await navigator.clipboard.writeText(copyButton.dataset.css);
+        await navigator.clipboard.writeText(button.dataset.css);
       } catch {
         return; // clipboard unavailable (e.g. not served from localhost or https)
       }
-      copyButton.classList.add("copied");
-      clearTimeout(copiedTimer);
-      copiedTimer = setTimeout(() => copyButton.classList.remove("copied"), 1500);
+      button.classList.add("copied");
+      clearTimeout(button.copiedTimer);
+      button.copiedTimer = setTimeout(() => button.classList.remove("copied"), 1500);
     });
     // Clicking the backdrop (outside the dialog's content) closes it.
     detail.addEventListener("click", (e) => { if (e.target === detail) detail.close(); });
@@ -275,6 +404,11 @@
       const [colors, families, combinations] = await Promise.all(
         ["colors.json", "families.json", "combinations.json"].map((f) => fetch(f).then((r) => r.json()))
       );
+      colors.forEach((c, i) => Object.assign(c, { index: i, css: oklchText(c.oklch) }));
+      const combos = combinations.map((ids, i) => ({ number: i + 1, colors: ids.map((k) => colors[k]) }));
+      const combosOf = colors.map(() => []); // colour index -> its combinations, in book order
+      for (const combo of combos) for (const c of combo.colors) combosOf[c.index].push(combo);
+      data = { colors, combos, combosOf };
 
       // Families: one grid per colour family (the book groups its colours by hue), in book order.
       for (const family of families) {
@@ -289,46 +423,363 @@
         const ul = document.createElement("ul");
         ul.className = "combos";
         ul.dataset.size = size;
-        combinations.forEach((combo, i) => {
-          if (combo.length === size) ul.append(combinationItem(i + 1, combo.map((k) => colors[k])));
-        });
+        ul.append(...combos.filter((combo) => combo.colors.length === size).map(combinationItem));
         views.combinations.append(ul);
       }
 
+      buildPicker(colors, families);
       buildWheel(colors);
-    } catch {
+      // Prepare the wheel background's hue table while the page is idle, so opening the wheel is quick.
+      (window.requestIdleCallback ?? setTimeout)(() => cuspTable());
+      showView(); // a #combination/<number> link opened directly needs the data
+    } catch (error) {
+      console.error(error);
       document.querySelector("main").innerHTML = `<p class="error">Couldn't load the colour data. Serve this folder over HTTP, e.g. <code>python3 -m http.server</code>.</p>`;
     }
 
-    // A colour block: shows its text on hover, opens the details on click.
-    function colorButton(c) {
-      const color = { ...c, css: oklchText(c.oklch) };
+    // A colour block: shows its text on hover, opens the details on click (or does onClick).
+    function colorButton(c, onClick = () => showDetail(c)) {
       const button = document.createElement("button");
       button.className = "swatch";
-      button.style.setProperty("--color", color.css);
+      button.style.setProperty("--color", c.css);
       button.style.setProperty("--ink", c.oklch[0] > 0.6 ? "rgb(0 0 0 / 0.75)" : "rgb(255 255 255 / 0.9)");
-      button.setAttribute("aria-label", color.name);
-      button.addEventListener("click", () => showDetail(color));
+      button.setAttribute("aria-label", c.name);
+      button.addEventListener("click", onClick);
       return button;
     }
 
-    function combinationItem(number, combo) {
-      const label = document.createElement("span");
-      label.className = "combo-number";
-      label.textContent = String(number).padStart(3, "0");
+    function comboNumber(number) {
+      return String(number).padStart(3, "0");
+    }
+
+    // The combination's colours laid out as in the book; make(colour) creates each block.
+    function blocksFor(combo, make) {
       const blocks = document.createElement("div");
       blocks.className = "blocks";
-      for (const c of combo) {
-        const button = colorButton(c);
-        const name = document.createElement("span");
-        name.textContent = c.name;
-        button.append(name);
-        blocks.append(button);
+      blocks.dataset.size = combo.colors.length;
+      for (const c of combo.colors) {
+        const block = make(c);
+        block.style.setProperty("--color", c.css);
+        blocks.append(block);
       }
+      return blocks;
+    }
+
+    // A colour block that shows its name on hover and opens the colour dialog on click (or does onClick).
+    function namedColorButton(c, onClick) {
+      const button = colorButton(c, onClick);
+      const name = document.createElement("span");
+      name.textContent = c.name;
+      button.append(name);
+      return button;
+    }
+
+    // A combination in a list: its number (a link to its page) above its colours.
+    function combinationItem(combo) {
+      const link = document.createElement("a");
+      link.className = "combo-number";
+      link.href = `#combination/${combo.number}`;
+      link.textContent = comboNumber(combo.number);
       const li = document.createElement("li");
-      li.setAttribute("aria-label", `Combination ${number}`);
-      li.append(label, blocks);
+      li.setAttribute("aria-label", `Combination ${combo.number}`);
+      li.append(link, blocksFor(combo, (c) => namedColorButton(c)));
       return li;
+    }
+
+    // Each colour's name, CMYK and OKLCH (with a copy button), placed like the colours themselves.
+    function infoFor(colors) {
+      const info = document.createElement("div");
+      info.className = "combo-info";
+      info.dataset.size = colors.length;
+      for (const c of colors) {
+        const name = document.createElement("p");
+        name.textContent = c.name;
+        const cmyk = document.createElement("p");
+        cmyk.textContent = cmykText(c.cmyk);
+        const oklch = document.createElement("p");
+        oklch.className = "oklch-line";
+        const values = document.createElement("span");
+        values.textContent = oklchValues(c.oklch);
+        oklch.append(values, copyButtonFor(c.css));
+        const cell = document.createElement("div");
+        cell.append(name, cmyk, oklch);
+        info.append(cell);
+      }
+      return info;
+    }
+
+    // Colours in an address: their numbers in book order, 1-based, e.g. 1-46-89.
+    function colorsCode(colors) {
+      return colors.map((c) => c.index + 1).join("-");
+    }
+    function parseColors(text) {
+      const colors = [];
+      for (const part of text.split("-")) {
+        const c = /^\d+$/.test(part) ? data.colors[Number(part) - 1] : undefined;
+        if (c && !colors.includes(c) && colors.length < 4) colors.push(c);
+      }
+      return colors;
+    }
+
+    // Opens the Create view: with the colours in the address, or else the combination composed last.
+    function openCreate(arg) {
+      if (arg !== undefined) create.picked = parseColors(arg);
+      else if (!create.picked.length) {
+        let saved = null;
+        try { saved = localStorage.getItem("create"); } catch {}
+        create.picked = parseColors(saved ?? "");
+      }
+      create.active = null;
+      create.note = "";
+      updateCreate();
+    }
+
+    // After every change: the address, the saved copy, the composition and the picker's marks.
+    function updateCreate(focusSlot) {
+      const code = colorsCode(create.picked);
+      history.replaceState(null, "", code ? `#create/${code}` : "#create");
+      try { localStorage.setItem("create", code); } catch {}
+      renderStage(focusSlot);
+      for (const c of data.colors) {
+        const at = create.picked.indexOf(c), button = pickerButtons[c.index];
+        button.setAttribute("aria-pressed", at >= 0);
+        button.firstElementChild.textContent = at >= 0 ? at + 1 : "";
+      }
+    }
+
+    // The composition: the colours laid out as in the book (2 to 4; empty slots until there are 2),
+    // each colour's values, a message, and actions.
+    function renderStage(focusSlot) {
+      const { picked, active } = create;
+      const size = Math.max(2, picked.length);
+      const blocks = document.createElement("div");
+      blocks.className = "blocks";
+      blocks.dataset.size = size;
+      for (let i = 0; i < size; i++) {
+        if (i < picked.length) blocks.append(slotButton(picked[i], i));
+        else blocks.append(Object.assign(document.createElement("div"), { className: "empty" }));
+      }
+      const figure = document.createElement("div");
+      figure.className = "combo-figure";
+      const info = document.createElement("ol");
+      info.className = "create-info";
+      for (const c of picked) {
+        const li = document.createElement("li");
+        const chip = document.createElement("span");
+        chip.className = "chip";
+        chip.style.setProperty("--color", c.css);
+        const oklch = document.createElement("span");
+        oklch.className = "oklch-line";
+        oklch.append(oklchValues(c.oklch), copyButtonFor(c.css));
+        li.append(
+          chip,
+          Object.assign(document.createElement("span"), { className: "name", textContent: c.name }),
+          Object.assign(document.createElement("span"), { className: "cmyk", textContent: cmykText(c.cmyk) }),
+          oklch,
+        );
+        info.append(li);
+      }
+      figure.append(blocks, info);
+
+      const note = document.createElement("p");
+      note.className = "section-label";
+      note.setAttribute("aria-live", "polite");
+      if (create.note) note.textContent = create.note;
+      else if (active !== null) note.textContent = "Pick a colour to replace it, or select another to swap them.";
+      else if (picked.length < 2) note.textContent = "Pick 2 to 4 colours.";
+      else {
+        // Book combinations that have all these colours.
+        const together = data.combos.filter((combo) => picked.every((c) => combo.colors.includes(c)));
+        if (!together.length) note.textContent = "Not together in the book.";
+        else {
+          note.append("Together in the book:");
+          for (const combo of together) {
+            const a = document.createElement("a");
+            a.href = `#combination/${combo.number}`;
+            a.textContent = comboNumber(combo.number);
+            note.append(" ", a);
+          }
+        }
+      }
+
+      const actions = document.createElement("p");
+      actions.className = "actions";
+      if (picked.length) {
+        const copyLink = Object.assign(document.createElement("button"), { type: "button", textContent: "Copy link" });
+        copyLink.addEventListener("click", async () => {
+          try { await navigator.clipboard.writeText(location.href); } catch { return; }
+          copyLink.textContent = "Copied";
+          setTimeout(() => (copyLink.textContent = "Copy link"), 1500);
+        });
+        const clear = Object.assign(document.createElement("button"), { type: "button", textContent: "Clear" });
+        clear.addEventListener("click", () => {
+          create.picked = [];
+          create.active = null;
+          create.note = "";
+          updateCreate();
+        });
+        actions.append(copyLink, clear);
+      }
+
+      views.create.querySelector(".create-stage").replaceChildren(figure, note, actions);
+      if (focusSlot !== undefined) blocks.children[focusSlot]?.focus();
+    }
+
+    // A colour of the composition: click it, then another, to swap them (or then a colour in the
+    // picker, to replace it); or drag it onto another. Delete or Backspace removes it.
+    function slotButton(c, i) {
+      const button = namedColorButton(c, () => { if (!create.dragged) selectSlot(i); });
+      button.dataset.slot = i;
+      button.setAttribute("aria-pressed", create.active === i);
+      button.addEventListener("pointerdown", (e) => dragSlot(e, button, i));
+      button.addEventListener("keydown", (e) => {
+        if (e.key !== "Delete" && e.key !== "Backspace") return;
+        e.preventDefault();
+        create.picked.splice(i, 1);
+        create.active = null;
+        create.note = "";
+        updateCreate(create.picked.length ? Math.min(i, create.picked.length - 1) : undefined);
+      });
+      return button;
+    }
+
+    function swapSlots(a, b) {
+      const p = create.picked;
+      [p[a], p[b]] = [p[b], p[a]];
+    }
+
+    function selectSlot(i) {
+      const { active } = create;
+      create.note = "";
+      if (active === null) create.active = i;
+      else {
+        if (active !== i) swapSlots(active, i);
+        create.active = null;
+      }
+      updateCreate(i);
+    }
+
+    // Dragging a colour of the composition: it follows the pointer; dropped on another colour, they swap.
+    function dragSlot(e, button, i) {
+      if (e.button !== 0 || !e.isPrimary) return;
+      const x0 = e.clientX, y0 = e.clientY;
+      const others = [...button.parentElement.querySelectorAll("[data-slot]")].filter((b) => b !== button);
+      let dragging = false, target = null;
+      button.setPointerCapture(e.pointerId);
+      const move = (ev) => {
+        const dx = ev.clientX - x0, dy = ev.clientY - y0;
+        if (!dragging && Math.hypot(dx, dy) < 6) return; // still a click
+        dragging = true;
+        button.classList.add("dragging");
+        button.style.transform = `translate(${dx}px, ${dy}px) scale(0.85)`; // smaller, to show the target
+        target = others.find((b) => {
+          const r = b.getBoundingClientRect();
+          return ev.clientX >= r.left && ev.clientX < r.right && ev.clientY >= r.top && ev.clientY < r.bottom;
+        }) ?? null;
+        for (const b of others) b.classList.toggle("drop-target", b === target);
+      };
+      const end = (ev) => {
+        button.removeEventListener("pointermove", move);
+        button.removeEventListener("pointerup", end);
+        button.removeEventListener("pointercancel", end);
+        if (!dragging) return; // a click, handled by the click listener
+        create.dragged = true; // ignore the click that follows this pointerup
+        setTimeout(() => (create.dragged = false));
+        if (target && ev.type === "pointerup") swapSlots(i, Number(target.dataset.slot));
+        create.active = null;
+        create.note = "";
+        updateCreate();
+      };
+      button.addEventListener("pointermove", move);
+      button.addEventListener("pointerup", end);
+      button.addEventListener("pointercancel", end);
+    }
+
+    // A colour in the picker: adds it to the composition (or replaces the selected slot); if it is
+    // already there, removes it.
+    function pick(c) {
+      const { picked } = create;
+      const at = picked.indexOf(c);
+      create.note = "";
+      if (at >= 0) picked.splice(at, 1);
+      else if (create.active !== null) picked[create.active] = c;
+      else if (picked.length < 4) picked.push(c);
+      else create.note = "4 colours at most: click a picked colour to remove it, or select one in the combination to replace it.";
+      create.active = null;
+      updateCreate();
+    }
+
+    // The colour picker: every colour, by family as in the Families view, small. A picked colour shows
+    // its place in the combination; hovering one shows its values above.
+    function buildPicker(colors, families) {
+      const picker = views.create.querySelector(".picker");
+      const status = picker.querySelector(".picker-status");
+      const showStatus = (c) => (status.textContent = `${c.name}\n${cmykText(c.cmyk)}  ${oklchValues(c.oklch)}`);
+      for (const family of families) {
+        const ul = document.createElement("ul");
+        ul.className = "grid";
+        for (const i of family) {
+          const c = colors[i];
+          const button = colorButton(c, () => pick(c));
+          button.append(document.createElement("span"));
+          button.addEventListener("pointerenter", () => showStatus(c));
+          button.addEventListener("focus", () => showStatus(c));
+          button.addEventListener("pointerleave", () => status.replaceChildren());
+          button.addEventListener("blur", () => status.replaceChildren());
+          pickerButtons[i] = button;
+          const li = document.createElement("li");
+          li.append(button);
+          ul.append(li);
+        }
+        picker.append(ul);
+      }
+    }
+
+    // Escape cancels a selected slot.
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape" || views.create.hidden || detail.open || create.active === null) return;
+      const focusSlot = create.active;
+      create.active = null;
+      updateCreate(focusSlot);
+    });
+
+    // One combination's page: number, colours, each colour's values, and related combinations
+    // (those sharing a colour with it: most shared colours first, then in book order).
+    function renderCombination(number) {
+      const view = views.combination;
+      const combo = data.combos[number - 1];
+      if (!combo) {
+        view.replaceChildren(Object.assign(document.createElement("p"), { className: "error", textContent: "No such combination." }));
+        return;
+      }
+      const title = document.createElement("h1");
+      title.className = "combo-number";
+      title.textContent = comboNumber(number);
+
+      const figure = document.createElement("div");
+      figure.className = "combo-figure";
+      figure.append(blocksFor(combo, (c) => namedColorButton(c)), infoFor(combo.colors));
+      const edit = document.createElement("a");
+      edit.href = `#create/${colorsCode(combo.colors)}`;
+      edit.textContent = "Edit in Create";
+      const actions = document.createElement("p");
+      actions.className = "actions";
+      actions.append(edit);
+      figure.append(actions);
+
+      const shared = (other) => other.colors.filter((c) => combo.colors.includes(c)).length;
+      const related = data.combos
+        .filter((other) => other !== combo && shared(other) > 0)
+        .sort((a, b) => shared(b) - shared(a) || a.number - b.number);
+      const label = document.createElement("p");
+      label.className = "section-label";
+      label.textContent = `${related.length} related combination${related.length === 1 ? "" : "s"}`;
+      const list = document.createElement("ul");
+      list.className = "combos";
+      list.append(...related.map(combinationItem));
+
+      view.replaceChildren(title, figure, label, list);
+      document.title = `${comboNumber(number)} | Wada Sanzo`;
     }
 
     function swatchItem(c) {
@@ -376,14 +827,13 @@
         const path = document.createElementNS(NS, "path");
         path.classList.add("segment");
         path.setAttribute("d", d);
-        path.setAttribute("fill", oklchText(c.oklch));
+        path.setAttribute("fill", c.css);
         path.setAttribute("tabindex", "0");
         path.setAttribute("role", "button");
         path.setAttribute("aria-label", c.name);
-        const color = { ...c, css: oklchText(c.oklch) };
         const show = () => {
           highlight.setAttribute("d", d);
-          fillDetails(panel, color);
+          fillDetails(panel, c);
           panel.classList.add("show");
         };
         const hide = () => { highlight.removeAttribute("d"); panel.classList.remove("show"); };
@@ -391,9 +841,9 @@
         path.addEventListener("focus", show);
         path.addEventListener("pointerleave", hide);
         path.addEventListener("blur", hide);
-        path.addEventListener("click", () => showDetail(color));
+        path.addEventListener("click", () => showDetail(c));
         path.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showDetail(color); }
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showDetail(c); }
         });
         svg.append(path);
       };
@@ -428,70 +878,83 @@
 
     // Paints the continuous wheel: at each pixel, hue from the angle and chroma from the radius (same
     // mapping as the segments), at that hue's most vivid lightness, limited to what sRGB can show.
+    // Only repaints when the size changes: a hidden canvas keeps its picture.
     function paintWheel(canvas, [R0, R1], lo, hi) {
       const size = Math.round(canvas.clientWidth * Math.min(devicePixelRatio, 1.5));
-      if (!size) return; // hidden view
+      if (!size || (size === canvas.width && canvas.dataset.painted)) return; // hidden, or already painted
       canvas.width = canvas.height = size;
+      canvas.dataset.painted = "1";
       const ctx = canvas.getContext("2d");
       const img = ctx.createImageData(size, size), px = img.data;
       const unit = 2.04 / size; // matches the SVG viewBox
-      const encode = (v) => 255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * Math.min(v, 1) ** (1 / 2.4) - 0.055);
+      const { L: cuspL, C: cuspC } = cuspTable();
+      const rgb = new Float64Array(3);
+      const encode = (v) => SRGB_ENCODE[v <= 0 ? 0 : v >= 1 ? 4095 : (v * 4095 + 0.5) | 0];
       for (let j = 0; j < size; j++) {
         const y = (j + 0.5) * unit - 1.02;
         for (let i = 0; i < size; i++) {
-          const x = (i + 0.5) * unit - 1.02, r = Math.hypot(x, y);
+          const x = (i + 0.5) * unit - 1.02, r = Math.sqrt(x * x + y * y);
           const alpha = Math.min(1, (r - R0) / unit, (R1 - r) / unit); // antialiased edges
           if (alpha <= 0) continue;
-          const h = ((Math.atan2(-y, x) * 180) / Math.PI + 360) % 360;
-          const { L, C: cMax } = cusp(h);
-          const C = Math.min((lo + ((r - R0) / (R1 - R0)) * (hi - lo)) ** 2, cMax);
-          const rgb = oklchToLinearSRGB(L, C, h);
+          // Hue in half-degree steps, interpolated between the table's entries.
+          const k = ((Math.atan2(-y, x) * 360) / Math.PI + 720) % 720, k0 = k | 0, t = k - k0;
+          const L = cuspL[k0] + (cuspL[k0 + 1] - cuspL[k0]) * t;
+          const c = lo + ((r - R0) / (R1 - R0)) * (hi - lo);
+          const C = Math.min(c * c, cuspC[k0] + (cuspC[k0 + 1] - cuspC[k0]) * t);
+          oklabToLinearSRGB(L, (C * x) / r, (-C * y) / r, rgb); // a = C cos h, b = C sin h
           const o = (j * size + i) * 4;
-          px[o] = encode(Math.max(rgb[0], 0));
-          px[o + 1] = encode(Math.max(rgb[1], 0));
-          px[o + 2] = encode(Math.max(rgb[2], 0));
+          px[o] = encode(rgb[0]);
+          px[o + 1] = encode(rgb[1]);
+          px[o + 2] = encode(rgb[2]);
           px[o + 3] = 255 * alpha;
         }
       }
       ctx.putImageData(img, 0, 0);
     }
 
-    // OKLCH -> linear sRGB (Ottosson's OKLab matrices).
-    function oklchToLinearSRGB(L, C, h) {
-      const a = C * Math.cos((h * Math.PI) / 180), b = C * Math.sin((h * Math.PI) / 180);
-      const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
-      const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
-      const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
-      return [
-        4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
-        -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
-        -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
-      ];
+    // Linear sRGB 0..1 (in 4096 steps) -> 8-bit sRGB.
+    const SRGB_ENCODE = Uint8ClampedArray.from({ length: 4096 }, (_, i) => {
+      const v = i / 4095;
+      return 255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055);
+    });
+
+    // OKLab -> linear sRGB (Ottosson's matrices), written into `out`.
+    function oklabToLinearSRGB(L, a, b, out = new Float64Array(3)) {
+      const l_ = L + 0.3963377774 * a + 0.2158037573 * b, l = l_ * l_ * l_;
+      const m_ = L - 0.1055613458 * a - 0.0638541728 * b, m = m_ * m_ * m_;
+      const s_ = L - 0.0894841775 * a - 1.291485548 * b, s = s_ * s_ * s_;
+      out[0] = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+      out[1] = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+      out[2] = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+      return out;
     }
 
     function inSRGB(L, C, h) {
-      return oklchToLinearSRGB(L, C, h).every((v) => v >= -1e-4 && v <= 1 + 1e-4);
+      const rad = (h * Math.PI) / 180;
+      return oklabToLinearSRGB(L, C * Math.cos(rad), C * Math.sin(rad)).every((v) => v >= -1e-4 && v <= 1 + 1e-4);
     }
 
-    // Most vivid sRGB colour per hue, { L, C }: computed in half-degree steps, interpolated between.
-    const cuspCache = new Map();
-    function cuspAt(key) {
-      if (!cuspCache.has(key)) {
-        const L = cuspLightness(key / 2);
-        cuspCache.set(key, { L, C: maxChroma(L, key / 2) });
+    // Most vivid sRGB colour per hue (the gamut "cusp"): lightness L and chroma C in half-degree steps,
+    // with entry 720 repeating entry 0 so interpolation wraps around. Computed once.
+    let cusps = null;
+    function cuspTable() {
+      if (!cusps) {
+        const L = new Float64Array(721), C = new Float64Array(721);
+        for (let k = 0; k < 720; k++) {
+          L[k] = cuspLightness(k / 2);
+          C[k] = maxChroma(L[k], k / 2);
+        }
+        L[720] = L[0];
+        C[720] = C[0];
+        cusps = { L, C };
       }
-      return cuspCache.get(key);
-    }
-    function cusp(h) {
-      const k = h * 2, k0 = Math.floor(k) % 720, t = k - Math.floor(k);
-      const a = cuspAt(k0), b = cuspAt((k0 + 1) % 720);
-      return { L: a.L + (b.L - a.L) * t, C: a.C + (b.C - a.C) * t };
+      return cusps;
     }
 
     // Largest chroma sRGB can show at this lightness and hue.
     function maxChroma(L, h) {
       let lo = 0, hi = 0.4;
-      for (let i = 0; i < 24; i++) {
+      for (let i = 0; i < 16; i++) { // to within 0.4 / 2^16
         const mid = (lo + hi) / 2;
         if (inSRGB(L, mid, h)) lo = mid; else hi = mid;
       }
@@ -502,7 +965,7 @@
     // Max chroma rises then falls with lightness, so a ternary search finds the peak.
     function cuspLightness(h) {
       let lo = 0.2, hi = 1;
-      for (let i = 0; i < 40; i++) {
+      for (let i = 0; i < 24; i++) { // to within 0.8 × (2/3)^24 ≈ 0.00005
         const m1 = lo + (hi - lo) / 3, m2 = hi - (hi - lo) / 3;
         if (maxChroma(m1, h) < maxChroma(m2, h)) lo = m1; else hi = m2;
       }

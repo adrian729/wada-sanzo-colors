@@ -10,7 +10,7 @@
       --fg: #1d1d1b;
       --muted: #6e6e68;
       --line: #e3e3dd;
-      --info: calc(32ch + 1rem); /* widest info row: "OKLCH" + gap + oklch(0.5579 0.1582 357.38) */
+      --info: 26ch; /* widest info line: OKLCH 0.5579 0.1582 357.38 */
     }
     /* DM Mono (SIL Open Font License, fonts/OFL.txt), from github.com/google/fonts/tree/main/ofl/dmmono.
        It has no bold: Medium (500) is the heaviest weight. */
@@ -20,18 +20,25 @@
     [hidden] { display: none !important; }
     body { font-family: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: var(--bg); color: var(--fg); }
 
-    nav {
+    /* Header: the main navigation, plus a sub-navigation row with the current view's options. */
+    header {
       position: sticky; top: 0; z-index: 3;
-      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
-      padding: 1rem 1.5rem;
       background: var(--bg);
       border-bottom: 1px solid var(--line);
     }
+    nav {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      padding: 1rem 1.5rem;
+    }
     nav strong { font-weight: 500; }
     nav span { color: var(--muted); }
-    .views { display: flex; gap: 1rem; }
-    .views a { color: var(--muted); text-decoration: none; }
-    .views a[aria-current] { color: var(--fg); text-decoration: underline; text-underline-offset: 0.25em; }
+    .views, .subnav { display: flex; gap: 1rem; }
+    .subnav { justify-content: flex-end; padding: 0 1.5rem 1rem; font-size: 0.875rem; }
+    .views a, .subnav button { color: var(--muted); text-decoration: none; }
+    .subnav button { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+    .views a[aria-current], .subnav button[aria-pressed="true"] {
+      color: var(--fg); text-decoration: underline; text-underline-offset: 0.25em;
+    }
 
     main { padding: 1.5rem; }
     #families-view { display: grid; gap: 1rem; }
@@ -61,13 +68,49 @@
     }
     .swatch:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; }
 
+    /* Rows layout: one full-width stripe per colour, edge to edge (cancels main's padding); the only
+       space is the gap between families. */
+    #families-view[data-show="rows"] { margin: -1.5rem; gap: 2rem; }
+    [data-show="rows"] .grid { grid-template-columns: 1fr; }
+    [data-show="rows"] .swatch { aspect-ratio: auto; height: 3.5rem; place-items: center start; padding: 0 1.5rem; }
+    /* Hover text: grid squares show the CMYK values one per line; rows show name, CMYK and OKLCH on
+       one line, in columns that line up from row to row (widest name: 22 characters, CMYK: 20). */
+    .swatch .in-rows, [data-show="rows"] .swatch .in-grid { display: none; }
+    [data-show="rows"] .swatch .in-rows { display: grid; grid-template-columns: 26ch 24ch auto; }
+
+    /* Combinations, laid out as in the book: 2 colours side by side (6:5 each), 3 squares in a row,
+       4 colours as a cross of 2:1 rectangles (top, left, right, bottom). The colours touch. */
+    #combinations-view { display: grid; gap: 3rem; }
+    .combos {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 2rem 1.5rem;
+      padding: 0; list-style: none;
+    }
+    .combo-number { display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; }
+    .blocks { display: grid; grid-template-rows: 1fr; }
+    [data-size="2"] .blocks { grid-template-columns: repeat(2, 1fr); aspect-ratio: 12 / 5; }
+    [data-size="3"] .blocks { grid-template-columns: repeat(3, 1fr); aspect-ratio: 3 / 1; }
+    [data-size="4"] .blocks {
+      grid-template: ". top top ." 1fr "left left right right" 1fr ". bottom bottom ." 1fr / 1fr 1fr 1fr 1fr;
+      aspect-ratio: 4 / 3;
+    }
+    [data-size="4"] .swatch:nth-child(1) { grid-area: top; }
+    [data-size="4"] .swatch:nth-child(2) { grid-area: left; }
+    [data-size="4"] .swatch:nth-child(3) { grid-area: right; }
+    [data-size="4"] .swatch:nth-child(4) { grid-area: bottom; }
+    .blocks .swatch { aspect-ratio: auto; height: 100%; padding: 0.5rem; }
+    .blocks .swatch span { white-space: normal; text-align: center; } /* the colour name */
+    /* Sub-navigation choice: only the combinations with that many colours. */
+    [data-show="2"] .combos:not([data-size="2"]),
+    [data-show="3"] .combos:not([data-size="3"]),
+    [data-show="4"] .combos:not([data-size="4"]) { display: none; }
+
     /* Wheel view: wheel (angle = hue, distance from centre = chroma) centred on the page; the info panel
        floats at the left middle of the screen, outside the layout, so it never moves the wheel. */
     #wheel-view { display: grid; justify-items: center; }
     .wheel { position: relative; width: min(100%, calc(100vh - 8rem)); aspect-ratio: 1; }
     .wheel-panel {
       position: fixed; left: 1.5rem; top: 50%; transform: translateY(-50%); z-index: 2;
-      width: 26ch; /* widest line: OKLCH 0.5579 0.1582 357.38 */
+      width: var(--info);
       line-height: 1.5; white-space: nowrap; font-variant-numeric: tabular-nums; pointer-events: none;
       opacity: 0; transition: opacity 0.6s ease; /* fade out */
     }
@@ -82,38 +125,58 @@
     @media (prefers-reduced-motion: reduce) { .swatch span, .wheel-panel { transition: none !important; } }
 
     dialog {
-      width: min(calc(var(--info) + 2.5rem), calc(100% - 2rem));
+      width: min(calc(var(--info) + 4.5rem), calc(100% - 2rem)); /* text + padding + copy button */
       margin: auto;
       padding: 0; border: 0;
       background: var(--bg); color: var(--fg);
     }
     dialog::backdrop { background: rgb(0 0 0 / 0.4); }
     .detail-swatch { height: 12rem; background: var(--color); }
-    .detail-body { padding: 1.25rem; }
-    .detail-body h2 { font-size: 1.25rem; font-weight: 500; margin-bottom: 0.75rem; }
-    dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; }
-    dt { color: var(--muted); }
-    dd { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .detail-body { padding: 1.25rem; line-height: 1.5; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .detail-body h2 { font-size: 1.25rem; font-weight: 500; margin-bottom: 0.5rem; }
+    .oklch-line { display: flex; align-items: center; gap: 0.5rem; }
+    .copy {
+      display: grid; padding: 0.25rem; margin: -0.25rem 0;
+      border: 0; background: none; color: var(--muted); cursor: pointer;
+    }
+    .copy:hover, .copy:focus-visible { color: var(--fg); }
+    .copy svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.25; }
+    .copy .done, .copy.copied .idle { display: none; }
+    .copy.copied .done { display: block; }
     .error { color: var(--muted); }
   </style>
 </head>
 <body>
-  <nav>
-    <div><strong>Wada Sanzo</strong> <span>| A Dictionary of Color Combinations</span></div>
-    <div class="views">
-      <a href="#families">Families</a>
-      <a href="#wheel">Wheel</a>
+  <header>
+    <nav>
+      <div><strong>Wada Sanzo</strong> <span>| A Dictionary of Color Combinations</span></div>
+      <div class="views">
+        <a href="#families">Families</a>
+        <a href="#combinations">Combinations</a>
+        <a href="#wheel">Wheel</a>
+      </div>
+    </nav>
+    <div class="subnav" data-view="families" role="group" aria-label="Families layout">
+      <button type="button" data-value="grid">Grid</button>
+      <button type="button" data-value="rows">Rows</button>
     </div>
-  </nav>
+    <div class="subnav" data-view="combinations" data-default="all" role="group" aria-label="Number of colours">
+      <button type="button" data-value="2">2</button>
+      <button type="button" data-value="3">3</button>
+      <button type="button" data-value="4">4</button>
+      <button type="button" data-value="all">All</button>
+    </div>
+  </header>
 
   <main>
     <section id="families-view"></section>
+    <section id="combinations-view" hidden></section>
     <section id="wheel-view" hidden>
       <aside class="wheel-panel" aria-live="polite">
         <div class="detail-swatch"></div>
         <h2></h2>
         <p data-field="cmyk"></p>
-        <p data-field="oklch-values"></p>
+        <p data-field="oklch"></p>
       </aside>
       <div class="wheel">
         <canvas class="wheel-bg" aria-hidden="true"></canvas>
@@ -126,22 +189,29 @@
     <div class="detail-swatch"></div>
     <div class="detail-body">
       <h2></h2>
-      <dl>
-        <dt>CMYK</dt><dd data-field="cmyk"></dd>
-        <dt>OKLCH</dt><dd data-field="oklch"></dd>
-      </dl>
+      <p data-field="cmyk"></p>
+      <p class="oklch-line">
+        <span data-field="oklch"></span>
+        <button type="button" class="copy" aria-label="Copy CSS colour" title="Copy CSS colour">
+          <svg class="idle" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8"/><path d="M10.5 5.5v-3h-8v8h3"/></svg>
+          <svg class="done" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>
+        </button>
+      </p>
     </div>
   </dialog>
 
   <script type="module">
     const views = {
       families: document.getElementById("families-view"),
+      combinations: document.getElementById("combinations-view"),
       wheel: document.getElementById("wheel-view"),
     };
     const detail = document.getElementById("detail");
+    const subnavs = document.querySelectorAll(".subnav");
 
     const cmykText = ([c, m, y, k]) => `C ${c} M ${m} Y ${y} K ${k}`;
     const oklchText = ([l, c, h]) => `oklch(${l} ${c} ${h})`;
+    const oklchValues = ([l, c, h]) => `OKLCH ${l} ${c} ${h}`;
 
     function showView() {
       const name = location.hash.slice(1) in views ? location.hash.slice(1) : "families";
@@ -150,32 +220,60 @@
         if (a.hash === `#${name}`) a.setAttribute("aria-current", "page");
         else a.removeAttribute("aria-current");
       }
+      for (const s of subnavs) s.hidden = s.dataset.view !== name;
     }
     addEventListener("hashchange", showView);
     showView();
+
+    // Sub-navigation: each view's options (families: grid or rows; combinations: number of colours).
+    // The choice is set on the view as data-show, which the CSS reads, and remembered in this browser.
+    for (const subnav of subnavs) {
+      const view = views[subnav.dataset.view], key = `${subnav.dataset.view}-show`;
+      const buttons = [...subnav.querySelectorAll("button")];
+      const choose = (value) => {
+        view.dataset.show = value;
+        for (const b of buttons) b.setAttribute("aria-pressed", b.dataset.value === value);
+        try { localStorage.setItem(key, value); } catch {}
+      };
+      for (const b of buttons) b.addEventListener("click", () => choose(b.dataset.value));
+      let saved = null;
+      try { saved = localStorage.getItem(key); } catch {}
+      choose(buttons.some((b) => b.dataset.value === saved) ? saved : subnav.dataset.default ?? buttons[0].dataset.value);
+    }
 
     // Fills a block that has .detail-swatch, h2 and data-field elements (the dialog and the wheel panel).
     function fillDetails(root, color) {
       root.querySelector(".detail-swatch").style.setProperty("--color", color.css);
       root.querySelector("h2").textContent = color.name;
-      const fields = {
-        cmyk: cmykText(color.cmyk),
-        oklch: color.css, // dialog: the CSS value
-        "oklch-values": `OKLCH ${color.oklch.join(" ")}`, // wheel panel
-      };
-      for (const el of root.querySelectorAll("[data-field]")) el.textContent = fields[el.dataset.field];
+      root.querySelector('[data-field="cmyk"]').textContent = cmykText(color.cmyk);
+      root.querySelector('[data-field="oklch"]').textContent = oklchValues(color.oklch);
     }
 
     function showDetail(color) {
       fillDetails(detail, color);
+      copyButton.dataset.css = color.css;
+      copyButton.classList.remove("copied");
       detail.showModal();
     }
+    // Copy button: copies the colour as CSS, oklch(L C h); shows a check mark for a moment.
+    const copyButton = detail.querySelector(".copy");
+    let copiedTimer;
+    copyButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(copyButton.dataset.css);
+      } catch {
+        return; // clipboard unavailable (e.g. not served from localhost or https)
+      }
+      copyButton.classList.add("copied");
+      clearTimeout(copiedTimer);
+      copiedTimer = setTimeout(() => copyButton.classList.remove("copied"), 1500);
+    });
     // Clicking the backdrop (outside the dialog's content) closes it.
     detail.addEventListener("click", (e) => { if (e.target === detail) detail.close(); });
 
     try {
-      const [colors, families] = await Promise.all(
-        ["colors.json", "families.json"].map((f) => fetch(f).then((r) => r.json()))
+      const [colors, families, combinations] = await Promise.all(
+        ["colors.json", "families.json", "combinations.json"].map((f) => fetch(f).then((r) => r.json()))
       );
 
       // Families: one grid per colour family (the book groups its colours by hue), in book order.
@@ -186,22 +284,66 @@
         views.families.append(ul);
       }
 
+      // Combinations: in book order, in the book's three sections (2, 3 and 4 colours).
+      for (const size of [2, 3, 4]) {
+        const ul = document.createElement("ul");
+        ul.className = "combos";
+        ul.dataset.size = size;
+        combinations.forEach((combo, i) => {
+          if (combo.length === size) ul.append(combinationItem(i + 1, combo.map((k) => colors[k])));
+        });
+        views.combinations.append(ul);
+      }
+
       buildWheel(colors);
     } catch {
       document.querySelector("main").innerHTML = `<p class="error">Couldn't load the colour data. Serve this folder over HTTP, e.g. <code>python3 -m http.server</code>.</p>`;
     }
 
-    function swatchItem(c) {
+    // A colour block: shows its text on hover, opens the details on click.
+    function colorButton(c) {
       const color = { ...c, css: oklchText(c.oklch) };
       const button = document.createElement("button");
       button.className = "swatch";
       button.style.setProperty("--color", color.css);
       button.style.setProperty("--ink", c.oklch[0] > 0.6 ? "rgb(0 0 0 / 0.75)" : "rgb(255 255 255 / 0.9)");
       button.setAttribute("aria-label", color.name);
-      const values = document.createElement("span");
-      values.textContent = c.cmyk.map((v, j) => `${"CMYK"[j]} ${v}`).join("\n");
-      button.append(values);
       button.addEventListener("click", () => showDetail(color));
+      return button;
+    }
+
+    function combinationItem(number, combo) {
+      const label = document.createElement("span");
+      label.className = "combo-number";
+      label.textContent = String(number).padStart(3, "0");
+      const blocks = document.createElement("div");
+      blocks.className = "blocks";
+      for (const c of combo) {
+        const button = colorButton(c);
+        const name = document.createElement("span");
+        name.textContent = c.name;
+        button.append(name);
+        blocks.append(button);
+      }
+      const li = document.createElement("li");
+      li.setAttribute("aria-label", `Combination ${number}`);
+      li.append(label, blocks);
+      return li;
+    }
+
+    function swatchItem(c) {
+      const button = colorButton(c);
+      const inGrid = document.createElement("span");
+      inGrid.className = "in-grid";
+      inGrid.textContent = c.cmyk.map((v, j) => `${"CMYK"[j]} ${v}`).join("\n");
+      const inRows = document.createElement("span");
+      inRows.className = "in-rows";
+      for (const text of [c.name, cmykText(c.cmyk), oklchValues(c.oklch)]) {
+        const cell = document.createElement("span");
+        cell.textContent = text;
+        inRows.append(cell);
+      }
+      button.append(inGrid, inRows);
       const li = document.createElement("li");
       li.append(button);
       return li;

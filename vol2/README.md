@@ -1,6 +1,6 @@
 # Volume 2: seasonal combinations (work in progress)
 
-How Volume 2's 72 seasonal combinations were extracted and checked, and the scripts that feed them to the site: the site's `seasons.json` is built from `extracted.json` by `scripts/build_seasons.py`; the 11 colours not in Volume 1 were added to the site's `colors.json` (marked `"volume": 2`, CMYK from `book.json`) and form the last family in `families.json`.
+How Volume 2's 72 seasonal combinations were extracted and checked, and the scripts that feed them to the site: the site's `seasons.json` is built from `extracted.json` by `scripts/build_seasons.py`; the 11 colours not in Volume 1 were added to the site's `colors.json` (marked `"volume": 2`, CMYK from `book.json`) and placed in `families.json` where Volume 2's colour index puts them (Volume 2 has the same six families).
 
 ## Source
 

@@ -42,7 +42,9 @@
     }
 
     main { padding: 1.5rem; }
-    #families-view { display: grid; gap: 1rem; }
+    #families-view { display: grid; gap: 2rem; }
+    /* A group's name above it: the book's colour families, the months of the seasonal combinations. */
+    .group-heading { margin-bottom: 1rem; font-size: 0.875rem; font-weight: 500; }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
@@ -70,8 +72,9 @@
     .swatch:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; }
 
     /* Rows layout: one full-width stripe per colour, edge to edge (cancels main's padding); the only
-       space is the gap between families. */
-    #families-view[data-show="rows"] { margin: -1.5rem; gap: 2rem; }
+       space is between families, around their names. */
+    #families-view[data-show="rows"] { margin: -1.5rem; gap: 0; }
+    [data-show="rows"] .group-heading { margin: 0; padding: 1.5rem 1.5rem 1rem; }
     [data-show="rows"] .grid { grid-template-columns: 1fr; }
     [data-show="rows"] .swatch { aspect-ratio: auto; height: 3.5rem; place-items: center start; padding: 0 1.5rem; }
     /* Hover text: grid squares show the CMYK values one per line; rows show name, CMYK and OKLCH on
@@ -114,7 +117,6 @@
     /* Seasonal combinations (Volume 2), as in the book: 3 to 7 colours stacked top to bottom, equal. */
     .blocks.stack { grid-template-rows: repeat(var(--n), minmax(0, 1fr)); grid-template-columns: minmax(0, 1fr); aspect-ratio: 3 / 4; }
     #seasons-view { display: grid; gap: 3rem; }
-    .month { margin-bottom: 1rem; font-size: 0.875rem; font-weight: 500; }
     .combos.seasons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     @media (min-width: 40rem) { .combos.seasons { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (min-width: 64rem) { .combos.seasons { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
@@ -453,13 +455,16 @@
       for (const combo of seasons) for (const c of combo.colors) seasonsOf[c.index].push(combo);
       data = { colors, combos, combosOf, seasons, seasonsOf };
 
-      // Families: one grid per colour family (the book groups its colours by hue), in book order; the
-      // colours only in Volume 2 last.
+      // Families: one grid per colour family (the book groups its colours by hue), in book order, under
+      // its name. Colours only in Volume 2 are where its colour index puts them.
       for (const family of families) {
+        const section = document.createElement("section");
+        section.append(Object.assign(document.createElement("h2"), { className: "group-heading", textContent: family.name }));
         const ul = document.createElement("ul");
         ul.className = "grid";
-        ul.append(...family.map((i) => swatchItem(colors[i])));
-        views.families.append(ul);
+        ul.append(...family.colors.map((i) => swatchItem(colors[i])));
+        section.append(ul);
+        views.families.append(section);
       }
 
       // Combinations: in book order, in the book's three sections (2, 3 and 4 colours).
@@ -473,7 +478,7 @@
 
       // Seasons: month by month, in book order.
       MONTHS.forEach((month, m) => {
-        const heading = Object.assign(document.createElement("h2"), { className: "month", textContent: month });
+        const heading = Object.assign(document.createElement("h2"), { className: "group-heading", textContent: month });
         const ul = document.createElement("ul");
         ul.className = "combos seasons";
         ul.append(...seasons.slice(m * 6, m * 6 + 6).map(combinationItem));
@@ -793,7 +798,7 @@
       for (const family of families) {
         const ul = document.createElement("ul");
         ul.className = "grid";
-        for (const i of family) {
+        for (const i of family.colors) {
           const c = colors[i];
           const button = colorButton(c, () => pick(c));
           button.append(document.createElement("span"));

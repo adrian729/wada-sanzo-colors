@@ -27,6 +27,9 @@ The translations from the Japanese were made for these notes. Before quoting one
 - [haishoku-sokan.md](haishoku-sokan.md): the original work: Wada and why he made it, the editions, the 12 extra plates and the cards.
 - [data-analysis.md](data-analysis.md): what the combinations show statistically.
 - [analysis.py](analysis.py): the script behind data-analysis.md. Run `python3 notes/analysis.py`; it takes about 40 seconds.
+- [ostwald.md](ostwald.md): Wada's colours placed in Ostwald's colour system as his 1935 supplement draws it, as in the site's Ostwald view, and how well that fits his own data.
+- [ostwald.py](ostwald.py): the script behind ostwald.md. Run `python3 notes/ostwald.py`.
+
 ## Sources
 
 - **Wada's 1935 supplement:** 『配色總鑑附說』 ("Supplement to the Haishoku Sōkan"). It was compiled by Wada and published by Hakubisha (博美社) on 20 November 1935, not for sale. NDL scan: https://dl.ndl.go.jp/pid/1903674.

@@ -512,7 +512,9 @@
     // Fills a block that has .detail-swatch, h2 and data-field elements (the dialog and the wheel panel).
     function fillDetails(root, color) {
       root.querySelector(".detail-swatch").style.setProperty("--color", color.css);
-      root.querySelector("h2").textContent = color.name;
+      const name = root.querySelector("h2");
+      name.classList.add("named");
+      name.replaceChildren(color.name, chipOf(color));
       root.querySelector('[data-field="cmyk"]').textContent = cmykText(color.cmyk);
       root.querySelector('[data-field="oklch"]').textContent = oklchValues(color.oklch);
     }
@@ -717,15 +719,19 @@
     // `size` colours side by side (Create shows 1 colour in 2 slots), or (row) in rows under the
     // combination, up to 4 to a row, the rows balanced (see the CSS).
     // A colour's name, then a small square of it (so it is clear which colour the values are of).
+    // Every colour name shown as text gets its square (here, the picker's status, the colour dialog
+    // and the wheel's panel); only names written on their own colour (the blocks' labels) don't.
     function namedLine(c) {
       const name = document.createElement("p");
       name.className = "named";
-      name.textContent = c.name;
+      name.append(c.name, chipOf(c));
+      return name;
+    }
+    function chipOf(c) {
       const chip = document.createElement("span");
       chip.className = "chip";
       chip.style.setProperty("--color", c.css);
-      name.append(chip);
-      return name;
+      return chip;
     }
 
     function infoFor(colors, row = false, size = colors.length) {

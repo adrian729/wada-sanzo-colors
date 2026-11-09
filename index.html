@@ -355,7 +355,18 @@
       display: block; height: calc(var(--h) * 0.85); aspect-ratio: 9.8 / 33.2;
       cursor: ns-resize; touch-action: none; outline: none; user-select: none; -webkit-user-select: none;
     }
-    .wheel-views:not([data-view="level"]) > .lightness-levels { display: none; }
+    .wheel-views:not([data-view="level"], [data-view="3d"]) > .lightness-levels { display: none; }
+    /* 3D: OKLCH's solid on a canvas in the wheel's place, with its pages' labels round it, which follow it */
+    .oklch-solid { position: absolute; inset: 0; width: 100%; height: 100%; display: none; touch-action: none; cursor: grab; outline: none; }
+    .oklch-solid:active { cursor: grabbing; }
+    .oklch-solid:focus-visible { outline: 1px solid var(--muted); outline-offset: 2px; }
+    /* Its labels: buttons that hide or show their page, as the Ostwald view's (whose .solid-label rules, below, apply too), placed as those are */
+    .wheel > .solid-label { position: absolute; display: none; transform: translate(var(--dx), -50%); color: var(--muted); font-size: 0.75rem; white-space: nowrap; text-align: var(--align); }
+    .wheel > .solid-label:not(.solid-dot) { z-index: 1; } /* the names over the dots, legible where they meet */
+    .wheel > .solid-label.solid-dot { width: 0.55rem; height: 0.55rem; padding: 0; border-radius: 50%; background: var(--hue); border: 1.5px solid var(--hue); }
+    .wheel > .solid-label.solid-dot[aria-pressed="false"] { background: var(--bg); }
+    .wheel-views[data-view="3d"] .wheel > :is(.oklch-solid, .solid-label) { display: block; }
+    .wheel-views[data-view="3d"] .wheel > :is(svg, .wheel-bg) { display: none; }
     .wheel-views[data-view="pages"] > .dial-box { display: block; }
     @media (prefers-reduced-motion: reduce) { .swatch span, .wheel-panel { transition: none !important; } }
 
@@ -1393,6 +1404,20 @@
       return li;
     }
 
+    // The arrow keys, anywhere on the page, for a view with slices (`box`, its layout, while shown): the
+    // next slice, as its control or the arrows under its pages would. Up and left go back (to the level
+    // above, or the previous pages), down and right on; `go(step)` says false if the view has no slices
+    // just then. Not while typing in a field, nor where the keys already do something (the level control,
+    // the dial, the 3D solid, which have the focus then), nor with a card open.
+    function onArrows(box, go) {
+      document.addEventListener("keydown", (e) => {
+        const step = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[e.key];
+        if (!step || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || detail.open) return;
+        if (!box.getClientRects().length || e.target.closest?.("input, textarea, select, [contenteditable]")) return;
+        if (go(step) !== false) e.preventDefault();
+      });
+    }
+
     // Donut wheel on a polar grid: angle = OKLCH hue (counter-clockwise from the right, 10° slices),
     // distance from the centre = chroma (8 rings, spaced by the square root of chroma so the many
     // muted colours get room). Colours sharing a cell split it side by side, in hue order; empty
@@ -1484,8 +1509,8 @@
       // Dots at their places (`items`: [colour, x, y]), nudged apart until no two overlap: only those that
       // nearly coincide move (on the flat wheel, colours that differ mostly in lightness), by at most about
       // a dot's radius; and, in 2D, kept inside the slice (`keepIn`, which moves a point back in and says
-      // whether it did).
-      const drawDots = (items, keepIn) => {
+      // whether it did). Where they end up, and how far round each its target reaches: [colour, x, y, reach].
+      const placeDots = (items, keepIn) => {
         const p = items.map(([, x, y]) => [x, y]), gap = 2 * DOT + 0.004;
         const inside = () => items.reduce((moved, [c], i) => keepIn(p[i], c) || moved, false);
         for (let round = 0, moved = true; moved && round < 300; round++) {
@@ -1502,12 +1527,13 @@
             }
           }
         }
-        p.forEach(([x, y], i) => {
+        return p.map(([x, y], i) => {
           let near = Infinity;
           p.forEach(([u, v], j) => { if (j !== i) near = Math.min(near, Math.hypot(u - x, v - y)); });
-          dot(items[i][0], x, y, Math.min(1.8 * DOT, near / 2));
+          return [items[i][0], x, y, Math.min(1.8 * DOT, near / 2)];
         });
       };
+      const drawDots = (items, keepIn) => { for (const [c, x, y, reach] of placeDots(items, keepIn)) dot(c, x, y, reach); };
 
       const chromatic = colors.filter((c) => c.oklch[1] >= NEUTRAL_C);
       const greys = colors.filter((c) => c.oklch[1] < NEUTRAL_C);
@@ -1552,15 +1578,30 @@
       };
 
       // Background: the continuous wheel on the same mapping, faded (in 2D, the slice, at full strength),
-      // repainted when the size changes or the slice does.
+      // repainted when the size changes or the slice does. With the views, what's been painted is kept
+      // (the flat wheel, and the last KEEP slices), so that going back to it, from another view or slice,
+      // takes no painting.
       const canvas = wheel.querySelector(".wheel-bg");
-      const FLAT = { key: "flat", paint: () => { delete canvas.dataset.painted; paintWheel(canvas, RING, lo, hi); } };
+      const FLAT = { key: "flat", paint: () => { delete canvas.dataset.painted; return paintWheel(canvas, RING, lo, hi); } };
       let background = FLAT, painted = ""; // what the background shows; what it was last painted with, at what size
+      const kept = new Map(), KEEP = 12; // pictures by what they show, the last shown last
       const paintBackground = () => {
-        const key = `${background.key} ${canvas.clientWidth}`;
+        const key = `${background.key} ${canvas.clientWidth} ${devicePixelRatio}`;
         if (!canvas.clientWidth || key === painted) return; // hidden (painted once shown), or done
         painted = key;
-        background.paint();
+        const picture = kept.get(key);
+        if (picture) { // as it was painted
+          kept.delete(key);
+          kept.set(key, picture);
+          canvas.width = picture.width;
+          canvas.height = picture.height;
+          canvas.getContext("2d").putImageData(picture, 0, 0);
+          return;
+        }
+        const painting = background.paint(); // its pixels (none if there was nothing to paint)
+        if (!views || !painting) return;
+        kept.set(key, painting);
+        for (const k of kept.keys()) if (kept.size > KEEP + 1 && !k.startsWith("flat ")) kept.delete(k); // the oldest slices go; the flat wheel stays
       };
       new ResizeObserver(paintBackground).observe(canvas);
 
@@ -1677,7 +1718,7 @@
       // greys' (chroma under 0.02) the level's grey.
       const paintLevel = (L, t, cells) => {
         const furthest = Math.max(...t), grey = oklabToLinearSRGB(L, 0, 0);
-        paintField(canvas, (x, y, rgb, unit) => {
+        return paintField(canvas, (x, y, rgb, unit) => {
           const r = Math.sqrt(x * x + y * y);
           if (r >= furthest) return 0; // beyond the slice's furthest
           const k = ((Math.atan2(-y, x) * 360) / Math.PI + 720) % 720, k0 = k | 0, e = t[k0] + (t[k0 + 1] - t[k0]) * (k - k0);
@@ -1693,30 +1734,33 @@
           return alpha;
         });
       };
+      // A level's dots (its edge `t`, its colours and its greys): at their share of the way out to the edge,
+      // inside it, as far out as the edge leaves room for the whole dot, over the hues it spans; the greys'
+      // start on the axis and move apart as overlapping dots do. As placeDots gives them.
+      const levelDots = (t, list, greyList) => {
+        const keepIn = (q, c) => {
+          const r = Math.hypot(q[0], q[1]);
+          if (isGrey(c) || r < inner / 2) return false;
+          const deg = (Math.atan2(-q[1], q[0]) * 180) / Math.PI, span = (Math.asin(Math.min(1, DOT / r)) * 180) / Math.PI;
+          let e = Infinity;
+          for (let k = -4; k <= 4; k++) e = Math.min(e, edgeAt(t, deg + (span * k) / 4));
+          const most = Math.max(inner, e - DOT);
+          if (r <= most + 1e-6) return false; // (to within a little: pulled in exactly, it would otherwise keep pulling)
+          q[0] *= most / r;
+          q[1] *= most / r;
+          return true;
+        };
+        return placeDots([...list.map((c) => [c, ...polar(out(shareOf(c), edgeAt(t, c.oklch[2])), c.oklch[2])]), ...greyList.map((c) => [c, 0, 0])], keepIn);
+      };
       const drawLevel = (i, chosen) => {
         const L = lightOf(i), here = colors.filter((c) => levelOf(c) === i);
         const list = here.filter((c) => !isGrey(c)), greyList = here.filter(isGrey);
         const t = levelEdge(L), point = !t.some((v) => v > 0), cells = levelCells(L, t);
         cut = { L, t, cells };
-        // Dots at their share of the way out to the edge (inside it); the greys' start on the axis and move
-        // apart as overlapping dots do. Squares: each colour's cell split by hue, as the wheel's are; the
-        // greys a disc on the axis, split as the wheel's ring is.
-        if (marksAs === "dots") {
-          // Inside: as far out as the edge leaves room for the whole dot, over the hues it spans.
-          const keepIn = (q, c) => {
-            const r = Math.hypot(q[0], q[1]);
-            if (isGrey(c) || r < inner / 2) return false;
-            const deg = (Math.atan2(-q[1], q[0]) * 180) / Math.PI, span = (Math.asin(Math.min(1, DOT / r)) * 180) / Math.PI;
-            let e = Infinity;
-            for (let k = -4; k <= 4; k++) e = Math.min(e, edgeAt(t, deg + (span * k) / 4));
-            const most = Math.max(inner, e - DOT);
-            if (r <= most + 1e-6) return false; // (to within a little: pulled in exactly, it would otherwise keep pulling)
-            q[0] *= most / r;
-            q[1] *= most / r;
-            return true;
-          };
-          drawDots([...list.map((c) => [c, ...polar(out(shareOf(c), edgeAt(t, c.oklch[2])), c.oklch[2])]), ...greyList.map((c) => [c, 0, 0])], keepIn);
-        } else {
+        // Dots (levelDots); squares: each colour's cell split by hue, as the wheel's are; the greys a disc on
+        // the axis, split as the wheel's ring is.
+        if (marksAs === "dots") for (const [c, x, y, reach] of levelDots(t, list, greyList)) dot(c, x, y, reach);
+        else {
           const groups = new Map();
           for (const c of list) {
             const s = sliceOf(c), b = ringOf(shareOf(c), cells[s].n), key = `${s} ${b}`;
@@ -1842,7 +1886,7 @@
       const greyTones = Array.from({ length: LEVELS + 1 }, (_, i) => oklabToLinearSRGB(lightOf(i), 0, 0));
       const paintPages = (hr, hl, tr, tl, cells) => {
         const toward = (h) => [Math.cos((h * Math.PI) / 180), Math.sin((h * Math.PI) / 180)], right = toward(hr), left = toward(hl);
-        paintField(canvas, (x, y, rgb, unit) => {
+        return paintField(canvas, (x, y, rgb, unit) => {
           const L = 0.5 - y / PAGE_Y;
           if (L < 0 || L > 1) return 0;
           const t = x >= 0 ? tr : tl, q = L * 512, k = Math.min(511, q | 0), ax = Math.abs(x), e = t[k] + (t[k + 1] - t[k]) * (q - k);
@@ -2047,28 +2091,39 @@
       };
       const title = () => (surface === "smooth" ? "Slice colour" : "Cell colour");
       let under = ""; // the colour hovered (its cell, or its values), so as not to show it again
-      gamut.addEventListener("pointermove", (e) => {
-        const at = own(colourAt(e)), key = `${at.key ?? at.css} ${!!at.cmyk}`;
-        if (key === under) return;
+      // In the panel: as one of Wada's colours, so nothing moves; or, if it's the one already there, not again.
+      const showOwn = (at, name) => {
+        const key = `${at.key ?? at.css} ${!!at.cmyk}`;
+        if (key === under) return false;
         under = key;
-        if (at.d) outlineAt(at.d, at.oklch[0]);
-        else highlight.removeAttribute("d");
         panel.querySelector(".detail-swatch").style.setProperty("--color", at.css);
-        const name = panel.querySelector("h2");
-        name.classList.add("named");
-        name.replaceChildren(title(), chipOf(at)); // not one of Wada's: same lines as a colour's, so nothing moves
+        const h2 = panel.querySelector("h2");
+        h2.classList.add("named");
+        h2.replaceChildren(name, chipOf(at));
         panel.querySelector('[data-field="cmyk"]').textContent = at.cmyk ? `≈ ${cmykText(at.cmyk)}` : "Not in Wada's palette";
         panel.querySelector('[data-field="oklch"]').textContent = oklchValues(at.oklch);
         panel.classList.add("show");
+        return true;
+      };
+      const openOwn = (at, name, where) => showComputedDetail(at, name, at.cmyk, at.line, `Not one of Wada's colours: OKLCH's own, ${where}${at.cmyk ? ", so its CMYK is an estimate" : ""}.`);
+      gamut.addEventListener("pointermove", (e) => {
+        const at = own(colourAt(e));
+        if (!showOwn(at, title())) return;
+        if (at.d) outlineAt(at.d, at.oklch[0]);
+        else highlight.removeAttribute("d");
       });
       gamut.addEventListener("pointerleave", (e) => {
         under = "";
         if (e.pointerType !== "touch") hide(); // a touch leaves as the finger lifts: its info stays until the next
       });
       gamut.addEventListener("click", (e) => {
-        const at = own(colourAt(e)), where = surface === "smooth" ? "at this point of the slice" : "in the middle of this cell of the slice";
-        showComputedDetail(at, title(), at.cmyk, at.line, `Not one of Wada's colours: OKLCH's own, ${where}${at.cmyk ? ", so its CMYK is an estimate" : ""}.`);
+        openOwn(own(colourAt(e)), title(), surface === "smooth" ? "at this point of the slice" : "in the middle of this cell of the slice");
       });
+      // In 3D (makeOklchSolid): an empty cell of a page, or of the greys' column; its own colour, as the
+      // pages' cells have it.
+      const cellColour = (t) => (t.greys
+        ? { oklch: t.oklch, key: `3d greys ${t.i}`, line: `Greys, chroma under 0.02, ${span(t.i)}. ` }
+        : { oklch: t.oklch, key: `3d ${t.s} ${t.i} ${t.b}`, line: `Hue ${pageName(t.s)}, ring ${t.b + 1} of ${t.n} out to the edge, ${span(t.i)}. ` });
 
       // The switches: the view; squares or dots; and, in 2D, how the solid is sliced and how the slice's
       // own colours show. The view is named; the others are icons: four cells or four dots; the solid's
@@ -2090,12 +2145,33 @@
           `<defs><radialGradient id="surface-smooth"><stop offset="0" stop-color="currentColor" stop-opacity="0.15"/><stop offset="1" stop-color="currentColor"/></radialGradient></defs><circle r="7" fill="url(#surface-smooth)" stroke="none"/>`],
         ["cells", "Cells: the slice in the squares' cells, each its middle's colour", cellIcons.map((d) => `<path d="${d}" stroke="none"/>`).join("")],
       ];
+      // In 3D, where the cut is from: the top (the lower part stays) or the bottom. Each choice is drawn as
+      // the solid's outline, the part that stays filled.
+      const CUTS = [
+        ["top", "Cut from the top: the lower part stays", `<path d="M -5 0 A 5 7 0 0 1 5 0" fill="none" stroke-dasharray="1.8 1.6"/><path d="M -5 0 A 5 7 0 0 0 5 0 Z"/><path d="M -7 0 H 7"/>`],
+        ["bottom", "Cut from the bottom: the upper part stays", `<path d="M -5 0 A 5 7 0 0 0 5 0" fill="none" stroke-dasharray="1.8 1.6"/><path d="M -5 0 A 5 7 0 0 1 5 0 Z"/><path d="M -7 0 H 7"/>`],
+      ];
+      // In 3D, the empty cells (none of Wada's colours there), as in the Ostwald view: every cell a dot, Wada's
+      // colours' bigger; or hidden; only a dot of the cell's own colour; the cell, with that dot; or filled
+      // with it. Each choice is drawn as a cell, dashed where the cell isn't drawn; every cell a dot, as a
+      // dot, with smaller ones at the cell's corners.
+      const SQUARE = `<rect x="-5" y="-5" width="10" height="10"`;
+      const CELLS = [
+        ["all", "Every cell a dot: Wada's colours bigger, the cell's own colour in the empty cells", `<circle r="2.4"/>${[[-5, -5], [5, -5], [5, 5], [-5, 5]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="0.9"/>`).join("")}`],
+        ["hidden", "Empty cells hidden: only Wada's colours", `${SQUARE} fill="none" stroke-dasharray="2.5 2.5"/>`],
+        ["points", "Empty cells: only a dot of the cell's own colour", `${SQUARE} fill="none" stroke-dasharray="2.5 2.5"/><circle r="2.1"/>`],
+        ["dots", "Empty cells: the cell, with a dot of its own colour", `${SQUARE} fill="none"/><circle r="2.1"/>`],
+        ["filled", "Empty cells filled with their own colour", `${SQUARE}/>`],
+      ];
       const modes = Object.assign(document.createElement("div"), { className: "view-modes" });
       modes.innerHTML = `<div class="view-switch" role="group" aria-label="View">`
         + `<button type="button" data-wheel-view="flat" title="Flat: every colour by hue and chroma, its lightness left out">Flat</button>`
-        + `<button type="button" data-wheel-view="2d" title="2D: a slice of OKLCH's solid, across its axis (one lightness) or through it (two hues' pages)">2D</button></div>`
-        + optionSwitch("Marks", "wheel-marks", MARKS) + optionSwitch("Slice", "wheel-slicing", SLICES) + optionSwitch("Surface", "wheel-surface", SURFACES);
-      const slicingOption = modes.querySelector('[data-option="wheel-slicing"]'), surfaceOption = modes.querySelector('[data-option="wheel-surface"]');
+        + `<button type="button" data-wheel-view="2d" title="2D: a slice of OKLCH's solid, across its axis (one lightness) or through it (two hues' pages)">2D</button>`
+        + `<button type="button" data-wheel-view="3d" title="3D: OKLCH's solid, its pages of hue as walls, cut at a lightness; drag to turn it">3D</button></div>`
+        + optionSwitch("Marks", "wheel-marks", MARKS) + optionSwitch("Slice", "wheel-slicing", SLICES) + optionSwitch("Surface", "wheel-surface", SURFACES)
+        + optionSwitch("Cells", "wheel-empty", CELLS) + optionSwitch("Cut", "wheel-cut", CUTS);
+      const option = (key) => modes.querySelector(`[data-option="${key}"]`);
+      const marksOption = option("wheel-marks"), slicingOption = option("wheel-slicing"), surfaceOption = option("wheel-surface"), emptyOption = option("wheel-empty"), cutOption = option("wheel-cut");
       layout.append(wheel, control, dialBox, caption, modes);
       box.append(panel, layout);
 
@@ -2104,8 +2180,10 @@
       // control or the dial, the one shown.
       const saved = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
       const save = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
-      let view = saved("wheel-view") === "2d" ? "2d" : "flat", slicing = saved("wheel-slicing") === "pages" ? "pages" : "level";
-      let surface = saved("wheel-surface") === "cells" ? "cells" : "smooth";
+      let view = ["2d", "3d"].includes(saved("wheel-view")) ? saved("wheel-view") : "flat", slicing = saved("wheel-slicing") === "pages" ? "pages" : "level";
+      let surface = saved("wheel-surface") === "cells" ? "cells" : "smooth", cutFrom = saved("wheel-cut") === "bottom" ? "bottom" : "top";
+      let empties = CELLS.some(([value]) => value === saved("wheel-empty")) ? saved("wheel-empty") : "dots"; // in 3D
+      let solid = null, solidTried = false; // the 3D view's (makeOklchSolid), made when first shown; none without WebGL 2
       marksAs = saved("wheel-marks") === "dots" ? "dots" : "squares";
       let level = Math.min(LEVELS, Math.max(0, Number(saved("wheel-level") ?? 8) | 0)), shown = level;
       let page = wrap(Number(saved("wheel-page") ?? 2) | 0), pageShown = page;
@@ -2120,7 +2198,8 @@
         back.hidden = ahead.hidden = true;
         captionText.textContent = "";
         under = "";
-        layout.dataset.view = view === "flat" ? "flat" : slicing;
+        solid?.unhover();
+        layout.dataset.view = view === "2d" ? slicing : view;
         layout.dataset.surface = surface;
         onSlice = view !== "flat";
         if (view === "flat") {
@@ -2130,7 +2209,10 @@
           svg.setAttribute("aria-label", captionText.textContent);
         } else {
           loadPrintTable(); // for the slice's own colours' CMYK
-          if (slicing === "level") drawLevel(shown, level);
+          if (view === "3d") {
+            drawLevel(shown, level); // (unseen: for the control and the caption)
+            solid.cut(shown);
+          } else if (slicing === "level") drawLevel(shown, level);
           else drawPages(pageShown, page);
         }
         paintBackground();
@@ -2222,13 +2304,43 @@
         const steps = Math.trunc(spunPages / 100);
         if (steps) { spunPages -= steps * 100; setPage(page - steps); }
       }, { passive: false });
+      // The arrow keys, anywhere: in 2D, the next level, or the next pages (as the arrows under them).
+      onArrows(layout, (step) => {
+        if (view === "flat") return false;
+        if (view === "3d" || slicing === "level") setLevel(level + step);
+        else setPage(page + step);
+      });
 
       const pressed = (key, value) => { for (const b of modes.querySelectorAll(`[data-${key}]`)) b.setAttribute("aria-pressed", b.getAttribute(`data-${key}`) === value); };
+      // The 3D view's solid, made the first time it's shown (the 3D button disabled without WebGL 2).
+      const solidMade = () => {
+        if (!solidTried) {
+          solidTried = true;
+          solid = makeOklchSolid({
+            colors,
+            walls: { LEVELS, SLICE, PAGE_Y, AXIS, inner, out, room, steps, lightOf, rowOf, levelOf, isGrey, sliceOf, shareOf, ringOf, midHue, pageEdge, edgeAtL, pageCells, NAMED, vivid, pageName },
+            onColour: (c) => { under = ""; fillDetails(panel, c); panel.classList.add("show"); },
+            onCell: (t) => showOwn(own(cellColour(t)), "Cell colour"),
+            onLeave: () => { under = ""; hide(); },
+            onOpen: showDetail,
+            onOpenCell: (t) => openOwn(own(cellColour(t)), "Cell colour", "in the middle of this cell of the solid"),
+          });
+          if (solid) {
+            wheel.append(solid.canvas, ...solid.labels);
+            solid.empty(empties);
+            solid.side(cutFrom, false);
+          } else Object.assign(modes.querySelector('[data-wheel-view="3d"]'), { disabled: true, title: "3D needs WebGL 2, which this browser doesn't have" });
+        }
+        return solid;
+      };
       const setView = (v) => {
+        if (v === "3d" && !solidMade()) v = "2d";
         view = v;
         shown = level;
         pageShown = page;
+        marksOption.hidden = v === "3d"; // (Wada's colours fill their cells, or are spheres, as the cells switch says)
         slicingOption.hidden = surfaceOption.hidden = v !== "2d";
+        emptyOption.hidden = cutOption.hidden = v !== "3d";
         pressed("wheel-view", v);
         save("wheel-view", v);
         render();
@@ -2255,11 +2367,29 @@
         save("wheel-surface", how);
         render();
       };
+      const setEmpty = (how) => {
+        hide();
+        solid?.unhover();
+        empties = how;
+        pressed("wheel-empty", how);
+        save("wheel-empty", how);
+        solid?.empty(how);
+      };
+      const setCut = (where, animate) => {
+        cutFrom = where;
+        pressed("wheel-cut", where);
+        save("wheel-cut", where);
+        solid?.side(where, animate);
+      };
       for (const b of modes.querySelectorAll("[data-wheel-slicing]")) b.addEventListener("click", () => setSlicing(b.dataset.wheelSlicing));
       for (const b of modes.querySelectorAll("[data-wheel-surface]")) b.addEventListener("click", () => setSurface(b.dataset.wheelSurface));
+      for (const b of modes.querySelectorAll("[data-wheel-empty]")) b.addEventListener("click", () => setEmpty(b.dataset.wheelEmpty));
+      for (const b of modes.querySelectorAll("[data-wheel-cut]")) b.addEventListener("click", () => setCut(b.dataset.wheelCut, true));
       pressed("wheel-marks", marksAs);
       pressed("wheel-slicing", slicing);
       pressed("wheel-surface", surface);
+      pressed("wheel-empty", empties);
+      pressed("wheel-cut", cutFrom);
       setView(view);
       return { panel, wheel, mark, box };
     }
@@ -2299,6 +2429,7 @@
         }
       }
       ctx.putImageData(img, 0, 0);
+      return img;
     }
 
     // Paints the continuous wheel: at each pixel, hue from the angle and chroma from the radius (same
@@ -2335,6 +2466,7 @@
         }
       }
       ctx.putImageData(img, 0, 0);
+      return img;
     }
 
     // SVG point at distance r and angle deg: 0° to the right, increasing counter-clockwise.
@@ -3147,6 +3279,11 @@
         const steps = Math.trunc(spunPages / 100);
         if (steps) { spunPages -= steps * 100; setPage(page + steps); }
       }, { passive: false });
+      // The arrow keys, anywhere: the next level (the cut, in 3D), or the next pages (as the arrows under them).
+      onArrows(layout, (step) => {
+        if (slicing === "pages" && disc.dataset.mode !== "3d") setPage(page + step);
+        else setLevel(level + step);
+      });
 
       render();
 
@@ -3218,6 +3355,91 @@
       setSlicing(savedSlicing === "pages" ? "pages" : "level");
       setMode(savedMode === "3d" ? "3d" : "2d");
       return box;
+    }
+
+    // For the two solids in 3D (Ostwald's and OKLCH's), drawn with WebGL 2: a program from its two shaders;
+    // one of the page's colours (a CSS custom property), as RGB from 0 to 1; the camera; and turning by hand.
+    function glProgram(gl, vertex, fragment) {
+      const program = gl.createProgram();
+      for (const [type, source] of [[gl.VERTEX_SHADER, vertex], [gl.FRAGMENT_SHADER, fragment]]) {
+        const sh = gl.createShader(type);
+        gl.shaderSource(sh, source);
+        gl.compileShader(sh);
+        if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh));
+        gl.attachShader(program, sh);
+      }
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+      return program;
+    }
+    function cssRGB(name) {
+      const ctx = document.createElement("canvas").getContext("2d");
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#888";
+      ctx.fillRect(0, 0, 1, 1);
+      return Array.from(ctx.getImageData(0, 0, 1, 1).data.slice(0, 3), (v) => v / 255);
+    }
+    // The camera, turning round the solid's middle, `dist` away: az, its direction seen from above (180:
+    // from the south, with north at the top), and el, its height in degrees (90: from straight above);
+    // seeing `half` degrees up and down from the middle. Its eye, its axes (right, up, forward), and the
+    // matrix from the solid to the screen.
+    function orbit(az, el, dist, half, aspect) {
+      const rad = (deg) => (deg * Math.PI) / 180, a = rad(az), e = rad(el), f = 1 / Math.tan(rad(half));
+      const eye = [Math.sin(a) * Math.cos(e) * dist, Math.sin(e) * dist, -Math.cos(a) * Math.cos(e) * dist];
+      const F = eye.map((v) => -v / dist), R = [-Math.cos(a), 0, -Math.sin(a)];
+      const U = [R[1] * F[2] - R[2] * F[1], R[2] * F[0] - R[0] * F[2], R[0] * F[1] - R[1] * F[0]];
+      const dotp = (p, q) => p[0] * q[0] + p[1] * q[1] + p[2] * q[2];
+      const view = [R[0], U[0], -F[0], 0, R[1], U[1], -F[1], 0, R[2], U[2], -F[2], 0, -dotp(R, eye), -dotp(U, eye), dotp(F, eye), 1];
+      const near = 1, far = 12, nf = 1 / (near - far);
+      const proj = [f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0];
+      const mvp = new Float32Array(16);
+      for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) mvp[c * 4 + r] += proj[k * 4 + r] * view[c * 4 + k];
+      return { eye, R, U, F, f, aspect, mvp };
+    }
+    // Turning a solid by hand: dragging it (a press that hardly moves is a tap), or the arrow keys while it
+    // has the focus. Hovering picks what's under the pointer once a frame. The solid's own: turn(dAz, dEl),
+    // hover(e) (null: nothing, as the pointer leaves or a drag starts) and tap(e).
+    function orbitInput(canvas, { turn, hover, tap }) {
+      let drag = null, moved = null, picking = false;
+      canvas.addEventListener("pointerdown", (e) => {
+        canvas.setPointerCapture(e.pointerId);
+        drag = { x: e.clientX, y: e.clientY, moved: false };
+      });
+      canvas.addEventListener("pointermove", (e) => {
+        if (drag) {
+          const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+          if (!drag.moved && Math.hypot(dx, dy) < 4) return;
+          if (!drag.moved) { drag.moved = true; hover(null); }
+          drag.x = e.clientX;
+          drag.y = e.clientY;
+          turn(dx * 0.4, dy * 0.4);
+          return;
+        }
+        if (e.pointerType === "touch") return;
+        moved = e;
+        if (picking) return;
+        picking = true;
+        requestAnimationFrame(() => {
+          picking = false;
+          if (moved && !drag) hover(moved);
+          moved = null;
+        });
+      });
+      canvas.addEventListener("pointerup", (e) => {
+        const tapped = drag && !drag.moved;
+        drag = null;
+        if (tapped) tap(e);
+      });
+      canvas.addEventListener("pointercancel", () => { drag = null; });
+      canvas.addEventListener("pointerleave", (e) => {
+        moved = null;
+        if (!drag && e.pointerType !== "touch") hover(null);
+      });
+      const KEYS = { ArrowLeft: [-15, 0], ArrowRight: [15, 0], ArrowUp: [0, 10], ArrowDown: [0, -10] };
+      canvas.addEventListener("keydown", (e) => {
+        if (!(e.key in KEYS)) return;
+        e.preventDefault();
+        turn(...KEYS[e.key]);
+      });
     }
 
     // Ostwald's solid in 3D, drawn with WebGL 2 (no library). The 24 hue pages stand round the grey pole
@@ -3424,15 +3646,7 @@
 
       // The program: hides what's above the cut (whole levels in the vertex shader, the cut level's upper
       // half in the fragment shader), and draws colours, card, lines, or ids for picking.
-      const shader = (type, source) => {
-        const sh = gl.createShader(type);
-        gl.shaderSource(sh, source);
-        gl.compileShader(sh);
-        if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh));
-        return sh;
-      };
-      const program = gl.createProgram();
-      gl.attachShader(program, shader(gl.VERTEX_SHADER, `#version 300 es
+      const program = glProgram(gl, `#version 300 es
         in vec3 a_pos; in vec4 a_col; in vec4 a_info; in float a_id, a_page, a_size;
         uniform mat4 u_mvp; uniform float u_cut, u_from, u_px, u_dpr; uniform int u_empty, u_off, u_mode; uniform bool u_hi; uniform vec3 u_card, u_cardSide; // u_hi: the hovered lone dot, bigger and ringed; // u_from: 1 cut from the top, -1 from the bottom; u_empty: 0 hidden, 1 only dots, 2 dots on card, 3 filled, 4 every cell a dot; u_off: the hidden pages, a bit each; u_px: pixels per unit at distance 1
         out vec3 v_col; out float v_y; flat out float v_clip, v_id, v_size, v_sprite;
@@ -3454,8 +3668,7 @@
           v_y = p.y;
           v_clip = atCut && kind != 1.0 ? 1.0 : 0.0;
           v_id = a_id;
-        }`));
-      gl.attachShader(program, shader(gl.FRAGMENT_SHADER, `#version 300 es
+        }`, `#version 300 es
         precision highp float; precision highp int; // u_mode is shared with the vertex shader: the same precision
         in vec3 v_col; in float v_y; flat in float v_clip, v_id, v_size, v_sprite;
         uniform float u_cutY, u_from, u_dpr; uniform int u_mode; uniform bool u_round, u_hi; uniform vec3 u_line;
@@ -3482,9 +3695,7 @@
             float id = v_id + 1.0;
             colour = vec4(mod(id, 256.0), mod(floor(id / 256.0), 256.0), floor(id / 65536.0), 255.0) / 255.0;
           } else colour = vec4(u_mode == 2 ? u_line : v_col, 1.0);
-        }`));
-      gl.linkProgram(program);
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+        }`);
       const u = Object.fromEntries(["u_mvp", "u_cut", "u_from", "u_px", "u_dpr", "u_empty", "u_off", "u_card", "u_cardSide", "u_cutY", "u_mode", "u_round", "u_hi", "u_line"].map((n) => [n, gl.getUniformLocation(program, n)]));
       const upload = (m) => {
         const vao = gl.createVertexArray();
@@ -3509,13 +3720,7 @@
       gl.bindVertexArray(null);
 
       // The page's colours: card a little darker than the background, its edges and lines darker still.
-      const css = (name) => {
-        const ctx = document.createElement("canvas").getContext("2d");
-        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#888";
-        ctx.fillRect(0, 0, 1, 1);
-        return Array.from(ctx.getImageData(0, 0, 1, 1).data.slice(0, 3), (v) => v / 255);
-      };
-      const BG = css("--bg"), FG = css("--fg");
+      const BG = cssRGB("--bg"), FG = cssRGB("--fg");
       const tint = (t) => BG.map((v, i) => v + (FG[i] - v) * t);
       const CARD = tint(0.06), CARD_SIDE = tint(0.11), LINE = tint(0.2);
 
@@ -3523,26 +3728,10 @@
       // north, yellow, at the top), and el, its height in degrees (90: from straight above, the disc).
       // The cut is at `level`, from the top (`from` 1: what's above is hidden) or the bottom (-1).
       let az = 180, el = 25, level = N - 1, from = 1, hovered = -1, emptyAs = 1, off = 0; // off: the hidden pages, a bit each
-      const eyeAt = () => {
-        const a = rad(az), e = rad(el), dist = 4.7;
-        return [Math.sin(a) * Math.cos(e) * dist, Math.sin(e) * dist, -Math.cos(a) * Math.cos(e) * dist];
-      };
+      const camera = () => orbit(az, el, 4.7, 13, canvas.width / canvas.height);
       // At the end the cut comes from (A from the top, P from the bottom), nothing is cut: the slice there
       // is the tip, as on the control.
       const cutLevel = () => (from > 0 ? (level === 0 ? -1 : level) : level === TOP ? TOP + 1 : level);
-      const matrix = () => {
-        const a = rad(az), dist = 4.7, aspect = canvas.width / canvas.height, f = 1 / Math.tan(rad(13));
-        const eye = eyeAt();
-        const F = eye.map((v) => -v / dist), R = [-Math.cos(a), 0, -Math.sin(a)];
-        const U = [R[1] * F[2] - R[2] * F[1], R[2] * F[0] - R[0] * F[2], R[0] * F[1] - R[1] * F[0]];
-        const dotp = (p, q) => p[0] * q[0] + p[1] * q[1] + p[2] * q[2];
-        const view = [R[0], U[0], -F[0], 0, R[1], U[1], -F[1], 0, R[2], U[2], -F[2], 0, -dotp(R, eye), -dotp(U, eye), dotp(F, eye), 1];
-        const near = 1, far = 12, nf = 1 / (near - far);
-        const proj = [f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0];
-        const out = new Float32Array(16);
-        for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) out[c * 4 + r] += proj[k * 4 + r] * view[c * 4 + k];
-        return out;
-      };
 
       // Round the solid's widest part still shown, following it (those behind it fainter): a button for
       // each of the 24 pages, which hides or shows it. The hue's name where it has one, else a dot of
@@ -3573,8 +3762,8 @@
         }
         return false;
       };
-      const placeLabels = (mvp) => {
-        const eye = eyeAt(), cutY = yOf(cutLevel());
+      const placeLabels = ({ mvp, eye }) => {
+        const cutY = yOf(cutLevel());
         labels.forEach((label, sector) => {
           const deg = sector * 15;
           const below = from > 0 ? TOP - level : level; // the levels still shown beyond the cut
@@ -3612,7 +3801,7 @@
       const draw = (px = -1, py = -1) => {
         resize();
         if (!W) return -1;
-        const picking = px >= 0, mvp = matrix();
+        const picking = px >= 0, cam = camera(), mvp = cam.mvp;
         gl.bindFramebuffer(gl.FRAMEBUFFER, picking ? pick.fb : null);
         gl.viewport(0, 0, W, H);
         if (picking) { gl.enable(gl.SCISSOR_TEST); gl.scissor(px, py, 1, 1); }
@@ -3645,7 +3834,7 @@
           const key = `${az} ${el}`;
           if (key !== order.key) {
             order.key = key;
-            const e = eyeAt();
+            const e = cam.eye;
             for (let i = 0; i < order.d.length; i++) order.d[i] = (points.pos[3 * i] - e[0]) ** 2 + (points.pos[3 * i + 1] - e[1]) ** 2 + (points.pos[3 * i + 2] - e[2]) ** 2;
             order.idx.sort((i, j) => order.d[j] - order.d[i]);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, order.idx, gl.DYNAMIC_DRAW);
@@ -3689,7 +3878,7 @@
               gl.drawArrays(gl.LINES, targets[hovered].from, targets[hovered].count);
             }
           }
-          placeLabels(mvp);
+          placeLabels(cam);
         }
         gl.bindVertexArray(null);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -3713,8 +3902,9 @@
         request();
       };
 
-      // Turning: drag (a press that hardly moves is a click), or the arrow keys. Hovering picks once a frame.
-      let drag = null, moved = null, picking = false, swing = 0;
+      // Turning: drag (a press that hardly moves is a click), or the arrow keys (orbitInput). Hovering picks
+      // once a frame.
+      let swing = 0;
       // The sector on the solid's right, as the view faces it (onTurn hears when it changes).
       let right = -1;
       const facing = () => {
@@ -3740,48 +3930,14 @@
         };
         swing = requestAnimationFrame(step);
       };
-      canvas.addEventListener("pointerdown", (e) => {
-        canvas.setPointerCapture(e.pointerId);
-        drag = { x: e.clientX, y: e.clientY, moved: false };
-      });
-      canvas.addEventListener("pointermove", (e) => {
-        if (drag) {
-          const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-          if (!drag.moved && Math.hypot(dx, dy) < 4) return;
-          if (!drag.moved) { drag.moved = true; hover(-1); }
-          drag.x = e.clientX;
-          drag.y = e.clientY;
-          turn(dx * 0.4, dy * 0.4);
-          return;
-        }
-        if (e.pointerType === "touch") return;
-        moved = e;
-        if (picking) return;
-        picking = true;
-        requestAnimationFrame(() => {
-          picking = false;
-          if (moved && !drag) hover(idAt(moved));
-          moved = null;
-        });
-      });
-      canvas.addEventListener("pointerup", (e) => {
-        const tap = drag && !drag.moved;
-        drag = null;
-        if (!tap) return;
-        const t = targets[idAt(e)];
-        if (t?.colour) onOpen(t.colour);
-        else if (t?.cell) onOpenCell(t.cell);
-      });
-      canvas.addEventListener("pointercancel", () => { drag = null; });
-      canvas.addEventListener("pointerleave", (e) => {
-        moved = null;
-        if (!drag && e.pointerType !== "touch") hover(-1);
-      });
-      const KEYS = { ArrowLeft: [-15, 0], ArrowRight: [15, 0], ArrowUp: [0, 10], ArrowDown: [0, -10] };
-      canvas.addEventListener("keydown", (e) => {
-        if (!(e.key in KEYS)) return;
-        e.preventDefault();
-        turn(...KEYS[e.key]);
+      orbitInput(canvas, {
+        turn,
+        hover: (e) => hover(e ? idAt(e) : -1),
+        tap: (e) => {
+          const t = targets[idAt(e)];
+          if (t?.colour) onOpen(t.colour);
+          else if (t?.cell) onOpenCell(t.cell);
+        },
       });
 
       facing();
@@ -3799,6 +3955,672 @@
         },
         empty: (how) => { emptyAs = ["hidden", "points", "dots", "filled", "all"].indexOf(how); request(); }, // how the cells show
         face: (k) => { az = (k * 15 + 90) % 360; facing(); request(); }, // turns to have sector k on the right
+        unhover: () => { if (hovered >= 0) { hovered = -1; request(); } },
+      };
+    }
+
+    // OKLCH's solid in 3D, drawn with WebGL 2, built as Ostwald's is (makeSolid): its 36 pages, 10° of hue
+    // each as on the 2D view's pages, are walls standing round the axis, PAGE of their slice thick, cut into
+    // the pages' cells (per level of lightness, 0.05, rings out to the page's edge at its middle hue: what
+    // the screen can show); the greys are a column on the axis, a piece per level, AXIS round, as in 2D.
+    // Wada's colours fill their cells (when several share one, they split the wall's thickness in hue
+    // order; on the axis, the column round it, lightest first). The other cells are pale card, outlined,
+    // with a dot of their own colour, their middle's (or filled with it, or hidden, as the cells switch
+    // says; or every cell is a sphere, Wada's colours' bigger). It's cut through the middle of the level
+    // chosen, from the top or the bottom: what's beyond is hidden, and the cut face shows the cells there.
+    // Faces keep their exact colour, with no lighting; only the walls' edges are shaded. Round it, a button
+    // per page (its hue's name, or a dot of its most vivid colour) hides or shows it. Drag (or use the
+    // arrow keys) to turn it; hovering and clicking show one of Wada's colours (onColour, onOpen) or an
+    // empty cell's own (onCell, onOpenCell: its colour, page, level and ring, or the greys' level).
+    // `walls`: the 2D view's cells and their helpers. Returns null without WebGL 2.
+    function makeOklchSolid({ colors, walls, onColour, onCell, onLeave, onOpen, onOpenCell }) {
+      const { LEVELS, SLICE, PAGE_Y, AXIS, inner, out, room, steps, lightOf, rowOf, levelOf, isGrey, sliceOf, shareOf, ringOf, midHue, pageEdge, edgeAtL, pageCells, NAMED, vivid, pageName } = walls;
+      const canvas = Object.assign(document.createElement("canvas"), { className: "oklch-solid", tabIndex: 0 });
+      canvas.setAttribute("role", "img");
+      canvas.setAttribute("aria-label", "OKLCH's colour solid in 3D, its pages of hue as walls, cut at the lightness chosen. Drag, or use the arrow keys, to turn it.");
+      const gl = canvas.getContext("webgl2", { antialias: true });
+      if (!gl) return null;
+
+      // Units as in 2D: out from the axis, √chroma, the rim at 1; up, lightness, y = (L − 0.5) PAGE_Y. Hue
+      // anticlockwise from the east, seen from above, as on the disc.
+      const PAGES = 360 / SLICE, POLE = 255, TOP = LEVELS; // POLE: the greys' column's page
+      const PAGE = 0.4; // a wall's share of its 10° slice: the rest is the gap to the next
+      const SIDE = 0.8; // the shade of the walls' edges
+      const PER = 80; // the walls follow the page's edge per 1/80 of lightness
+      const rad = (deg) => (deg * Math.PI) / 180, yOf = (L) => (L - 0.5) * PAGE_Y;
+      const at = (r, h, y) => [r * Math.cos(rad(h)), y, -r * Math.sin(rad(h))];
+      const encode = (v) => Math.round(255 * Math.min(1, Math.max(0, v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055)));
+      const rgb8 = (linear) => Array.from(linear, encode);
+      // What a piece of geometry is: BODY, always (clipped beyond the cut); CAP, the cut face, only at the
+      // cut level. When it shows, as Ostwald's: ALWAYS; EMPTY, an empty cell, unless they're hidden; ALONE,
+      // a wall of Wada's colour next to an empty cell, only when they're hidden or only dots; DOTS, an empty
+      // cell's lines, only when they're dots on card; POINTS, an empty cell's lone dot, only when they're
+      // only dots or every cell is a dot; WADA, a dot of Wada's colour, only when every cell is a dot.
+      const BODY = 0, CAP = 1;
+      const ALWAYS = 0, EMPTY = 1, ALONE = 2, DOTS = 3, POINTS = 4, WADA = 5;
+
+      // The pages: each one's middle hue, its edge, and per level its cells (the 2D view's: rings, and their
+      // colours), the lightness it spans where it has room (none: null), every 1/80, and where it ends.
+      const thin = (ps) => ps.filter((q, k) => k === 0 || k === ps.length - 1 || Math.floor(q * PER) !== Math.floor(ps[k - 1] * PER));
+      const pages = Array.from({ length: PAGES }, (_, s) => {
+        const h = midHue(s), t = pageEdge(h), e = (q) => edgeAtL(t, q), cells = pageCells(t, h);
+        const levels = cells.map(({ n, tones }, i) => {
+          const all = steps(...rowOf(i), 512), lights = room(all, e);
+          return lights === all && !all.some((q) => e(q) > inner) ? null : { n, tones, lights: thin(lights) };
+        });
+        return { s, h, t, e, levels };
+      });
+      const poleCache = new Map();
+      const poleR = (q) => { // the column: AXIS round, or less where a page's edge is nearer
+        if (!poleCache.has(q)) poleCache.set(q, Math.min(AXIS, ...pages.map((p) => p.e(q))));
+        return poleCache.get(q);
+      };
+
+      // Wada's colours by cell, as the 2D view's pages have them: by hue in a cell; the greys lightest first.
+      const groups = new Map();
+      for (const c of colors) {
+        const i = levelOf(c), s = sliceOf(c), key = isGrey(c) ? `pole ${i}` : `${s} ${i} ${ringOf(shareOf(c), pages[s].levels[i]?.n ?? 1)}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(c);
+      }
+      for (const [key, list] of groups) list.sort(key.startsWith("pole") ? (p, q) => q.oklch[0] - p.oklch[0] : (p, q) => p.oklch[2] - q.oklch[2]);
+      const empty = (s, i, b) => !groups.has(`${s} ${i} ${b}`);
+
+      // Geometry, as flat lists, grown as needed: position, colour (8-bit sRGB and a shade), level, kind,
+      // whether it's card (coloured by the page's theme, unless the empty cells are filled: then its own
+      // colour, which it carries), when it shows, the id of what it belongs to, its page, and `extra`: a
+      // lone dot's radius, or the dot an empty cell's card has (its middle, and its radius: negative on a
+      // wall's face, as that dot is hidden at the cut level, where the cut face has one).
+      const FIELDS = [["pos", Float32Array, 3], ["col", Uint8Array, 4], ["info", Uint8Array, 4], ["id", Float32Array, 1], ["page", Uint8Array, 1], ["extra", Float32Array, 4]];
+      const mesh = () => ({ n: 0, size: 0, ni: 0, idx: new Uint32Array(1 << 16) }); // and the triangles' or lines' vertices, by index
+      const faces = mesh(), lines = mesh(), points = mesh();
+      const NONE = [0, 0, 0, 0], BLACK = [0, 0, 0];
+      let only = ALWAYS, page = POLE;
+      const put = (m, p, rgb, shade, level, kind, card, id, other = only, extra = NONE) => {
+        if (m.n === m.size) {
+          m.size = Math.max(1 << 16, 2 * m.size);
+          for (const [name, Type, width] of FIELDS) {
+            const grown = new Type(m.size * width);
+            if (m[name]) grown.set(m[name]);
+            m[name] = grown;
+          }
+        }
+        const n = m.n++, i = 3 * n, j = 4 * n;
+        m.pos[i] = p[0]; m.pos[i + 1] = p[1]; m.pos[i + 2] = p[2];
+        m.col[j] = rgb[0]; m.col[j + 1] = rgb[1]; m.col[j + 2] = rgb[2]; m.col[j + 3] = Math.round(shade * 255);
+        m.info[j] = level; m.info[j + 1] = kind; m.info[j + 2] = card; m.info[j + 3] = other;
+        m.id[n] = id;
+        m.page[n] = page;
+        m.extra[j] = extra[0]; m.extra[j + 1] = extra[1]; m.extra[j + 2] = extra[2]; m.extra[j + 3] = extra[3];
+        return n;
+      };
+      const room3 = (m, k) => { // room for k more indices
+        if (m.ni + k <= m.idx.length) return;
+        const grown = new Uint32Array(2 * (m.ni + k));
+        grown.set(m.idx);
+        m.idx = grown;
+      };
+      const index = (m, v) => { room3(m, 1); m.idx[m.ni++] = v; };
+      // A strip of quads between two lines of points, S0 and S1 (each quad S0[j], S1[j], S1[j + 1], S0[j + 1]),
+      // its points shared; a triangle; a quad; and, for lines, a closed loop through points.
+      const strip = (m, S0, S1, rgb, shade, level, kind, card, id, other = only, extra = NONE) => {
+        const base = m.n;
+        for (let j = 0; j < S0.length; j++) {
+          put(m, S0[j], rgb, shade, level, kind, card, id, other, extra);
+          put(m, S1[j], rgb, shade, level, kind, card, id, other, extra);
+        }
+        room3(m, 6 * (S0.length - 1));
+        for (let j = 0, v = base; j + 1 < S0.length; j++, v += 2) {
+          const x = m.idx, k = m.ni;
+          x[k] = v; x[k + 1] = v + 1; x[k + 2] = v + 3; x[k + 3] = v; x[k + 4] = v + 3; x[k + 5] = v + 2;
+          m.ni += 6;
+        }
+      };
+      const triangle = (m, a, b, c, rgb, shade, level, kind, card, id, other = only, extra = NONE) => {
+        index(m, put(m, a, rgb, shade, level, kind, card, id, other, extra));
+        index(m, put(m, b, rgb, shade, level, kind, card, id, other, extra));
+        index(m, put(m, c, rgb, shade, level, kind, card, id, other, extra));
+      };
+      const quad = (m, a, b, c, d, ...rest) => strip(m, [a, d], [b, c], ...rest);
+      const loop = (m, pts, level, kind, id) => {
+        const base = m.n;
+        for (const p of pts) put(m, p, BLACK, 1, level, kind, 0, id, DOTS);
+        for (let j = 0; j < pts.length; j++) { index(m, base + j); index(m, base + ((j + 1) % pts.length)); }
+      };
+      const mid = (p, q) => p.map((v, j) => (v + q[j]) / 2);
+      const dist = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+
+      // What each id is: one of Wada's colours or an empty cell, with its level and outline (for the
+      // highlight: its edges, and its cut face's).
+      const targets = [];
+      const lone = new Map(), spots = new Map(); // an empty cell's id -> its lone dot; one of Wada's colours' -> its dot
+
+      // A cell of a page (wall), ring b of n at level i, or its piece k of m: Wada's colour `rgb`, or card
+      // with `own`'s dot. In the page, it's between rings b/n and (b + 1)/n of the way out to the edge, over
+      // the lightness `lights` (where it has room). Its two faces (the inner pieces of a shared cell have
+      // none), its edges where the wall ends, its cut face, its lines and its outline.
+      const wallPiece = (pg, i, b, n, k, m, t, rgb, own) => {
+        only = rgb ? ALWAYS : EMPTY;
+        page = pg.s;
+        const { lights } = pg.levels[i], last = lights.length - 1, w = SLICE * PAGE, da = pg.h - w / 2 + (k * w) / m, db = da + w / m;
+        const card = rgb ? 0 : 1, col = rgb ?? own.rgb8, id = targets.length - 1;
+        // In the page: per lightness, its height and the rings' radii; then where each is on either face.
+        const ca = Math.cos(rad(da)), sa = Math.sin(rad(da)), cb = Math.cos(rad(db)), sb = Math.sin(rad(db));
+        const onA = (r, y) => [r * ca, y, -r * sa], onB = (r, y) => [r * cb, y, -r * sb];
+        const ys = lights.map(yOf), es = lights.map(pg.e), R0 = es.map((e) => out(b / n, e)), R1 = es.map((e) => out((b + 1) / n, e));
+        const A0 = R0.map((r, j) => onA(r, ys[j])), A1 = R1.map((r, j) => onA(r, ys[j])), B0 = R0.map((r, j) => onB(r, ys[j])), B1 = R1.map((r, j) => onB(r, ys[j]));
+        // Its faces, with an empty cell's dot in the middle.
+        const qm = (lights[0] + lights[last]) / 2, em = pg.e(qm), rm = out((b + 0.5) / n, em), ym = yOf(qm);
+        const size = Math.min(0.011, 0.3 * (out((b + 1) / n, em) - out(b / n, em)), 0.3 * (ys[last] - ys[0]));
+        for (const [F0, F1, on, has] of [[A0, A1, onA, k === 0], [B0, B1, onB, k === m - 1]]) {
+          if (!has) continue;
+          const dot = rgb ? NONE : [...on(rm, ym), -size];
+          strip(faces, F0, F1, col, 1, i, BODY, card, id, only, dot);
+        }
+        // Its edges: below, above, inside and outside, each on both faces; beyond each, the cells there (null:
+        // none, the edge is the wall's), each whether it's empty. Below and above, the next level's rings
+        // that meet it.
+        const [q0, q1] = rowOf(i);
+        const meeting = (j, whole) => { // (whole: the cell's edge there is the level's, not a point)
+          const there = pg.levels[j];
+          if (!whole || !there) return null;
+          const got = [];
+          for (let c = 0; c < there.n; c++) if (c / there.n < (b + 1) / n - 1e-9 && (c + 1) / there.n > b / n + 1e-9) got.push(empty(pg.s, j, c));
+          return got;
+        };
+        const sides = [
+          [[A0[0], A1[0]], [B0[0], B1[0]], meeting(i + 1, lights[0] <= q0 + 1e-9)],
+          [[A0[last], A1[last]], [B0[last], B1[last]], meeting(i - 1, lights[last] >= q1 - 1e-9)],
+          [A0, B0, b > 0 ? [empty(pg.s, i, b - 1)] : null],
+          [A1, B1, b < n - 1 ? [empty(pg.s, i, b + 1)] : null],
+        ];
+        for (const [SA, SB, across] of sides) {
+          const steps = SA.slice(1).map((p, j) => dist(SA[j], p)), length = steps.reduce((x, y) => x + y, 0);
+          if (length < 1e-6) continue; // where the cell ends in a point
+          // Wada's colour next to an empty cell: a wall, for when the empty cells are hidden (or only dots).
+          const other = across ? (rgb && across.some(Boolean) ? ALONE : null) : only;
+          if (other === null) continue;
+          // An empty cell's dot on its edge too, in its middle: the solid's outer surface shows its colours.
+          let dot = NONE;
+          if (!rgb && !across) {
+            let half = length / 2, j = 0;
+            while (j + 1 < steps.length && half > steps[j]) half -= steps[j++];
+            const f = steps[j] ? Math.min(1, half / steps[j]) : 0, along = (S) => S[j].map((v, c) => v + (S[j + 1][c] - v) * f);
+            const a = along(SA), z = along(SB);
+            dot = [...mid(a, z), Math.min(0.011, 0.3 * length, 0.3 * dist(a, z))];
+          }
+          strip(faces, SA, SB, col, SIDE, i, BODY, card, id, other, dot);
+        }
+        // Its cut face, through the level's middle.
+        const L = lightOf(i), eL = pg.e(L), cut = eL > inner + 1e-9, yL = yOf(L);
+        const C = cut && [onA(out(b / n, eL), yL), onA(out((b + 1) / n, eL), yL), onB(out((b + 1) / n, eL), yL), onB(out(b / n, eL), yL)];
+        if (cut) {
+          const rc = out((b + 0.5) / n, eL), a = onA(rc, yL), z = onB(rc, yL);
+          quad(faces, ...C, col, 1, i, CAP, card, id, only, rgb ? NONE : [...mid(a, z), Math.min(0.011, 0.3 * (out((b + 1) / n, eL) - out(b / n, eL)), 0.3 * dist(a, z))]);
+        }
+        // Its lines (an empty cell's) and outline: both faces (up the outer side, down the inner), the cut
+        // face, and, for the outline, the corners between the faces.
+        const ringA = [...A1, ...[...A0].reverse()], ringB = [...B1, ...[...B0].reverse()];
+        if (!rgb) {
+          loop(lines, ringA, i, BODY, id);
+          loop(lines, ringB, i, BODY, id);
+          if (cut) loop(lines, C, i, CAP, id);
+        }
+        t.outline = () => { // made when it's hovered
+          const pairs = (pts) => pts.flatMap((p, j) => [p, pts[(j + 1) % pts.length]]);
+          return [[...pairs(ringA), ...pairs(ringB), A0[0], B0[0], A1[0], B1[0], A1[last], B1[last], A0[last], B0[last]], cut ? pairs(C) : []];
+        };
+        if (rgb) return;
+        lone.set(id, points.n);
+        put(points, at(rm, pg.h, ym), own.rgb8, 1, i, BODY, 0, id, POINTS, [size, 0, 0, 0]);
+      };
+      // The greys at level i on the axis, or their piece k of m round it: a piece of the column, from
+      // lightness q0 to q1, round as far as poleR. An empty one is card with a band of its grey round the
+      // middle, as Ostwald's are.
+      const polePiece = (i, k, m, t, rgb, own) => {
+        only = rgb ? ALWAYS : EMPTY;
+        page = POLE;
+        const [q0, q1] = rowOf(i), qm = (q0 + q1) / 2, band = [qm - 0.15 * (q1 - q0), qm + 0.15 * (q1 - q0)];
+        const qs = [...new Set([...steps(q0, q1, PER), ...band])].sort((p, q) => p - q);
+        const d0 = (k * 360) / m, d1 = ((k + 1) * 360) / m, segments = Math.max(6, Math.round(48 / m));
+        const card = rgb ? 0 : 1, col = rgb ?? own.rgb8, id = targets.length - 1, L = lightOf(i);
+        const body = [], capLines = [];
+        for (let g = 0; g < segments; g++) {
+          const a0 = d0 + ((d1 - d0) * g) / segments, a1 = d0 + ((d1 - d0) * (g + 1)) / segments;
+          for (let j = 0; j + 1 < qs.length; j++) {
+            const [q, p] = [qs[j], qs[j + 1]], inBand = !rgb && q >= band[0] - 1e-12 && p <= band[1] + 1e-12;
+            quad(faces, at(poleR(q), a0, yOf(q)), at(poleR(p), a0, yOf(p)), at(poleR(p), a1, yOf(p)), at(poleR(q), a1, yOf(q)), inBand ? own.rgb8 : col, 1, i, BODY, inBand ? 0 : card, id);
+          }
+          // Its ends (inside the column but where a neighbour's hidden), and its cut face, with an empty one's dot.
+          for (const q of [q0, q1]) {
+            if (poleR(q) < 1e-6) continue;
+            triangle(faces, at(0, 0, yOf(q)), at(poleR(q), a0, yOf(q)), at(poleR(q), a1, yOf(q)), col, SIDE, i, BODY, card, id);
+            body.push(at(poleR(q), a0, yOf(q)), at(poleR(q), a1, yOf(q)));
+          }
+          if (poleR(L) > 1e-6) {
+            triangle(faces, at(0, 0, yOf(L)), at(poleR(L), a0, yOf(L)), at(poleR(L), a1, yOf(L)), col, 1, i, CAP, card, id, only, rgb ? NONE : [0, yOf(L), 0, 0.4 * poleR(L)]);
+            capLines.push(at(poleR(L), a0, yOf(L)), at(poleR(L), a1, yOf(L)));
+          }
+        }
+        if (m > 1) { // the piece's sides: from the axis out, at its ends, and up its rim
+          for (const d of [d0, d1]) {
+            for (const q of [q0, q1]) body.push(at(0, d, yOf(q)), at(poleR(q), d, yOf(q)));
+            for (let j = 0; j + 1 < qs.length; j++) body.push(at(poleR(qs[j]), d, yOf(qs[j])), at(poleR(qs[j + 1]), d, yOf(qs[j + 1])));
+          }
+        }
+        if (!rgb) {
+          for (const p of body) index(lines, put(lines, p, BLACK, 1, i, BODY, 0, id, DOTS));
+          for (const p of capLines) index(lines, put(lines, p, BLACK, 1, i, CAP, 0, id, DOTS));
+        }
+        t.outline = () => [body, capLines];
+        if (rgb) return;
+        lone.set(id, points.n);
+        put(points, at(0, 0, yOf(qm)), own.rgb8, 1, i, BODY, 0, id, POINTS, [Math.min(0.011, 0.3 * poleR(qm)), 0, 0, 0]);
+      };
+      // Every cell a dot: Wada's colours in a cell, as spheres BIG times its empty dot, as big as fits. Several
+      // share it side by side through its middle, out from the axis by chroma (the greys one above another,
+      // the lightest at the top). Their radius, and their centres, in the list's order.
+      const wadaDots = (list, pg, i, b, n) => {
+        const m = list.length;
+        if (!pg) { // the greys
+          const [q0, q1] = rowOf(i), y = yOf((q0 + q1) / 2);
+          const place = (size) => along(m, size).map((u) => [0, y - u]);
+          const size = fitDots(BIG * Math.min(0.011, 0.3 * poleR((q0 + q1) / 2)), place, ([, yy], h) => yy - h >= yOf(q0) && yy + h <= yOf(q1) && h <= poleR(yy / PAGE_Y + 0.5));
+          return { size, at: place(size).map(([, yy]) => [0, yy, 0]) };
+        }
+        const { lights } = pg.levels[i], qa = lights[0], qb = lights[lights.length - 1], qm = (qa + qb) / 2;
+        const r0 = (q) => out(b / n, pg.e(q)), r1 = (q) => out((b + 1) / n, pg.e(q)), y = yOf(qm), rm = out((b + 0.5) / n, pg.e(qm));
+        const order = [...list].sort((p, q) => shareOf(p) - shareOf(q)); // the least chroma nearest the axis
+        const place = (size) => along(m, size).map((u) => [rm + u, y]);
+        const fits = ([rho, yy], h) => {
+          const lo = (yy - h) / PAGE_Y + 0.5, hi = (yy + h) / PAGE_Y + 0.5;
+          return lo >= qa && hi <= qb && [lo, (lo + hi) / 2, hi].every((q) => rho - h >= r0(q) && rho + h <= r1(q)) && rho * Math.sin(rad(SLICE / 2)) >= h; // clear of the next pages' dots too
+        };
+        const size = fitDots(BIG * Math.min(0.011, 0.3 * (r1(qm) - r0(qm)), 0.3 * (yOf(qb) - yOf(qa))), place, fits), centres = place(size);
+        return { size, at: list.map((c) => { const [rho, yy] = centres[order.indexOf(c)]; return at(rho, pg.h, yy); }) };
+      };
+
+      // Every cell, the pages' and the column's: Wada's colours' pieces, or the empty cell.
+      const greyOwn = (i) => ({ oklch: [lightOf(i), 0, 0], rgb8: rgb8(oklabToLinearSRGB(lightOf(i), 0, 0)) });
+      const build = (list, made, pg, i, b, n) => {
+        const pieces = list ? list.map((colour) => ({ colour })) : [{ cell: made }];
+        const dots = list && wadaDots(list, pg, i, b, n);
+        pieces.forEach((t, k) => {
+          targets.push(t);
+          t.level = i;
+          const rgb = t.colour ? rgb8(oklabToLinearSRGB(t.colour.oklch[0], t.colour.oklch[1] * Math.cos(rad(t.colour.oklch[2])), t.colour.oklch[1] * Math.sin(rad(t.colour.oklch[2])))) : null;
+          if (pg) wallPiece(pg, i, b, n, k, pieces.length, t, rgb, made);
+          else polePiece(i, k, pieces.length, t, rgb, made);
+          if (dots) {
+            page = pg ? pg.s : POLE;
+            spots.set(targets.length - 1, points.n);
+            put(points, dots.at[k], rgb, 1, i, BODY, 0, targets.length - 1, WADA, [dots.size, 0, 0, 0]);
+          }
+        });
+      };
+      for (let i = 0; i <= LEVELS; i++) {
+        const grey = greyOwn(i);
+        build(groups.get(`pole ${i}`), { ...grey, greys: true, i }, null, i);
+        for (const pg of pages) {
+          const here = pg.levels[i];
+          if (!here) continue;
+          for (let b = 0; b < here.n; b++) {
+            const tone = here.tones[b];
+            build(groups.get(`${pg.s} ${i} ${b}`), { oklch: tone.oklch, rgb8: rgb8(tone.rgb), s: pg.s, i, b, n: here.n }, pg, i, b, here.n);
+          }
+        }
+      }
+
+      // The program: hides what's beyond the cut (whole levels in the vertex shader, the cut level's far
+      // half in the fragment shader) and the pages hidden, and draws colours (with an empty cell's dot on
+      // its card), card, lines, or ids for picking.
+      const program = glProgram(gl, `#version 300 es
+        in vec3 a_pos; in vec4 a_col; in vec4 a_info; in float a_id, a_page; in vec4 a_extra;
+        uniform mat4 u_mvp; uniform float u_cut, u_from, u_px, u_dpr; uniform int u_empty, u_mode; uniform ivec2 u_off; uniform bool u_hi; uniform vec3 u_card, u_cardSide; // u_from: 1 cut from the top, -1 from the bottom; u_empty: 0 hidden, 1 only dots, 2 dots on card, 3 filled, 4 every cell a dot; u_off: the pages hidden, a bit each (0-31, 32-35); u_hi: the hovered lone dot, bigger and ringed; u_px: pixels per unit at distance 1
+        out vec3 v_col, v_own, v_pos; flat out vec3 v_dot; flat out float v_clip, v_id, v_size, v_sprite, v_dotR;
+        void main() {
+          float level = a_info.x, kind = a_info.y, other = a_info.w;
+          bool atCut = abs(level - u_cut) < 0.5;
+          int page = int(a_page + 0.5);
+          bool off = page < 32 ? ((u_off.x >> page) & 1) == 1 : page < 64 && ((u_off.y >> (page - 32)) & 1) == 1;
+          bool shown = (level - u_cut) * u_from > -0.5 && (kind != 1.0 || atCut) && !off
+            && (other != 0.0 || u_empty != 4) && (other != 1.0 || u_empty == 2 || u_empty == 3) && (other != 2.0 || u_empty <= 1)
+            && (other != 3.0 || u_empty == 2) && (other != 4.0 || u_empty == 1 || u_empty == 4) && (other != 5.0 || u_empty == 4);
+          gl_Position = shown ? u_mvp * vec4(a_pos, 1.0) : vec4(2.0, 2.0, 2.0, 1.0);
+          // A lone dot's size, its own; bigger to pick, so it's easy to hover.
+          v_size = 2.0 * a_extra.x * u_px / gl_Position.w * (u_hi ? 1.5 : 1.0); // the sphere, across, in pixels
+          v_sprite = u_hi ? v_size + 5.0 * u_dpr + 2.0 : v_size; // with room for the ring: a gap of 1.5 px, a line of 1
+          gl_PointSize = u_mode == 1 ? max(1.6 * v_size, 10.0 * u_dpr) : v_sprite;
+          bool card = a_info.z > 0.5 && u_empty != 3;
+          v_col = card ? (a_col.a > 0.99 ? u_card : u_cardSide) : a_col.rgb * a_col.a;
+          v_own = a_col.rgb;
+          v_dot = a_extra.xyz;
+          v_dotR = card && u_empty == 2 && !(a_extra.w < 0.0 && atCut) ? abs(a_extra.w) : 0.0; // an empty cell's dot, on card
+          v_pos = a_pos;
+          v_clip = atCut && kind != 1.0 ? 1.0 : 0.0;
+          v_id = a_id;
+        }`, `#version 300 es
+        precision highp float; precision highp int; // u_mode is shared with the vertex shader: the same precision
+        in vec3 v_col, v_own, v_pos; flat in vec3 v_dot; flat in float v_clip, v_id, v_size, v_sprite, v_dotR;
+        uniform float u_cutY, u_from, u_dpr; uniform int u_mode; uniform bool u_round, u_hi; uniform vec3 u_line;
+        out vec4 colour;
+        void main() {
+          if (v_clip > 0.5 && (v_pos.y - u_cutY) * u_from > 1e-5) discard; // the cut level's half beyond the cut
+          vec2 q = gl_PointCoord * 2.0 - 1.0; // a lone dot: a sphere, faked on a disc facing the camera
+          if (u_round && length(q) > 1.0) discard;
+          if (u_round && u_mode == 0) {
+            // Lit from the upper left, in front: its exact colour where the light falls square, darker to the
+            // rim; the edge smoothed over a pixel (blended, the dots drawn from the back). Hovered, a ring of
+            // the text's colour round it, a gap away.
+            float rs = 0.5 * v_size, px = length(q) * 0.5 * v_sprite; // the sphere's radius, and this pixel's distance, in pixels
+            vec2 s = q * 0.5 * v_sprite / rs;
+            float d = min(length(s), 1.0);
+            vec3 n = vec3(s.x, -s.y, sqrt(1.0 - d * d));
+            float shade = 0.7 + 0.3 * max(dot(n, normalize(vec3(-0.35, 0.45, 0.82))), 0.0);
+            float sphere = clamp(rs - px, 0.0, 1.0), ring = u_hi ? clamp(0.5 * u_dpr + 0.5 - abs(px - rs - 2.0 * u_dpr), 0.0, 1.0) : 0.0;
+            if (sphere <= 0.0 && ring <= 0.0) discard;
+            colour = sphere > 0.0 ? vec4(v_col * shade, sphere) : vec4(u_line, ring);
+            return;
+          }
+          if (u_mode == 1) {
+            float id = v_id + 1.0;
+            colour = vec4(mod(id, 256.0), mod(floor(id / 256.0), 256.0), floor(id / 65536.0), 255.0) / 255.0;
+            return;
+          }
+          if (u_mode == 2) { colour = vec4(u_line, 1.0); return; }
+          vec3 c = v_col;
+          if (v_dotR > 0.0) { // a disc round its middle, its edge smoothed over a pixel
+            float d = distance(v_pos, v_dot);
+            c = mix(c, v_own, clamp((v_dotR - d) / max(fwidth(d), 1e-6) + 0.5, 0.0, 1.0));
+          }
+          colour = vec4(c, 1.0);
+        }`);
+      const u = Object.fromEntries(["u_mvp", "u_cut", "u_from", "u_px", "u_dpr", "u_empty", "u_off", "u_card", "u_cardSide", "u_cutY", "u_mode", "u_round", "u_hi", "u_line"].map((n) => [n, gl.getUniformLocation(program, n)]));
+      const ATTRIBUTES = [["a_pos", "pos", 3, gl.FLOAT, false], ["a_col", "col", 4, gl.UNSIGNED_BYTE, true], ["a_info", "info", 4, gl.UNSIGNED_BYTE, false],
+        ["a_id", "id", 1, gl.FLOAT, false], ["a_page", "page", 1, gl.UNSIGNED_BYTE, false], ["a_extra", "extra", 4, gl.FLOAT, false]];
+      const loc = Object.fromEntries(ATTRIBUTES.map(([name]) => [name, gl.getAttribLocation(program, name)]));
+      const upload = (m) => {
+        const vao = gl.createVertexArray();
+        gl.bindVertexArray(vao);
+        for (const [name, field, size, type, normalized] of ATTRIBUTES) {
+          gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+          gl.bufferData(gl.ARRAY_BUFFER, m[field]?.subarray(0, m.n * size) ?? new Uint8Array(4), gl.STATIC_DRAW);
+          gl.enableVertexAttribArray(loc[name]);
+          gl.vertexAttribPointer(loc[name], size, type, normalized, 0, 0);
+        }
+        if (m.ni) {
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, m.idx.subarray(0, m.ni), gl.STATIC_DRAW);
+        }
+        gl.bindVertexArray(null);
+        return { vao, count: m.n, indices: m.ni };
+      };
+      const meshes = { faces: upload(faces), lines: upload(lines), points: upload(points) };
+      // The lone dots' order, from the back, kept for the camera it was sorted for.
+      const order = { idx: Uint16Array.from({ length: meshes.points.count }, (_, i) => i), d: new Float32Array(meshes.points.count), key: "" };
+      gl.bindVertexArray(meshes.points.vao);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+      // The piece hovered: its outline, its positions alone (the rest is set for the whole draw).
+      const hoverVao = gl.createVertexArray(), hoverBuffer = gl.createBuffer();
+      gl.bindVertexArray(hoverVao);
+      gl.bindBuffer(gl.ARRAY_BUFFER, hoverBuffer);
+      gl.enableVertexAttribArray(loc.a_pos);
+      gl.vertexAttribPointer(loc.a_pos, 3, gl.FLOAT, false, 0, 0);
+      gl.bindVertexArray(null);
+
+      // The page's colours: card a little darker than the background, its edges and lines darker still.
+      const BG = cssRGB("--bg"), FG = cssRGB("--fg");
+      const tint = (t) => BG.map((v, i) => v + (FG[i] - v) * t);
+      const CARD = tint(0.06), CARD_SIDE = tint(0.11), LINE = tint(0.2);
+
+      // The camera: from the red side (hue 10°), so that yellow, most vivid near the top, is on the right,
+      // and blue, near the middle, on the left; a little above. The cut is at `level`, from the top (`from`
+      // 1: what's above is hidden) or the bottom (-1); at the end it comes from (white from the top, black
+      // from the bottom), nothing is cut: the slice there is the tip.
+      const DIST = 4.7, HALF = 13; // (as Ostwald's)
+      let az = 80, el = 25, level = 0, from = 1, hovered = -1, emptyAs = 2, off = new Set(); // off: the pages hidden
+      const camera = () => orbit(az, el, DIST, HALF, canvas.width / canvas.height);
+      const cutLevel = () => (from > 0 ? (level === 0 ? -1 : level) : level === TOP ? TOP + 1 : level);
+      const cutY = () => yOf(lightOf(cutLevel()));
+
+      // Round the solid, a button per page, which hides or shows it: the hue's name where it has one, else a
+      // dot of its most vivid colour. Each by its page's furthest still shown, following it (those behind
+      // fainter; a dot hidden behind the solid).
+      const labels = pages.map(({ s }) => {
+        const name = NAMED.find(([h]) => Math.floor(h / SLICE) === s)?.[1], what = name ? `${name}, ${pageName(s)}` : `Hue ${pageName(s)}`;
+        const b = Object.assign(document.createElement("button"), { type: "button", className: `solid-label${name ? "" : " solid-dot"}` });
+        if (name) b.textContent = name;
+        else b.style.setProperty("--hue", vivid(s).css);
+        const mark = () => {
+          const shown = !off.has(s);
+          b.setAttribute("aria-pressed", shown);
+          b.setAttribute("aria-label", `Page: ${what}`);
+          b.title = `${what}: ${shown ? "hide" : "show"} its page`;
+        };
+        b.addEventListener("click", () => { if (!off.delete(s)) off.add(s); mark(); request(); });
+        mark();
+        return b;
+      });
+      let anchors = [], anchorsFor = "";
+      const labelAnchors = () => {
+        const key = `${cutLevel()} ${from}`;
+        if (key === anchorsFor) return anchors;
+        anchorsFor = key;
+        const L = lightOf(cutLevel());
+        anchors = pages.map(({ h, t }) => {
+          let best = 0, row = 0;
+          for (let k = 0; k <= 512; k++) if ((k / 512 - L) * from <= 1e-9 && t[k] > best) [best, row] = [t[k], k / 512];
+          return best > inner ? at(best + 0.1, h, yOf(row)) : null;
+        });
+        return anchors;
+      };
+      // Whether the solid stands between the eye and p: within a page's edge, on the side of the cut shown,
+      // sampled along the line where it can be.
+      const behind = (p, eye) => {
+        const y0 = cutY();
+        for (let i = 0; i < 64; i++) {
+          const t = 0.6 + (0.4 * i) / 64, x = eye[0] + (p[0] - eye[0]) * t, y = eye[1] + (p[1] - eye[1]) * t, z = eye[2] + (p[2] - eye[2]) * t;
+          const q = y / PAGE_Y + 0.5, h = ((Math.atan2(-z, x) * 180) / Math.PI + 360) % 360;
+          if (q > 0 && q < 1 && (y - y0) * from < 0 && Math.hypot(x, z) < pages[Math.floor(h / SLICE) % PAGES].e(q)) return true;
+        }
+        return false;
+      };
+      const placeLabels = ({ mvp, eye }) => {
+        const spots = labelAnchors(), toward = Math.hypot(eye[0], eye[2]) || 1;
+        labels.forEach((label, s) => {
+          const p = spots[s];
+          label.style.visibility = p ? "" : "hidden";
+          if (!p) return;
+          const [x, y, z] = p, w = mvp[3] * x + mvp[7] * y + mvp[11] * z + mvp[15];
+          label.style.left = `${(((mvp[0] * x + mvp[4] * y + mvp[8] * z + mvp[12]) / w + 1) / 2) * 100}%`;
+          label.style.top = `${((1 - (mvp[1] * x + mvp[5] * y + mvp[9] * z + mvp[13]) / w) / 2) * 100}%`;
+          const facing = (x * eye[0] + z * eye[2]) / (Math.hypot(x, z) * toward);
+          label.style.opacity = facing < -0.2 && Math.abs(el) < 60 ? 0.35 : 1;
+          if (label.classList.contains("solid-dot") && behind(p, eye)) label.style.visibility = "hidden";
+        });
+      };
+
+      // Drawing, on screen or, for picking, one pixel of ids off screen.
+      let W = 0, H = 0, frame = 0;
+      const pick = { fb: gl.createFramebuffer(), tex: gl.createTexture(), depth: gl.createRenderbuffer() };
+      const resize = () => {
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
+        if (!w || !h || (w === W && h === H)) return;
+        W = canvas.width = w;
+        H = canvas.height = h;
+        gl.bindTexture(gl.TEXTURE_2D, pick.tex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, pick.depth);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, W, H);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pick.fb);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pick.tex, 0);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pick.depth);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      };
+      const draw = (px = -1, py = -1) => {
+        resize();
+        if (!W) return -1;
+        const picking = px >= 0, cam = camera();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, picking ? pick.fb : null);
+        gl.viewport(0, 0, W, H);
+        if (picking) { gl.enable(gl.SCISSOR_TEST); gl.scissor(px, py, 1, 1); }
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
+        gl.useProgram(program);
+        gl.uniformMatrix4fv(u.u_mvp, false, cam.mvp);
+        const cutAt = cutLevel();
+        let offLow = 0, offHigh = 0;
+        for (const s of off) if (s < 32) offLow |= 1 << s; else offHigh |= 1 << (s - 32);
+        gl.uniform1f(u.u_cut, cutAt);
+        gl.uniform1f(u.u_from, from);
+        gl.uniform1i(u.u_empty, emptyAs);
+        gl.uniform2i(u.u_off, offLow, offHigh);
+        gl.uniform1f(u.u_px, H / 2 / Math.tan(rad(HALF)));
+        gl.uniform1f(u.u_dpr, W / canvas.clientWidth);
+        gl.uniform1i(u.u_round, 0);
+        gl.uniform1i(u.u_hi, 0);
+        gl.uniform1f(u.u_cutY, cutY());
+        gl.uniform3fv(u.u_card, CARD);
+        gl.uniform3fv(u.u_cardSide, CARD_SIDE);
+        gl.uniform1i(u.u_mode, picking ? 1 : 0);
+        gl.enable(gl.POLYGON_OFFSET_FILL); // faces a little behind their outlines
+        gl.polygonOffset(1, 1);
+        gl.bindVertexArray(meshes.faces.vao);
+        gl.drawElements(gl.TRIANGLES, meshes.faces.indices, gl.UNSIGNED_INT, 0);
+        gl.disable(gl.POLYGON_OFFSET_FILL);
+        if (emptyAs === 1 || emptyAs === 4) { // the lone dots, from the back, so that each one's smoothed edge lies over what's behind it
+          gl.bindVertexArray(meshes.points.vao);
+          const key = `${az} ${el}`;
+          if (key !== order.key) {
+            order.key = key;
+            const e = cam.eye;
+            for (let i = 0; i < order.d.length; i++) order.d[i] = (points.pos[3 * i] - e[0]) ** 2 + (points.pos[3 * i + 1] - e[1]) ** 2 + (points.pos[3 * i + 2] - e[2]) ** 2;
+            order.idx.sort((i, j) => order.d[j] - order.d[i]);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, order.idx, gl.DYNAMIC_DRAW);
+          }
+          gl.uniform1i(u.u_round, 1);
+          if (!picking) { gl.enable(gl.BLEND); gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA); }
+          gl.drawElements(gl.POINTS, order.idx.length, gl.UNSIGNED_SHORT, 0);
+          gl.disable(gl.BLEND);
+          gl.uniform1i(u.u_round, 0);
+        }
+        let id = -1;
+        if (picking) {
+          const got = new Uint8Array(4);
+          gl.readPixels(px, py, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, got);
+          id = got[0] + got[1] * 256 + got[2] * 65536 - 1;
+          gl.disable(gl.SCISSOR_TEST);
+        } else {
+          gl.uniform1i(u.u_mode, 2);
+          gl.uniform3fv(u.u_line, LINE);
+          gl.bindVertexArray(meshes.lines.vao);
+          gl.drawElements(gl.LINES, meshes.lines.indices, gl.UNSIGNED_INT, 0);
+          // The piece under the pointer, outlined through everything in front of it; with the empty cells
+          // only dots, an empty cell's dot itself, bigger, on top, ringed; with every cell a dot, any dot.
+          if (hovered >= 0) {
+            gl.disable(gl.DEPTH_TEST);
+            gl.uniform3fv(u.u_line, FG);
+            const spot = emptyAs === 1 ? lone.get(hovered) : emptyAs === 4 ? lone.get(hovered) ?? spots.get(hovered) : undefined;
+            if (spot !== undefined) {
+              gl.uniform1i(u.u_mode, 0);
+              gl.uniform1i(u.u_round, 1);
+              gl.uniform1i(u.u_hi, 1);
+              gl.enable(gl.BLEND);
+              gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+              gl.bindVertexArray(meshes.points.vao);
+              gl.drawArrays(gl.POINTS, spot, 1);
+              gl.disable(gl.BLEND);
+              gl.uniform1i(u.u_round, 0);
+              gl.uniform1i(u.u_hi, 0);
+            } else {
+              const t = targets[hovered], [body, cap] = (t.lines ??= t.outline().map((list) => new Float32Array(list.flat())));
+              gl.bindVertexArray(hoverVao);
+              gl.bindBuffer(gl.ARRAY_BUFFER, hoverBuffer);
+              gl.bufferData(gl.ARRAY_BUFFER, body.byteLength + cap.byteLength, gl.STREAM_DRAW);
+              gl.bufferSubData(gl.ARRAY_BUFFER, 0, body);
+              gl.bufferSubData(gl.ARRAY_BUFFER, body.byteLength, cap);
+              gl.vertexAttrib1f(loc.a_id, hovered);
+              gl.vertexAttrib1f(loc.a_page, POLE);
+              gl.vertexAttrib4f(loc.a_extra, 0, 0, 0, 0);
+              gl.vertexAttrib4f(loc.a_col, 0, 0, 0, 1);
+              for (const [kind, first, count] of [[BODY, 0, body.length / 3], [CAP, body.length / 3, cap.length / 3]]) {
+                gl.vertexAttrib4f(loc.a_info, t.level, kind, 0, ALWAYS);
+                if (count) gl.drawArrays(gl.LINES, first, count);
+              }
+            }
+          }
+          placeLabels(cam);
+        }
+        gl.bindVertexArray(null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        return id;
+      };
+      const request = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; draw(); }); };
+      new ResizeObserver(request).observe(canvas);
+      const idAt = (e) => {
+        const r = canvas.getBoundingClientRect();
+        const x = Math.floor(((e.clientX - r.left) / r.width) * W), y = H - 1 - Math.floor(((e.clientY - r.top) / r.height) * H);
+        return x >= 0 && y >= 0 && x < W && y < H ? draw(x, y) : -1;
+      };
+      const hover = (id) => {
+        if (id === hovered) return;
+        hovered = id;
+        const t = targets[id];
+        if (t?.colour) onColour(t.colour);
+        else if (t?.cell) onCell(t.cell);
+        else onLeave();
+        hovered = id; // onLeave unhovers
+        request();
+      };
+
+      // Turning: drag (a press that hardly moves is a click), or the arrow keys (orbitInput). Hovering picks
+      // once a frame.
+      let swing = 0;
+      const turn = (dAz, dEl) => {
+        cancelAnimationFrame(swing);
+        az = (((az + dAz) % 360) + 360) % 360;
+        el = Math.min(90, Math.max(-90, el + dEl));
+        request();
+      };
+      // Turns the camera, in 0.4 s, to the height `to`.
+      const swingTo = (to) => {
+        cancelAnimationFrame(swing);
+        const start = performance.now(), el0 = el;
+        const step = (now) => {
+          const t = Math.min(1, (now - start) / 400);
+          el = el0 + (to - el0) * t * t * (3 - 2 * t);
+          draw();
+          if (t < 1) swing = requestAnimationFrame(step);
+        };
+        swing = requestAnimationFrame(step);
+      };
+      orbitInput(canvas, {
+        turn,
+        hover: (e) => hover(e ? idAt(e) : -1),
+        tap: (e) => {
+          const t = targets[idAt(e)];
+          if (t?.colour) onOpen(t.colour);
+          else if (t?.cell) onOpenCell(t.cell);
+        },
+      });
+
+      return {
+        canvas, labels,
+        cut: (i) => { level = i; request(); },
+        // From the top or the bottom; the camera turns to the cut's side if it isn't there (at once, or in a swing).
+        side: (where, animate) => {
+          from = where === "bottom" ? -1 : 1;
+          if (el * from < 15) {
+            const to = from * Math.max(25, Math.abs(el));
+            if (animate) swingTo(to); else el = to;
+          }
+          request();
+        },
+        empty: (how) => { emptyAs = ["hidden", "points", "dots", "filled", "all"].indexOf(how); request(); }, // how the cells show
         unhover: () => { if (hovered >= 0) { hovered = -1; request(); } },
       };
     }
@@ -3906,13 +4728,6 @@
       return out;
     }
 
-    // Within sRGB, to within `tolerance` (the OKLCH layout's 2D slices use a strict one: near black
-    // and white, a loose one lets through chroma that isn't there).
-    function inSRGB(L, C, h, tolerance = 1e-4) {
-      const rad = (h * Math.PI) / 180;
-      return oklabToLinearSRGB(L, C * Math.cos(rad), C * Math.sin(rad)).every((v) => v >= -tolerance && v <= 1 + tolerance);
-    }
-
     // Most vivid sRGB colour per hue (the gamut "cusp"): lightness L and chroma C in half-degree steps,
     // with entry 720 repeating entry 0 so interpolation wraps around. Computed once (into `cusps`, set at
     // the top, as the wheel can need it before the script gets here).
@@ -3930,12 +4745,17 @@
       return cusps;
     }
 
-    // Largest chroma sRGB can show at this lightness and hue.
-    function maxChroma(L, h, tolerance) {
+    // Largest chroma sRGB can show at this lightness and hue: within sRGB to within `tolerance` (the OKLCH
+    // layout's slices use a strict one: near black and white, a loose one lets through chroma that isn't
+    // there).
+    function maxChroma(L, h, tolerance = 1e-4) {
+      const rad = (h * Math.PI) / 180, cos = Math.cos(rad), sin = Math.sin(rad), v = new Float64Array(3);
       let lo = 0, hi = 0.4;
       for (let i = 0; i < 16; i++) { // to within 0.4 / 2^16
         const mid = (lo + hi) / 2;
-        if (inSRGB(L, mid, h, tolerance)) lo = mid; else hi = mid;
+        oklabToLinearSRGB(L, mid * cos, mid * sin, v);
+        if (v[0] >= -tolerance && v[0] <= 1 + tolerance && v[1] >= -tolerance && v[1] <= 1 + tolerance && v[2] >= -tolerance && v[2] <= 1 + tolerance) lo = mid;
+        else hi = mid;
       }
       return lo;
     }

@@ -56,9 +56,9 @@
 
     main { padding: 1.5rem; }
     #colors-view { display: grid; gap: 2rem; }
-    /* Its layouts (the sub-navigation): the families as grids or rows, the wheel, or Ostwald's solid. */
-    #colors-view:is([data-show="wheel"], [data-show="ostwald"]) > section,
-    #colors-view:not([data-show="wheel"]) > .wheel-box,
+    /* Its layouts (the sub-navigation): the families as grids or rows, or the colours in OKLCH or in Ostwald's solid. */
+    #colors-view:is([data-show="oklch"], [data-show="ostwald"]) > section,
+    #colors-view:not([data-show="oklch"]) > .wheel-box,
     #colors-view:not([data-show="ostwald"]) > .ostwald-box { display: none; }
     /* A group's name above it: the book's colour families, the months of the seasonal combinations. */
     .group-heading { margin-bottom: 1rem; font-size: 0.875rem; font-weight: 500; }
@@ -322,6 +322,7 @@
     .wheel-bg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.35; pointer-events: none; }
     .wheel svg { position: relative; }
     .wheel .highlight { fill: none; stroke: var(--fg); stroke-width: 0.008; pointer-events: none; }
+    .wheel .highlight.on-dark { stroke: var(--bg); } /* in 2D, round a dark colour on the slice's own dark ones */
     /* A combination's colours on the wheel: the others faded (until hovered), its colours outlined and
        joined in hue order by a thin line (greys, near the centre, have no hue to join). */
     .wheel.marking .segment:not(.marked) { opacity: 0.2; }
@@ -329,12 +330,39 @@
     .wheel.marking .wheel-bg { opacity: 0.15; }
     .wheel .marks { fill: none; stroke: var(--fg); stroke-width: 0.008; pointer-events: none; }
     .wheel .shape { fill: none; stroke: var(--fg); stroke-width: 0.004; stroke-opacity: 0.6; pointer-events: none; }
+    /* The Colors page's OKLCH layout, the wheel with its switches under a column to its right, as in the Ostwald view: Flat
+       (the wheel above), or 2D, a slice of OKLCH's solid, with its control in that column (the lightness
+       levels, or the dial); and squares or dots. */
+    .wheel-views {
+      --h: min(calc(100vh - 12rem), calc((100vw - 7rem) / 1.6)); /* the wheel's size: room for the column on both sides, so that it stays centred */
+      justify-self: stretch; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.75rem 2rem;
+    }
+    .wheel-views > .wheel { grid-column: 2; width: var(--h); }
+    .wheel .dot { cursor: pointer; outline: none; }
+    .wheel .dot-hit { fill: transparent; } /* round the dot, as far as its neighbours leave room: easier to hover */
+    .wheel :is(.dot-mark, .on-axis) { stroke: var(--line); stroke-width: 0.002; } /* as the Ostwald view's dots: pale ones show (and white, on the axis) */
+    .wheel :is(.gamut, .rim) { fill: none; stroke: var(--muted); stroke-width: 0.003; pointer-events: none; }
+    .wheel .rim { stroke-dasharray: 0.01 0.015; } /* the widest the slices go, for scale */
+    .wheel .gamut { pointer-events: fill; cursor: pointer; } /* hovering the slice, off Wada's colours, shows its own colour */
+    .wheel-views[data-surface="smooth"] .gamut { cursor: crosshair; } /* the colour exactly under the pointer */
+    .wheel-views:not([data-view="flat"]) .wheel-bg { opacity: 1; } /* in 2D, the slice's own colours, at full strength, as the panel shows them */
+    /* There, each of Wada's colours sits on its own colour: ringed, light round a dark one, dark round a light one. */
+    .wheel-views:not([data-view="flat"]) .wheel :is(.segment, .dot-mark) { stroke-width: 0.004; }
+    .wheel-views:not([data-view="flat"]) .wheel :is(.segment, .dot-mark).on-dark { stroke: var(--bg); }
+    .wheel-views:not([data-view="flat"]) .wheel :is(.segment, .dot-mark).on-light { stroke: var(--fg); stroke-opacity: 0.6; }
+    .lightness-levels {
+      grid-column: 3; justify-self: start;
+      display: block; height: calc(var(--h) * 0.85); aspect-ratio: 9.8 / 33.2;
+      cursor: ns-resize; touch-action: none; outline: none; user-select: none; -webkit-user-select: none;
+    }
+    .wheel-views:not([data-view="level"]) > .lightness-levels { display: none; }
+    .wheel-views[data-view="pages"] > .dial-box { display: block; }
     @media (prefers-reduced-motion: reduce) { .swatch span, .wheel-panel { transition: none !important; } }
 
     /* Ostwald layout: one level of Ostwald's colour solid at a time, seen from above (angle = hue,
-       distance from the centre = colour content), centred on the page as the wheel is, with its control
+       distance from the centre = colour content), centred on the page as the OKLCH layout's wheel is, with its control
        to the right: Wada's 16 greys, white at the top, and the solid's outline with the level marked. The
-       info panel floats at the left, as the wheel's. */
+       info panel floats at the left, as the OKLCH layout's. */
     .ostwald {
       /* the disc's height: the screen's below the header, or its width less room for the control
          (0.25 of it) on both sides, so that the disc stays centred */
@@ -356,11 +384,11 @@
       position: absolute; transform: translate(var(--dx), -50%);
       color: var(--muted); font-size: 0.75rem; white-space: nowrap; text-align: var(--align); pointer-events: none;
     }
-    .ostwald-caption { grid-column: 2; grid-row: 2; align-self: start; padding-top: 0.25rem; contain: inline-size; margin: 0; color: var(--muted); font-size: 0.8rem; text-align: center; } /* wraps to the disc's width */
-    .ostwald-caption .chip { display: inline-block; width: 0.75em; height: 0.75em; margin-left: 0.5ch; vertical-align: -0.05em; }
-    .ostwald-caption .hue-name { white-space: nowrap; } /* a hue's name with its square (and comma): never split */
+    .view-caption { grid-column: 2; grid-row: 2; align-self: start; padding-top: 0.25rem; contain: inline-size; margin: 0; color: var(--muted); font-size: 0.8rem; text-align: center; } /* wraps to the disc's width */
+    .view-caption .chip { display: inline-block; width: 0.75em; height: 0.75em; margin-left: 0.5ch; vertical-align: -0.05em; }
+    .view-caption .hue-name { white-space: nowrap; } /* a hue's name with its square (and comma): never split */
     /* Sliced through the axis, the caption has a button each side to turn to the previous or next pages. */
-    .ostwald-caption.turns { display: flex; justify-content: center; align-items: center; gap: 0.75rem; padding-top: 0; }
+    .view-caption.turns { display: flex; justify-content: center; align-items: center; gap: 0.75rem; padding-top: 0; }
     .page-turn {
       flex: none; display: grid; place-items: center; width: 1.75em; height: 1.75em; padding: 0;
       border: 1px solid var(--line); border-radius: 50%; background: none; color: var(--muted); cursor: pointer; transition: color 0.15s, border-color 0.15s;
@@ -384,62 +412,62 @@
     .ostwald-label.solid-dot { --dx: -50%; width: 0.55rem; height: 0.55rem; padding: 0; border-radius: 50%; background: var(--hue); border: 1.5px solid var(--hue); }
     .ostwald-label.solid-dot[aria-pressed="false"] { background: var(--bg); }
     .solid-dot::before { content: ""; position: absolute; inset: -0.45rem; } /* a bigger target */
-    /* Under the control: two small segmented switches, the view and how the empty cells show. */
-    .ostwald-modes { grid-column: 3; grid-row: 2; justify-self: start; align-self: start; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; font-size: 0.7rem; }
-    .ostwald-option { display: flex; align-items: center; gap: 0.45em; color: var(--muted); white-space: nowrap; }
-    .ostwald-option[hidden] { display: none; }
-    .ostwald-option > span { display: none; } /* no room beside the control: the choices' tooltips say what they are */
-    @media (hover: none), (max-width: 600px) { .ostwald-option > span { display: inline; } } /* no tooltips on touch: a label (and room for it on phones) */
-    .ostwald-switch { display: inline-flex; gap: 1px; padding: 2px; border: 1px solid var(--line); border-radius: 999px; }
-    .ostwald-switch button {
+    /* Under the control: small segmented switches, the view and its options (the Ostwald layout's, and the OKLCH one's). */
+    .view-modes { grid-column: 3; grid-row: 2; justify-self: start; align-self: start; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; font-size: 0.7rem; }
+    .view-option { display: flex; align-items: center; gap: 0.45em; color: var(--muted); white-space: nowrap; }
+    .view-option[hidden] { display: none; }
+    .view-option > span { display: none; } /* no room beside the control: the choices' tooltips say what they are */
+    @media (hover: none), (max-width: 600px) { .view-option > span { display: inline; } } /* no tooltips on touch: a label (and room for it on phones) */
+    .view-switch { display: inline-flex; gap: 1px; padding: 2px; border: 1px solid var(--line); border-radius: 999px; }
+    .view-switch button {
       font: inherit; display: flex; align-items: center; justify-content: center; min-width: 1.9em; height: 1.9em; padding: 0 0.4em;
       border: 0; border-radius: 999px; background: none; color: var(--muted); cursor: pointer; transition: background-color 0.15s, color 0.15s;
     }
-    .ostwald-option button { min-width: 1.75em; padding: 0 0.325em; } /* the icons: a little narrower, so that the three switches fit in a line beside a disc as tall as the screen allows */
-    .ostwald-switch button:hover:not(:disabled) { color: var(--fg); }
-    .ostwald-switch button[aria-pressed="true"] { background: color-mix(in srgb, var(--fg) 9%, transparent); color: var(--fg); }
-    .ostwald-switch button:disabled { opacity: 0.45; cursor: default; }
-    .ostwald-switch button:focus-visible { outline: 1px solid var(--fg); outline-offset: 1px; }
-    .ostwald-switch svg { display: block; width: 1.1em; height: 1.1em; fill: currentColor; stroke: currentColor; stroke-width: 1.2; stroke-linejoin: round; }
+    .view-option button { min-width: 1.75em; padding: 0 0.325em; } /* the icons: a little narrower, so that the switches fit in a line beside a disc as tall as the screen allows (on wide screens) */
+    .view-switch button:hover:not(:disabled) { color: var(--fg); }
+    .view-switch button[aria-pressed="true"] { background: color-mix(in srgb, var(--fg) 9%, transparent); color: var(--fg); }
+    .view-switch button:disabled { opacity: 0.45; cursor: default; }
+    .view-switch button:focus-visible { outline: 1px solid var(--fg); outline-offset: 1px; }
+    .view-switch svg { display: block; width: 1.1em; height: 1.1em; fill: currentColor; stroke: currentColor; stroke-width: 1.2; stroke-linejoin: round; }
     .ostwald-levels {
       grid-column: 3; justify-self: start;
       display: block; height: calc(var(--h) * 0.85); aspect-ratio: 9.8 / 33.2;
       cursor: ns-resize; touch-action: none; outline: none; user-select: none; -webkit-user-select: none;
     }
-    .ostwald-levels * { vector-effect: non-scaling-stroke; } /* strokes in screen pixels */
-    .ostwald-levels :is(.outline, .strip) { fill: none; stroke: var(--muted); stroke-width: 1px; }
+    :is(.ostwald-levels, .lightness-levels) * { vector-effect: non-scaling-stroke; } /* strokes in screen pixels */
+    :is(.ostwald-levels, .lightness-levels) :is(.outline, .strip) { fill: none; stroke: var(--muted); stroke-width: 1px; }
     .ostwald-levels .equator { stroke-dasharray: 3 3; }
     .ostwald-levels .axis { stroke: var(--line); stroke-width: 1px; }
     .ostwald-levels .section { opacity: 0.6; } /* a wash: the outlines still show through */
     .ostwald-levels .section path { stroke-width: 0.5px; } /* its own colour: no seams between cells */
-    .ostwald-levels :is(.slice, .ghost) { fill: none; } /* painted with their level's disc instead */
-    .ostwald-levels .slice { fill: var(--fg); fill-opacity: 0.12; stroke: var(--fg); stroke-width: 1.5px; }
-    .ostwald-levels .ghost { fill: var(--fg); fill-opacity: 0.05; stroke: var(--fg); stroke-width: 1px; stroke-dasharray: 3 2; } /* the level previewed under the pointer */
-    .ostwald-levels .marker { stroke: var(--fg); stroke-width: 1.5px; }
-    .ostwald-levels .pointer { fill: var(--fg); }
-    .ostwald-levels text { font-family: inherit; pointer-events: none; }
-    .ostwald-levels:focus-visible .strip { stroke: var(--fg); stroke-width: 2px; }
+    :is(.ostwald-levels, .lightness-levels) :is(.slice, .ghost) { fill: none; } /* painted with their level's disc instead */
+    :is(.ostwald-levels, .lightness-levels) .slice { fill: var(--fg); fill-opacity: 0.12; stroke: var(--fg); stroke-width: 1.5px; }
+    :is(.ostwald-levels, .lightness-levels) .ghost { fill: var(--fg); fill-opacity: 0.05; stroke: var(--fg); stroke-width: 1px; stroke-dasharray: 3 2; } /* the level previewed under the pointer */
+    :is(.ostwald-levels, .lightness-levels) .marker { stroke: var(--fg); stroke-width: 1.5px; }
+    :is(.ostwald-levels, .lightness-levels) .pointer { fill: var(--fg); }
+    :is(.ostwald-levels, .lightness-levels) text { font-family: inherit; pointer-events: none; }
+    :is(.ostwald-levels, .lightness-levels):focus-visible .strip { stroke: var(--fg); stroke-width: 2px; }
     /* Sliced through the axis (2D): the two pages, with their hues named at their tips, and the dial in
        the control's place: the solid's middle level seen from above, the two pages bright, the slice
        across it, and a pointer at the page on the right. */
     .ostwald-disc:not([data-slicing="pages"]) > .page-label, .ostwald-disc[data-slicing="pages"] > .level-label { display: none; }
-    .ostwald-dial-box { grid-column: 3; display: none; container-type: inline-size; min-width: calc(var(--h) * 0.3); } /* the column's width, to fit the dial and its labels in; at least the dial's */
-    .ostwald[data-view="pages"] > .ostwald-dial-box { display: block; }
+    .dial-box { grid-column: 3; display: none; container-type: inline-size; min-width: calc(var(--h) * 0.3); } /* the column's width, to fit the dial and its labels in; at least the dial's */
+    .ostwald[data-view="pages"] > .dial-box { display: block; }
     .dial-face { /* the dial and its labels: room on the left for the longest, as wide as fits, up to the control's size */
       position: relative; width: min(calc(var(--h) * 0.3), calc(100cqw - 5.8rem)); margin-left: 4.1rem;
       cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none;
     }
-    .ostwald-dial { display: block; width: 100%; aspect-ratio: 1; outline: none; }
+    .hue-dial { display: block; width: 100%; aspect-ratio: 1; outline: none; }
     .ostwald[data-view="pages"] > .ostwald-levels { display: none; }
-    .ostwald-dial * { vector-effect: non-scaling-stroke; } /* strokes in screen pixels */
-    .ostwald-dial .hue { opacity: 0.35; transition: opacity 0.15s; }
-    .ostwald-dial .hue.on { opacity: 1; }
-    .ostwald-dial .hue path { stroke-width: 0.5px; } /* its own colour: no seams between cells */
-    .ostwald-dial .rim { fill: none; stroke: var(--muted); stroke-width: 1px; }
-    .ostwald-dial .cut { stroke: var(--fg); stroke-width: 1.5px; }
-    .ostwald-dial .ghost { stroke: var(--fg); stroke-width: 1px; stroke-dasharray: 3 2; } /* the pages previewed under the pointer */
-    .ostwald-dial .pointer { fill: var(--fg); }
-    .ostwald-dial:focus-visible .rim { stroke: var(--fg); stroke-width: 2px; }
+    .hue-dial * { vector-effect: non-scaling-stroke; } /* strokes in screen pixels */
+    .hue-dial .hue { opacity: 0.35; transition: opacity 0.15s; }
+    .hue-dial .hue.on { opacity: 1; }
+    .hue-dial .hue path { stroke-width: 0.5px; } /* its own colour: no seams between cells */
+    .hue-dial .rim { fill: none; stroke: var(--muted); stroke-width: 1px; }
+    .hue-dial .cut { stroke: var(--fg); stroke-width: 1.5px; }
+    .hue-dial .ghost { stroke: var(--fg); stroke-width: 1px; stroke-dasharray: 3 2; } /* the pages previewed under the pointer */
+    .hue-dial .pointer { fill: var(--fg); }
+    .hue-dial:focus-visible .rim { stroke: var(--fg); stroke-width: 2px; }
     /* Round the dial, the named hues; the two pages', if named, bright, as their sectors are. */
     .dial-label { position: absolute; transform: translate(var(--dx), var(--dy)); color: var(--muted); font-size: 0.7rem; line-height: 1.2; white-space: nowrap; transition: color 0.15s; }
     .dial-label:is(.on, :hover) { color: var(--fg); }
@@ -449,15 +477,20 @@
     }
     @media (max-width: 600px) { /* no room to centre the disc: disc and control side by side, and room for the side labels */
       .ostwald { --h: calc((100vw - 4rem) / 1.47); grid-template-columns: auto auto; justify-content: center; column-gap: 1rem; }
-      .ostwald-disc, .ostwald-caption { grid-column: 1; }
-      .ostwald-levels, .ostwald-dial-box { grid-column: 2; }
-      .ostwald-dial-box { width: calc(var(--h) * 0.3); } /* the column fits its content here */
-      .ostwald-modes { grid-column: 1 / -1; grid-row: 3; justify-self: center; } /* the control's column is narrow: a row of their own */
+      .ostwald-disc, .view-caption { grid-column: 1; }
+      .ostwald-levels, .dial-box { grid-column: 2; }
+      .dial-box { width: calc(var(--h) * 0.3); } /* the column fits its content here */
+      .view-modes { grid-column: 1 / -1; grid-row: 3; justify-self: center; } /* the control's column is narrow: a row of their own */
       .ostwald-label { font-size: 0.65rem; white-space: normal; width: min-content; line-height: 1.2; }
       .ostwald-disc > .page-label { display: none; } /* no room beside the pages' tips: the caption names their hues, left then right */
       /* no room beside the disc either: the info panel goes below it (a tapped empty cell's info stays) */
       .ostwald-box { display: flex; flex-direction: column; }
       .ostwald-box > .wheel-panel { position: static; transform: none; order: 1; align-self: center; margin-top: 1.5rem; }
+      /* The wheel likewise: as wide as fits, with its control (in 2D) beside it */
+      .wheel-views { --h: calc((100vw - 4rem) / 1.3); grid-template-columns: auto auto; justify-content: center; column-gap: 1rem; }
+      .wheel-views[data-view="flat"] { --h: calc(100vw - 3rem); }
+      .wheel-views > .wheel { grid-column: 1; }
+      .wheel-views > .lightness-levels { grid-column: 2; }
     }
 
     dialog {
@@ -502,7 +535,7 @@
     <div class="subnav" data-view="colors" role="group" aria-label="Colours layout">
       <button type="button" data-value="grid">Grid</button>
       <button type="button" data-value="rows">Rows</button>
-      <button type="button" data-value="wheel">Wheel</button>
+      <button type="button" data-value="oklch">OKLCH</button>
       <button type="button" data-value="ostwald">Ostwald</button>
     </div>
     <div class="subnav" data-view="combinations" data-default="all" role="group" aria-label="Number of colours">
@@ -530,6 +563,33 @@
       <div class="pager"></div>
       <div class="tabs"></div>
     </nav>
+    <script>
+      // The header as the address and this browser's choices have it, from the first paint (the page's
+      // script, a module, runs only once the whole page is in): the section highlighted, only its
+      // options shown, and in each view's options the one chosen. The page's script calls showHeader
+      // again on every change of address; it returns the view to show.
+      function showHeader() {
+        const route = location.hash.slice(1).split("/")[0];
+        const name = ["colors", "combinations", "combination", "seasons", "season", "create"].includes(route) ? route : "colors";
+        const section = { combination: "combinations", season: "seasons" }[name] ?? name; // highlighted in the nav
+        for (const a of document.querySelectorAll(".views a")) {
+          if (a.hash === `#${section}`) a.setAttribute("aria-current", "page");
+          else a.removeAttribute("aria-current");
+        }
+        for (const s of document.querySelectorAll(".subnav[data-view]")) s.hidden = s.dataset.view !== name;
+        document.querySelector(".combo-subnav").hidden = name !== "combination" && name !== "season";
+        return name;
+      }
+      showHeader();
+      for (const subnav of document.querySelectorAll(".subnav[data-view]")) { // the option remembered, or the default
+        const buttons = [...subnav.querySelectorAll("button")];
+        let saved = null;
+        try { saved = localStorage.getItem(`${subnav.dataset.view}-show`); } catch {}
+        if (subnav.dataset.view === "colors" && saved === "wheel") saved = "oklch"; // the OKLCH layout's old name
+        const value = buttons.some((b) => b.dataset.value === saved) ? saved : subnav.dataset.default ?? buttons[0].dataset.value;
+        for (const b of buttons) b.setAttribute("aria-pressed", b.dataset.value === value);
+      }
+    </script>
   </header>
 
   <main>
@@ -564,7 +624,7 @@
   </dialog>
 
   <script type="module">
-    const views = {
+    const views = { // (the header's script, showHeader, knows the same names)
       colors: document.getElementById("colors-view"),
       combinations: document.getElementById("combinations-view"),
       combination: document.getElementById("combination-view"),
@@ -592,6 +652,8 @@
     const SECTIONS = [[2, "Two-colour combinations", "2色の配色帖"], [3, "Three-colour combinations", "3色の配色帖"], [4, "Four-colour combinations", "4色の配色帖"]];
     const MAX_PICKED = 7; // as many colours as the largest combination in the book
     const BIG = 1.6, DOT_GAP = 2.3; // Ostwald layout, every cell a dot: see along() below
+    let cusps = null; // the wheel's table of each hue's most vivid colour: see cuspTable() below
+    let printTable = null, printLoading = null; // the print profile's table, for CMYK estimates: see loadPrintTable() below
     // A combination's pages: its colours on their own, the combinations of each kind that share a colour
     // with it, and its colours on the wheel. Address suffix and name.
     const TABS = [["", "Colours"], ["combinations", "Combinations"], ["seasons", "Seasons"], ["wheel", "Wheel"]];
@@ -602,16 +664,9 @@
     const pickerButtons = []; // colour index -> its button in the colour picker
     let comboWheel = null; // the combination pages' wheel, made the first time it is shown
     function showView() {
-      const [route, arg, tab] = location.hash.slice(1).split("/");
-      const name = route in views ? route : "colors";
-      const section = { combination: "combinations", season: "seasons" }[name] ?? name; // highlighted in the nav
+      const [, arg, tab] = location.hash.slice(1).split("/");
+      const name = showHeader(); // the header's script (in the page, so as to show the header right from the start)
       for (const [key, el] of Object.entries(views)) el.hidden = key !== name;
-      for (const a of document.querySelectorAll(".views a")) {
-        if (a.hash === `#${section}`) a.setAttribute("aria-current", "page");
-        else a.removeAttribute("aria-current");
-      }
-      for (const s of subnavs) s.hidden = s.dataset.view !== name;
-      comboSubnav.hidden = name !== "combination" && name !== "season";
       if (detail.open) detail.close();
       if ((name === "combination" || name === "season") && data) {
         renderCombination(name, Number(arg), tab);
@@ -623,9 +678,10 @@
         document.title = "Wada Sanzo | A Dictionary of Color Combinations";
       }
     }
-    // Sub-navigation: each view's options (colors: grid, rows or the wheel; combinations: number of
+    // Sub-navigation: each view's options (colors: grid, rows, OKLCH or Ostwald; combinations: number of
     // colours; seasons: one month or all).
-    // The choice is set on the view as data-show, which the CSS reads, and remembered in this browser.
+    // The choice is set on the view as data-show, which the CSS reads, and remembered in this browser;
+    // at first, the one the header's script chose (the one remembered, or the default).
     for (const subnav of subnavs) {
       const view = views[subnav.dataset.view], key = `${subnav.dataset.view}-show`;
       const buttons = [...subnav.querySelectorAll("button")];
@@ -635,9 +691,7 @@
         try { localStorage.setItem(key, value); } catch {}
       };
       for (const b of buttons) b.addEventListener("click", () => choose(b.dataset.value));
-      let saved = null;
-      try { saved = localStorage.getItem(key); } catch {}
-      choose(buttons.some((b) => b.dataset.value === saved) ? saved : subnav.dataset.default ?? buttons[0].dataset.value);
+      choose(buttons.find((b) => b.getAttribute("aria-pressed") === "true").dataset.value);
     }
 
     addEventListener("hashchange", showView);
@@ -651,6 +705,27 @@
       name.replaceChildren(color.name, chipOf(color));
       root.querySelector('[data-field="cmyk"]').textContent = cmykText(color.cmyk);
       root.querySelector('[data-field="oklch"]').textContent = oklchValues(color.oklch);
+    }
+
+    // The card of a colour that isn't one of Wada's (an empty cell's, in the Ostwald view or on the wheel
+    // sliced): its values, its CMYK if estimated, and the CSS colour to copy; then `line` and `warning`
+    // (that it isn't one of his) instead of combinations.
+    function showComputedDetail(own, title, cmyk, line, warning) {
+      detail.querySelector(".detail-swatch").style.setProperty("--color", own.css);
+      const name = detail.querySelector("h2");
+      name.classList.add("named");
+      name.replaceChildren(title, chipOf(own));
+      detail.querySelector('[data-field="cmyk"]').textContent = cmyk ? `≈ ${cmykText(cmyk)}` : "Not in Wada's palette"; // an estimate, so ≈
+      detail.querySelector('[data-field="oklch"]').textContent = oklchValues(own.oklch);
+      const copy = detail.querySelector(".copy");
+      copy.dataset.css = oklchText(own.oklch);
+      copy.classList.remove("copied");
+      const note = detail.querySelector(".detail-note");
+      note.replaceChildren(line, Object.assign(document.createElement("span"), { className: "detail-warning", textContent: warning }));
+      note.hidden = false;
+      detail.querySelector(".detail-combos").replaceChildren();
+      detail.showModal();
+      detail.scrollTop = 0;
     }
 
     function showDetail(color) {
@@ -767,11 +842,7 @@
       });
 
       buildPicker(colors, families);
-      const wheel = makeWheel(colors);
-      const wheelBox = document.createElement("div");
-      wheelBox.className = "wheel-box";
-      wheelBox.append(wheel.panel, wheel.wheel);
-      views.colors.append(wheelBox, makeOstwald(colors));
+      views.colors.append(makeWheel(colors, { views: true }).box, makeOstwald(colors));
       // Prepare the wheel background's hue table while the page is idle, so opening the wheel is quick.
       (window.requestIdleCallback ?? setTimeout)(() => cuspTable());
       showView(); // a #combination/<number> (or #season, #create) link opened directly needs the data
@@ -1328,8 +1399,14 @@
     // cells stay as gaps. Near-neutral colours (no meaningful hue) form the inner ring, light to dark.
     // Returns the wheel, its info panel (the colour under the pointer), and mark(colours), which shows
     // a combination's colours on it.
-    function makeWheel(colors) {
-      const SLICE = 10, BANDS = 8, NEUTRAL_C = 0.02;
+    // With `views` (the Colors page's wheel), it also returns `box`: the wheel with its switches. The
+    // view: Flat, the wheel above, every colour at once, its lightness left out; or 2D, a slice of OKLCH's
+    // solid (lightness up its axis), across the axis (one lightness, seen from above, as the wheel is) or
+    // through it (a hue's page and the opposite hue's, back to back), with its control beside it. The
+    // marks: squares, each colour filling its piece of its cell, as above; or dots, each colour at its
+    // exact place.
+    function makeWheel(colors, { views = false } = {}) {
+      const SLICE = 10, BANDS = 8, NEUTRAL_C = 0.02, LEVELS = 20; // (the 2D view's lightness levels: 21, 0.05 apart)
       const RING = [0.25, 1], GREYS = [0.13, 0.23];
       const panel = Object.assign(document.createElement("aside"), { className: "wheel-panel" });
       panel.setAttribute("aria-live", "polite");
@@ -1339,70 +1416,153 @@
         + `<svg viewBox="-1.02 -1.02 2.04 2.04" role="group" aria-label="Colour wheel"></svg>`;
       const svg = wheel.querySelector("svg");
       const NS = "http://www.w3.org/2000/svg";
-      const overlay = (name) => { // drawn over the colours
-        const path = document.createElementNS(NS, "path");
-        path.classList.add(name);
-        return path;
+      const svgEl = (name, attrs = {}) => {
+        const e = document.createElementNS(NS, name);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        return e;
       };
+      const overlay = (name) => svgEl("path", { class: name }); // drawn over the colours
       const shape = overlay("shape"), marks = overlay("marks"), highlight = overlay("highlight");
+      // Under the colours, in 2D: the slice's edge (as far as the screen's colours go) and, across the axis,
+      // the rim, for scale.
+      const gamut = svgEl("path", { class: "gamut" }), rim = svgEl("path", { class: "rim" });
+      const layer = svgEl("g"); // the colours
+      svg.append(...(views ? [gamut, rim] : []), layer, shape, marks, highlight);
       const segments = new Map(); // colour -> its path, outline, and (if not grey) hue angle and centre
       const pt = polarPoint, arc = ringSector;
+      const polar = (r, deg) => [r * Math.cos((deg * Math.PI) / 180), -r * Math.sin((deg * Math.PI) / 180)]; // as polarPoint
+      const circle = (x, y, r) => `M ${x + r} ${y} A ${r} ${r} 0 1 0 ${x - r} ${y} A ${r} ${r} 0 1 0 ${x + r} ${y} Z`;
 
-      const segment = (c, d, angle, centre) => {
-        const path = document.createElementNS(NS, "path");
-        segments.set(c, { path, d, angle, centre });
-        path.classList.add("segment");
-        path.setAttribute("d", d);
-        path.setAttribute("fill", c.css);
-        path.setAttribute("tabindex", "0");
-        path.setAttribute("role", "button");
-        path.setAttribute("aria-label", c.name);
+      // Makes `el` a colour's: hovering or focusing it outlines `d` and shows the colour in the panel;
+      // clicking it (or Enter) opens its card. In 2D the slice round it is as light as its level, so round
+      // a dark one (a level of lightness 0.6 or less, as the lightness levels' labels) the outline is
+      // light, and so is the ring round Wada's colour's own mark (dark round the others).
+      let onSlice = false; // in 2D
+      const dark = (L) => 1 - Math.round((1 - L) * LEVELS) / LEVELS <= 0.6; // (its level, as levelOf)
+      const outlineAt = (d, L) => {
+        highlight.setAttribute("d", d);
+        highlight.classList.toggle("on-dark", onSlice && dark(L));
+      };
+      const ring = (el, c) => { if (onSlice) el.classList.add(dark(c.oklch[0]) ? "on-dark" : "on-light"); };
+      const hide = () => { highlight.removeAttribute("d"); panel.classList.remove("show"); };
+      const target = (el, c, d) => {
+        el.setAttribute("tabindex", "0");
+        el.setAttribute("role", "button");
+        el.setAttribute("aria-label", c.name);
         const show = () => {
-          highlight.setAttribute("d", d);
+          outlineAt(d, c.oklch[0]);
           fillDetails(panel, c);
           panel.classList.add("show");
         };
-        const hide = () => { highlight.removeAttribute("d"); panel.classList.remove("show"); };
-        path.addEventListener("pointerenter", show);
-        path.addEventListener("focus", show);
-        path.addEventListener("pointerleave", hide);
-        path.addEventListener("blur", hide);
-        path.addEventListener("click", () => showDetail(c));
-        path.addEventListener("keydown", (e) => {
+        el.addEventListener("pointerenter", show);
+        el.addEventListener("focus", show);
+        el.addEventListener("pointerleave", hide);
+        el.addEventListener("blur", hide);
+        el.addEventListener("click", () => showDetail(c));
+        el.addEventListener("keydown", (e) => {
           if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showDetail(c); }
         });
-        svg.append(path);
+      };
+      const segment = (c, d, angle, centre) => {
+        const path = svgEl("path", { class: "segment", d, fill: c.css });
+        ring(path, c);
+        segments.set(c, { path, d, angle, centre });
+        target(path, c, d);
+        layer.append(path);
+        return path;
+      };
+      // A colour's dot at (x, y), on an unseen target round it, as big as its neighbours leave room for.
+      const DOT = 0.018;
+      const dot = (c, x, y, reach) => {
+        const g = svgEl("g", { class: "dot" });
+        const spot = svgEl("circle", { class: "dot-mark", cx: x, cy: y, r: DOT, fill: c.css });
+        ring(spot, c);
+        g.append(svgEl("circle", { class: "dot-hit", cx: x, cy: y, r: reach }), spot);
+        target(g, c, circle(x, y, DOT + 0.006));
+        layer.append(g);
+      };
+      // Dots at their places (`items`: [colour, x, y]), nudged apart until no two overlap: only those that
+      // nearly coincide move (on the flat wheel, colours that differ mostly in lightness), by at most about
+      // a dot's radius; and, in 2D, kept inside the slice (`keepIn`, which moves a point back in and says
+      // whether it did).
+      const drawDots = (items, keepIn) => {
+        const p = items.map(([, x, y]) => [x, y]), gap = 2 * DOT + 0.004;
+        const inside = () => items.reduce((moved, [c], i) => keepIn(p[i], c) || moved, false);
+        for (let round = 0, moved = true; moved && round < 300; round++) {
+          moved = !!keepIn && inside();
+          for (let i = 0; i < p.length; i++) {
+            for (let j = i + 1; j < p.length; j++) {
+              let dx = p[j][0] - p[i][0], dy = p[j][1] - p[i][1], d = Math.hypot(dx, dy);
+              if (d >= gap * 0.999) continue; // apart enough (pushed to exactly the gap, they would otherwise keep nudging)
+              if (d < 1e-9) { dx = Math.cos(j) * 1e-9; dy = Math.sin(j) * 1e-9; d = 1e-9; } // exactly together: apart any way
+              const f = (gap - d) / 2 / d;
+              p[i][0] -= dx * f; p[i][1] -= dy * f;
+              p[j][0] += dx * f; p[j][1] += dy * f;
+              moved = true;
+            }
+          }
+        }
+        p.forEach(([x, y], i) => {
+          let near = Infinity;
+          p.forEach(([u, v], j) => { if (j !== i) near = Math.min(near, Math.hypot(u - x, v - y)); });
+          dot(items[i][0], x, y, Math.min(1.8 * DOT, near / 2));
+        });
       };
 
       const chromatic = colors.filter((c) => c.oklch[1] >= NEUTRAL_C);
       const greys = colors.filter((c) => c.oklch[1] < NEUTRAL_C);
+      const isGrey = (c) => c.oklch[1] < NEUTRAL_C;
       const lo = Math.sqrt(NEUTRAL_C), hi = Math.sqrt(Math.max(...chromatic.map((c) => c.oklch[1])));
       const bandWidth = (RING[1] - RING[0]) / BANDS;
+      const sliceOf = (c) => Math.floor(c.oklch[2] / SLICE);
+      const band = (c) => Math.min(Math.floor(((Math.sqrt(c.oklch[1]) - lo) / (hi - lo)) * BANDS), BANDS - 1);
+      // The greys round the inner ring, lightest first: each one's piece, from and to (degrees); or its dot,
+      // in the piece's middle.
+      const greyPieces = (list) => {
+        list.sort((a, b) => b.oklch[0] - a.oklch[0]);
+        const step = 360 / list.length;
+        return list.map((c, k) => [c, k * step, (k + 1) * step]);
+      };
+      const greyDots = (list) => greyPieces(list).map(([c, d0, d1]) => [c, ...polar((GREYS[0] + GREYS[1]) / 2, (d0 + d1) / 2)]);
+      // The flat wheel's squares: colours in their cells (slice, and ring b); the greys round the inner ring.
+      const drawSquares = (list, greyList) => {
+        const cells = new Map();
+        for (const c of list) {
+          const s = sliceOf(c), b = band(c), key = `${s},${b}`;
+          if (!cells.has(key)) cells.set(key, { s, b, list: [] });
+          cells.get(key).list.push(c);
+        }
+        for (const { s, b, list } of cells.values()) {
+          list.sort((x, y) => x.oklch[2] - y.oklch[2]);
+          const [r0, r1] = flatRing(b), w = SLICE / list.length;
+          list.forEach((c, k) => {
+            const d0 = s * SLICE + k * w, mid = d0 + w / 2;
+            segment(c, arc(r0, r1, d0, d0 + w), mid, pt((r0 + r1) / 2, mid));
+          });
+        }
+        for (const [c, d0, d1] of greyPieces(greyList)) segment(c, arc(GREYS[0], GREYS[1], d0, d1));
+      };
+      // The flat wheel; its dots at their hue and chroma (√chroma from the inner ring's edge to the rim).
+      let marksAs = "squares";
+      const flatRing = (b) => [RING[0] + b * bandWidth, RING[0] + b * bandWidth + bandWidth];
+      const flatR = (C) => RING[0] + ((Math.sqrt(C) - lo) / (hi - lo)) * (RING[1] - RING[0]);
+      const drawFlat = () => {
+        if (marksAs === "dots") drawDots([...chromatic.map((c) => [c, ...polar(flatR(c.oklch[1]), c.oklch[2])]), ...greyDots(greys)]);
+        else drawSquares(chromatic, greys);
+      };
 
-      // Background: the continuous wheel on the same mapping, faded, repainted when the size changes.
+      // Background: the continuous wheel on the same mapping, faded (in 2D, the slice, at full strength),
+      // repainted when the size changes or the slice does.
       const canvas = wheel.querySelector(".wheel-bg");
-      new ResizeObserver(() => paintWheel(canvas, RING, lo, hi)).observe(canvas);
-
-      const cells = new Map();
-      for (const c of chromatic) {
-        const s = Math.floor(c.oklch[2] / SLICE);
-        const b = Math.min(Math.floor(((Math.sqrt(c.oklch[1]) - lo) / (hi - lo)) * BANDS), BANDS - 1);
-        const key = `${s},${b}`;
-        if (!cells.has(key)) cells.set(key, { s, b, list: [] });
-        cells.get(key).list.push(c);
-      }
-      for (const { s, b, list } of cells.values()) {
-        list.sort((x, y) => x.oklch[2] - y.oklch[2]);
-        const r0 = RING[0] + b * bandWidth, w = SLICE / list.length;
-        list.forEach((c, k) => {
-          const d0 = s * SLICE + k * w, mid = d0 + w / 2;
-          segment(c, arc(r0, r0 + bandWidth, d0, d0 + w), mid, pt(r0 + bandWidth / 2, mid));
-        });
-      }
-      greys.sort((a, b) => b.oklch[0] - a.oklch[0]);
-      const step = 360 / greys.length;
-      greys.forEach((c, k) => segment(c, arc(GREYS[0], GREYS[1], k * step, (k + 1) * step)));
-      svg.append(shape, marks, highlight);
+      const FLAT = { key: "flat", paint: () => { delete canvas.dataset.painted; paintWheel(canvas, RING, lo, hi); } };
+      let background = FLAT, painted = ""; // what the background shows; what it was last painted with, at what size
+      const paintBackground = () => {
+        const key = `${background.key} ${canvas.clientWidth}`;
+        if (!canvas.clientWidth || key === painted) return; // hidden (painted once shown), or done
+        painted = key;
+        background.paint();
+      };
+      new ResizeObserver(paintBackground).observe(canvas);
 
       // A combination's colours: the others faded, its own outlined, joined in hue order.
       const mark = (list) => {
@@ -1413,7 +1573,732 @@
         if (points.length < 2) shape.removeAttribute("d");
         else shape.setAttribute("d", `M ${points.join(" L ")}${points.length > 2 ? " Z" : ""}`);
       };
-      return { panel, wheel, mark };
+      if (!views) {
+        drawFlat();
+        return { panel, wheel, mark };
+      }
+
+      // 2D: OKLCH's solid. Out from the axis, √chroma, as on the wheel, out to the rim: 11 of its rings, not
+      // 8, so as to reach the screen's most vivid colours (chroma 0.32, blue to magenta) past Wada's
+      // (0.22), and show the slice's whole shape. The greys are on the axis, in a cell as narrow as the
+      // rings (their chroma, under 0.02, would take 0.24 of the radius). Its 21 levels, 0 (white,
+      // lightness 1) to 20 (black, 0), are 0.05 apart, each holding the colours within 0.025 of it.
+      const SOLID_RINGS = 11, AXIS = 0.08;
+      const edge = lo + (SOLID_RINGS * (hi - lo)) / BANDS; // the rim's √chroma
+      const rho = (C) => Math.sqrt(C) / edge;
+      const lightOf = (i) => 1 - i / LEVELS, levelOf = (c) => Math.round((1 - c.oklch[0]) * LEVELS);
+      const count = (n) => `${n} colour${n === 1 ? "" : "s"}`;
+      const num = (v) => String(+v.toFixed(3));
+      const most = (L, h) => (L <= 0 || L >= 1 ? 0 : maxChroma(L, h, 1e-9)); // the most chroma the screen can show, strictly (none at black and white)
+      // The cells, which the squares fill, follow the slice's shape: per 10° slice of hue (through the
+      // axis, per level), rings from chroma 0.02 (`inner`, where the greys end) out to the slice's own
+      // edge, each the same share of the way out at every hue (or lightness), as many as fit about a
+      // wheel's ring (`step`), at least one. A colour's ring is its share of the way out to the edge at
+      // its own lightness and hue: inside the shape, then, or in the outermost ring if it's more vivid
+      // than the screen can show (16 of Wada's printed colours are).
+      const inner = lo / edge, step = (hi - lo) / BANDS / edge;
+      const out = (u, e) => inner + u * Math.max(0, e - inner); // the radius `u` of the way out to edge e
+      const ringsIn = (far) => Math.max(1, Math.round((far - inner) / step));
+      const ringOf = (u, n) => Math.min(n - 1, Math.floor(u * n));
+      // The points an outline goes through from p0 to p1 (hue or lightness): both ends, and the edge table's
+      // own steps (`per` to the unit) between, so that it follows the slice's edge exactly as that's drawn.
+      const steps = (p0, p1, per) => {
+        const ps = [p0];
+        for (let k = Math.floor(p0 * per + 1e-9) + 1; k < p1 * per - 1e-9; k++) ps.push(k / per);
+        ps.push(p1);
+        return ps;
+      };
+      // Of those, where a cell has room: where the edge, e(p), is past `inner`, with where it crosses it
+      // (the cell ends there in a point). Past black and white, and for some hues near them, the screen
+      // shows less than chroma 0.02 there.
+      const room = (all, e) => {
+        const ps = [];
+        let before = 0, eBefore = 0;
+        all.forEach((p, k) => {
+          const ep = e(p);
+          if (k && (eBefore > inner) !== (ep > inner)) ps.push(before + ((p - before) * (inner - eBefore)) / (ep - eBefore));
+          if (ep > inner) ps.push(p);
+          [before, eBefore] = [p, ep];
+        });
+        return ps.length > 1 ? ps : all; // no room at all: as is
+      };
+      const shareOf = (c) => {
+        const e = rho(most(c.oklch[0], c.oklch[2]));
+        return e > inner ? Math.min(1, Math.max(0, (rho(c.oklch[1]) - inner) / (e - inner))) : 1;
+      };
+      // A cell's own colour: its middle's, at as much chroma as the screen can show there if less.
+      const tone = (L, r, h) => {
+        const C = Math.min((r * edge) ** 2, most(L, h)), rad = (h * Math.PI) / 180;
+        return { oklch: [L, C, h], rgb: oklabToLinearSRGB(L, C * Math.cos(rad), C * Math.sin(rad)) };
+      };
+
+      // The layout, with the caption under the wheel, as in the Ostwald view.
+      const box = Object.assign(document.createElement("div"), { className: "wheel-box" });
+      const layout = Object.assign(document.createElement("div"), { className: "wheel-views" });
+      const caption = Object.assign(document.createElement("p"), { className: "view-caption" });
+      const captionText = document.createElement("span");
+      const turn = (step, d) => {
+        const b = Object.assign(document.createElement("button"), { type: "button", className: "page-turn", hidden: true });
+        b.innerHTML = `<svg viewBox="-8 -8 16 16" aria-hidden="true"><path d="${d}"/></svg>`;
+        b.addEventListener("click", () => setPage(page + step));
+        return b;
+      };
+      const back = turn(-1, "M 2 -5 L -3 0 L 2 5"), ahead = turn(1, "M -2 -5 L 3 0 L -2 5");
+      caption.append(back, captionText, ahead);
+
+      // Across the axis: one level, seen from above, as the wheel. Its colours, and the slice of what the
+      // screen can show at that lightness: its edge per half degree of hue (entry 720 repeats 0).
+      const levelEdge = (L) => {
+        const t = new Float64Array(721);
+        for (let k = 0; k < 720; k++) t[k] = rho(most(L, k / 2));
+        t[720] = t[0];
+        return t;
+      };
+      const edgeAt = (t, deg) => { // the edge at hue `deg`, between the table's half degrees
+        const k = (((deg % 360) + 360) % 360) * 2, k0 = Math.min(719, k | 0);
+        return t[k0] + (t[k0 + 1] - t[k0]) * (k - k0);
+      };
+      // The level's cells: per slice, its rings and their colours (at the slice's middle hue).
+      const levelCells = (L, t) => Array.from({ length: 360 / SLICE }, (_, s) => {
+        let far = 0;
+        for (let k = 2 * SLICE * s; k <= 2 * SLICE * (s + 1); k++) far = Math.max(far, t[k]);
+        const n = ringsIn(far), h = midHue(s), e = edgeAt(t, h);
+        return { n, tones: Array.from({ length: n }, (_, b) => tone(L, out((b + 0.5) / n, e), h)) };
+      });
+      // A piece of a ring, from u0 to u1 of the way out, over hues d0 to d1: its sides follow the edge.
+      const levelPiece = (t, u0, u1, d0, d1) => {
+        const hues = room(steps(d0, d1, 2), (deg) => edgeAt(t, deg)); // per half degree
+        const at = (u) => (deg) => polar(out(u, edgeAt(t, deg)), deg).map((v) => v.toFixed(4)).join(" ");
+        return `M ${hues.map(at(u1)).join(" L ")} L ${hues.reverse().map(at(u0)).join(" L ")} Z`;
+      };
+      // The greys' cell: out to chroma 0.02, or to the edge where that's nearer (at black and white, the point).
+      const greyDisc = (t) => (t.some((v) => v > 0) ? `M ${Array.from({ length: 720 }, (_, k) => polar(Math.min(inner, t[k]), k / 2).map((v) => v.toFixed(4)).join(" ")).join(" L ")} Z` : circle(0, 0, 0.04));
+      // The background: the slice's colours, continuous, or (`cells`) each cell its own colour, and the
+      // greys' (chroma under 0.02) the level's grey.
+      const paintLevel = (L, t, cells) => {
+        const furthest = Math.max(...t), grey = oklabToLinearSRGB(L, 0, 0);
+        paintField(canvas, (x, y, rgb, unit) => {
+          const r = Math.sqrt(x * x + y * y);
+          if (r >= furthest) return 0; // beyond the slice's furthest
+          const k = ((Math.atan2(-y, x) * 360) / Math.PI + 720) % 720, k0 = k | 0, e = t[k0] + (t[k0 + 1] - t[k0]) * (k - k0);
+          const alpha = Math.min(1, (e - r) / unit); // antialiased edge
+          if (alpha <= 0) return 0;
+          if (cells) {
+            const { n, tones } = cells[Math.min(cells.length - 1, (k / (2 * SLICE)) | 0)];
+            rgb.set(r < inner ? grey : tones[ringOf((r - inner) / (e - inner), n)].rgb);
+            return alpha;
+          }
+          const f = r * edge * edge; // chroma per unit of distance: C = (r edge)², over r
+          oklabToLinearSRGB(L, f * x, -f * y, rgb); // a = C cos h, b = C sin h
+          return alpha;
+        });
+      };
+      const drawLevel = (i, chosen) => {
+        const L = lightOf(i), here = colors.filter((c) => levelOf(c) === i);
+        const list = here.filter((c) => !isGrey(c)), greyList = here.filter(isGrey);
+        const t = levelEdge(L), point = !t.some((v) => v > 0), cells = levelCells(L, t);
+        cut = { L, t, cells };
+        // Dots at their share of the way out to the edge (inside it); the greys' start on the axis and move
+        // apart as overlapping dots do. Squares: each colour's cell split by hue, as the wheel's are; the
+        // greys a disc on the axis, split as the wheel's ring is.
+        if (marksAs === "dots") {
+          // Inside: as far out as the edge leaves room for the whole dot, over the hues it spans.
+          const keepIn = (q, c) => {
+            const r = Math.hypot(q[0], q[1]);
+            if (isGrey(c) || r < inner / 2) return false;
+            const deg = (Math.atan2(-q[1], q[0]) * 180) / Math.PI, span = (Math.asin(Math.min(1, DOT / r)) * 180) / Math.PI;
+            let e = Infinity;
+            for (let k = -4; k <= 4; k++) e = Math.min(e, edgeAt(t, deg + (span * k) / 4));
+            const most = Math.max(inner, e - DOT);
+            if (r <= most + 1e-6) return false; // (to within a little: pulled in exactly, it would otherwise keep pulling)
+            q[0] *= most / r;
+            q[1] *= most / r;
+            return true;
+          };
+          drawDots([...list.map((c) => [c, ...polar(out(shareOf(c), edgeAt(t, c.oklch[2])), c.oklch[2])]), ...greyList.map((c) => [c, 0, 0])], keepIn);
+        } else {
+          const groups = new Map();
+          for (const c of list) {
+            const s = sliceOf(c), b = ringOf(shareOf(c), cells[s].n), key = `${s} ${b}`;
+            if (!groups.has(key)) groups.set(key, { s, b, list: [] });
+            groups.get(key).list.push(c);
+          }
+          for (const { s, b, list } of groups.values()) {
+            // split over the hues where the cell has room (the whole slice, unless it ends in a point)
+            const hues = room(steps(s * SLICE, (s + 1) * SLICE, 2), (deg) => edgeAt(t, deg)), d0 = hues[0], w = (hues[hues.length - 1] - d0) / list.length, n = cells[s].n;
+            list.sort((p, q) => p.oklch[2] - q.oklch[2]);
+            list.forEach((c, k) => segment(c, levelPiece(t, b / n, (b + 1) / n, d0 + k * w, d0 + (k + 1) * w)));
+          }
+          const axis = point ? 0.04 : AXIS; // at black and white, the point
+          for (const [c, d0, d1] of greyPieces(greyList)) segment(c, greyList.length === 1 ? circle(0, 0, axis) : arc(0, axis, d0, d1)).classList.add("on-axis");
+        }
+        // At black and white, the slice is the axis alone, a point: a small disc of that grey, not faded,
+        // as it's all there is.
+        gamut.setAttribute("d", point ? circle(0, 0, 0.04) : `M ${Array.from({ length: 720 }, (_, k) => polar(t[k], k / 2).map((v) => v.toFixed(4)).join(" ")).join(" L ")} Z`); // per half degree, as the cells
+        if (point) gamut.style.fill = `oklch(${L} 0 0)`;
+        rim.setAttribute("d", circle(0, 0, 1));
+        background = { key: `level ${i} ${surface}`, paint: () => paintLevel(L, t, surface === "cells" && cells) };
+        const where = (i) => {
+          const range = `lightness ${num(Math.max(0, lightOf(i) - 0.025))} to ${num(Math.min(1, lightOf(i) + 0.025))}`;
+          return i === 0 ? `White, ${range}` : i === LEVELS ? `Black, ${range}` : range[0].toUpperCase() + range.slice(1);
+        };
+        captionText.textContent = `${where(i)} · ${count(here.length)}`;
+        svg.setAttribute("aria-label", `A slice of OKLCH's colour solid: ${where(i).toLowerCase()}`);
+        // The control: the chosen level, and a ghost of the one previewed.
+        const place = (el, i) => {
+          const rx = halfWidth(lightOf(i));
+          el.setAttribute("cy", levelY(i));
+          el.setAttribute("rx", rx);
+          el.setAttribute("ry", rx * 0.3);
+          return rx;
+        };
+        const y = levelY(chosen), rx = place(slice, chosen);
+        marker.setAttribute("y1", y);
+        marker.setAttribute("y2", y);
+        marker.setAttribute("x2", CX - rx);
+        pointer.setAttribute("d", `M -1.1 ${y - 0.8} L -0.24 ${y} L -1.1 ${y + 0.8} Z`);
+        place(ghost, i);
+        ghost.setAttribute("visibility", i === chosen ? "hidden" : "visible");
+        control.setAttribute("aria-valuenow", chosen);
+        control.setAttribute("aria-valuetext", `${where(chosen)}, ${count(colors.filter((c) => levelOf(c) === chosen).length)}`);
+      };
+
+      // The level control: the 21 levels' greys, white at the top, and beside them the solid seen from the
+      // side (as wide at each lightness as its widest hue there), with the slice.
+      const CH = 32 / (LEVELS + 1), CX = 5.5, W = 2.8; // a level's height; the solid's axis and half-width
+      const levelY = (i) => (i + 0.5) * CH;
+      const control = svgEl("svg", {
+        class: "lightness-levels", viewBox: "-1.2 -0.6 9.8 33.2", role: "slider", tabindex: "0",
+        "aria-label": "Lightness, from white to black", "aria-orientation": "vertical", "aria-valuemin": 0, "aria-valuemax": LEVELS,
+      });
+      for (let i = 0; i <= LEVELS; i++) {
+        control.append(svgEl("rect", { x: 0, y: i * CH, width: 1.8, height: CH, fill: `oklch(${lightOf(i)} 0 0)` }));
+        if (i % 2) continue;
+        const value = svgEl("text", { x: 0.9, y: levelY(i), "font-size": 0.7, "text-anchor": "middle", "dominant-baseline": "central", fill: lightOf(i) > 0.6 ? "rgb(0 0 0 / 0.6)" : "rgb(255 255 255 / 0.75)" });
+        value.textContent = lightOf(i).toFixed(1);
+        control.append(value);
+      }
+      const outline = svgEl("path", { class: "outline" });
+      let widths = null; // the solid's half-width per 0.01 of lightness, made when first shown
+      const halfWidth = (L) => {
+        if (!widths) {
+          widths = Array.from({ length: 101 }, (_, k) => {
+            let widest = 0;
+            for (let h = 0; h < 360; h += 2) widest = Math.max(widest, most(k / 100, h));
+            return W * rho(widest);
+          });
+          const yAt = (k) => levelY((1 - k / 100) * LEVELS);
+          const side = (sign) => widths.map((w, k) => `${CX + sign * w} ${yAt(k)}`);
+          outline.setAttribute("d", `M ${[...side(1), ...side(-1).reverse()].join(" L ")} Z`);
+        }
+        const q = L * 100, k = Math.min(99, q | 0);
+        return widths[k] + (widths[k + 1] - widths[k]) * (q - k);
+      };
+      const slice = svgEl("ellipse", { class: "slice", cx: CX });
+      const ghost = svgEl("ellipse", { class: "ghost", cx: CX }); // the level under the pointer, previewed
+      const marker = svgEl("line", { class: "marker", x1: 1.8 }); // from the greys to the slice
+      const pointer = svgEl("path", { class: "pointer" });
+      control.append(svgEl("rect", { class: "strip", x: 0, y: 0, width: 1.8, height: 32 }), outline, ghost, marker, slice, pointer);
+
+      // Through the axis: hue slice s's page on the right, the opposite slice's (s + 18) on the left, the
+      // greys between, white at the top; across, √chroma as on the disc; up, lightness. Each page's
+      // background is its middle hue's: what the screen can show of it, per 1/512 of lightness.
+      const PAGE_Y = 2 / 1.05; // lightness -0.025 (y = 1) to 1.025 (y = -1): the levels' cells, whole
+      const pageY = (L) => (0.5 - L) * PAGE_Y;
+      const wrap = (s) => ((s % 36) + 36) % 36, opposite = (s) => (s + 18) % 36, midHue = (s) => s * SLICE + SLICE / 2;
+      const pageEdge = (h) => Float64Array.from({ length: 513 }, (_, k) => rho(most(k / 512, h)));
+      const edgeAtL = (t, L) => { // the edge at lightness L, between the table's 512ths
+        const q = Math.min(1, Math.max(0, L)) * 512, k = Math.min(511, q | 0);
+        return t[k] + (t[k + 1] - t[k]) * (q - k);
+      };
+      const rowOf = (i) => [Math.max(0, lightOf(i) - 0.025), Math.min(1, lightOf(i) + 0.025)]; // a level's lightness, from and to
+      // A page's cells: per level, its rings and their colours (at the level's lightness).
+      const pageCells = (t, h) => Array.from({ length: LEVELS + 1 }, (_, i) => {
+        const [q0, q1] = rowOf(i), L = lightOf(i);
+        let far = 0;
+        for (let k = Math.ceil(q0 * 512); k <= Math.floor(q1 * 512); k++) far = Math.max(far, t[k]);
+        const n = ringsIn(far), e = edgeAtL(t, L);
+        return { n, tones: Array.from({ length: n }, (_, b) => tone(L, out((b + 0.5) / n, e), h)) };
+      });
+      // A strip of a level's ring on a page (`side` 1 right, -1 left), from u0 to u1 of the way out: its
+      // sides follow the edge.
+      const pageStrip = (t, side, i, u0, u1) => {
+        const [q0, q1] = rowOf(i), lights = room(steps(q0, q1, 512), (q) => edgeAtL(t, q));
+        const at = (u) => (q) => `${(side * out(u, edgeAtL(t, q))).toFixed(4)} ${pageY(q).toFixed(4)}`;
+        return `M ${lights.map(at(u0)).join(" L ")} L ${lights.reverse().map(at(u1)).join(" L ")} Z`;
+      };
+      // The greys' part of a level, on the pages: out to `w` either side of the axis, or to the edge if
+      // that's nearer (towards white and black), piece k of m, left to right.
+      const greyStrip = (tr, tl, i, w, k = 0, m = 1) => {
+        const [q0, q1] = rowOf(i), lights = steps(q0, q1, 512);
+        const at = (piece) => (q) => {
+          const l = -Math.min(w, edgeAtL(tl, q)), r = Math.min(w, edgeAtL(tr, q));
+          return `${(l + ((r - l) * piece) / m).toFixed(4)} ${pageY(q).toFixed(4)}`;
+        };
+        return `M ${lights.map(at(k)).join(" L ")} L ${lights.reverse().map(at(k + 1)).join(" L ")} Z`;
+      };
+      // The background, as the level's: continuous, or (`cells`, the right page's and the left's) each
+      // cell its own colour, and the greys' each level's grey.
+      const greyTones = Array.from({ length: LEVELS + 1 }, (_, i) => oklabToLinearSRGB(lightOf(i), 0, 0));
+      const paintPages = (hr, hl, tr, tl, cells) => {
+        const toward = (h) => [Math.cos((h * Math.PI) / 180), Math.sin((h * Math.PI) / 180)], right = toward(hr), left = toward(hl);
+        paintField(canvas, (x, y, rgb, unit) => {
+          const L = 0.5 - y / PAGE_Y;
+          if (L < 0 || L > 1) return 0;
+          const t = x >= 0 ? tr : tl, q = L * 512, k = Math.min(511, q | 0), ax = Math.abs(x), e = t[k] + (t[k + 1] - t[k]) * (q - k);
+          const alpha = Math.min(1, (e - ax) / unit); // antialiased edge
+          if (alpha <= 0) return 0;
+          if (cells) {
+            const i = Math.min(LEVELS, Math.max(0, Math.round((1 - L) * LEVELS)));
+            if (ax < inner) rgb.set(greyTones[i]);
+            else {
+              const { n, tones } = cells[x >= 0 ? 0 : 1][i];
+              rgb.set(tones[ringOf((ax - inner) / (e - inner), n)].rgb);
+            }
+            return alpha;
+          }
+          const C = ax * ax * edge * edge, [cos, sin] = x >= 0 ? right : left;
+          oklabToLinearSRGB(L, C * cos, C * sin, rgb);
+          return alpha;
+        });
+      };
+      // The hues of the screen's primaries and secondaries (OKLCH's hue of sRGB's pure red, ...), and orange
+      // and violet halfway between, named round the dial. A page is named by its hues alone.
+      const NAMED = [[29.2, "Red"], [52.8, "Orange"], [109.8, "Yellow"], [142.5, "Green"], [194.8, "Cyan"], [264.1, "Blue"], [293.8, "Violet"], [328.4, "Magenta"]];
+      const pageName = (s) => `${s * SLICE}–${(s + 1) * SLICE}°`;
+      const vivid = (s) => { // the page's most vivid colour, for its square
+        const { L, C } = cuspTable(), k = midHue(s) * 2;
+        return { css: `oklch(${L[k]} ${C[k]} ${midHue(s)})` };
+      };
+      const onPages = (s) => colors.filter((c) => isGrey(c) || sliceOf(c) === s || sliceOf(c) === opposite(s)).length;
+      const drawPages = (s, chosen) => {
+        const left = opposite(s), sideOf = (c) => (isGrey(c) ? 0 : sliceOf(c) === s ? 1 : sliceOf(c) === left ? -1 : null);
+        const tr = pageEdge(midHue(s)), tl = pageEdge(midHue(left));
+        const pages = { [1]: { side: 1, s, h: midHue(s), t: tr, cells: pageCells(tr, midHue(s)) }, [-1]: { side: -1, s: left, h: midHue(left), t: tl, cells: pageCells(tl, midHue(left)) } };
+        cut = pages;
+        // By cell: the greys' (one per level, down the middle) and each page's (level, and ring out to its edge).
+        const groups = new Map();
+        for (const c of colors) {
+          const side = sideOf(c);
+          if (side === null) continue;
+          const i = levelOf(c), key = `${side} ${side ? ringOf(shareOf(c), pages[side].cells[i].n) : 0} ${i}`;
+          if (!groups.has(key)) groups.set(key, []);
+          groups.get(key).push(c);
+        }
+        // Squares: a cell split side by side, in hue order (greys lightest first); dots: at the colour's
+        // lightness and its share of the way out to the edge there, inside it (the greys' in their
+        // piece's middle).
+        const items = [];
+        for (const [key, list] of groups) {
+          const [side, b, i] = key.split(" ").map(Number), m = list.length;
+          list.sort(side ? (p, q) => p.oklch[2] - q.oklch[2] : (p, q) => q.oklch[0] - p.oklch[0]);
+          list.forEach((c, k) => {
+            if (!side) { // the greys' column, ±AXIS
+              if (marksAs === "dots") items.push([c, -AXIS + ((k + 0.5) * 2 * AXIS) / m, pageY(c.oklch[0])]);
+              else segment(c, greyStrip(tr, tl, i, AXIS, k, m)).classList.add("on-axis");
+              return;
+            }
+            const { t, cells } = pages[side], n = cells[i].n;
+            if (marksAs === "dots") items.push([c, side * out(shareOf(c), edgeAtL(t, c.oklch[0])), pageY(c.oklch[0])]);
+            else {
+              const j = side > 0 ? k : m - 1 - k; // left to right: out from the axis on the right, in towards it on the left
+              segment(c, pageStrip(t, side, i, (b + j / m) / n, (b + (j + 1) / m) / n));
+            }
+          });
+        }
+        // Dots inside: as far out as the edge leaves room for the whole dot, over the lightness it spans;
+        // the greys', up or down, away from white or black, until it does (White's, at the very top).
+        const edgeNear = (x, L) => {
+          let e = Infinity;
+          for (let k = -4; k <= 4; k++) e = Math.min(e, edgeAtL(pages[x >= 0 ? 1 : -1].t, L + (DOT / PAGE_Y) * (k / 4)));
+          return e;
+        };
+        const keepIn = (q, c) => {
+          let L = 0.5 - q[1] / PAGE_Y, moved = false;
+          if (isGrey(c)) {
+            while (Math.abs(q[0]) + DOT > edgeNear(q[0], L) + 1e-6 && Math.abs(L - 0.5) > 0.05) {
+              L += L > 0.5 ? -0.001 : 0.001;
+              moved = true;
+            }
+            if (moved) q[1] = pageY(L);
+            return moved;
+          }
+          const most = Math.max(inner, edgeNear(q[0], L) - DOT);
+          if (Math.abs(q[0]) <= most + 1e-6) return false;
+          q[0] = Math.sign(q[0]) * most;
+          return true;
+        };
+        if (marksAs === "dots") drawDots(items, keepIn);
+        const sideLine = (t, sign) => Array.from({ length: 513 }, (_, k) => `${(sign * t[k]).toFixed(4)} ${pageY(k / 512).toFixed(4)}`); // per 512th, as the cells'
+        gamut.setAttribute("d", `M ${[...sideLine(tr, 1), ...sideLine(tl, -1).reverse()].join(" L ")} Z`);
+        background = { key: `pages ${s} ${surface}`, paint: () => paintPages(midHue(s), midHue(left), tr, tl, surface === "cells" && [pages[1].cells, pages[-1].cells]) };
+        svg.setAttribute("aria-label", `Two pages of OKLCH's colour solid, back to back: hues ${pageName(left)} and ${pageName(s)}`);
+        // The caption, with a square of each page's most vivid colour.
+        const hue = (s) => {
+          const span = Object.assign(document.createElement("span"), { className: "hue-name" });
+          span.append(pageName(s), chipOf(vivid(s)));
+          return span;
+        };
+        captionText.replaceChildren("Hues ", hue(left), " and ", hue(s)); // as they're shown, left to right
+        caption.classList.add("turns");
+        back.hidden = ahead.hidden = false;
+        back.title = `Previous pages: ${pageName(wrap(chosen - 1))} on the right`;
+        ahead.title = `Next pages: ${pageName(wrap(chosen + 1))} on the right`;
+        back.setAttribute("aria-label", back.title);
+        ahead.setAttribute("aria-label", ahead.title);
+        // The dial: the chosen pages, and a ghost of those previewed.
+        const on = [s, left, chosen, opposite(chosen)];
+        dialHues().forEach((g, k) => g.classList.toggle("on", on.includes(k)));
+        dialLabels.forEach((label) => label.classList.toggle("on", on.includes(+label.dataset.slice)));
+        across(dialCut, chosen);
+        across(dialGhost, s);
+        dialGhost.setAttribute("visibility", s === chosen ? "hidden" : "visible");
+        const deg = midHue(chosen), t = (deg * Math.PI) / 180, w = 0.065, tip = polar(1.03, deg), [bx, by] = polar(DIAL - 0.02, deg);
+        dialPointer.setAttribute("d", `M ${tip.join(" ")} L ${bx + w * Math.sin(t)} ${by + w * Math.cos(t)} L ${bx - w * Math.sin(t)} ${by - w * Math.cos(t)} Z`);
+        dial.setAttribute("aria-valuenow", chosen);
+        dial.setAttribute("aria-valuetext", `${pageName(chosen)} on the right, ${pageName(opposite(chosen))} on the left, ${count(onPages(chosen))}`);
+      };
+      // The dial: the hue circle seen from above, as the disc shows it, each slice its most vivid colour
+      // and two paler rings inside, so that the two pages shown can be bright (made when first shown).
+      const DIAL = 1.16; // the dial's half-width: the ring (1), and the pointer just outside it
+      const dial = svgEl("svg", {
+        class: "hue-dial", viewBox: `${-DIAL} ${-DIAL} ${2 * DIAL} ${2 * DIAL}`, role: "slider", tabindex: "0",
+        "aria-label": "Pages: the hue on the right, the opposite hue on the left", "aria-valuemin": 0, "aria-valuemax": 35,
+      });
+      const dialGhost = svgEl("line", { class: "ghost" }), dialCut = svgEl("line", { class: "cut" }), dialPointer = svgEl("path", { class: "pointer" });
+      const dialRim = svgEl("circle", { class: "rim", r: 1 });
+      dial.append(dialRim, dialGhost, dialCut, dialPointer);
+      let hues = null;
+      const dialHues = () => {
+        if (!hues) {
+          const { L, C } = cuspTable();
+          hues = Array.from({ length: 36 }, (_, s) => {
+            const g = svgEl("g", { class: "hue" }), k = midHue(s) * 2;
+            for (let j = 0; j < 3; j++) {
+              const css = `oklch(${L[k]} ${(C[k] * (j + 1)) / 3} ${midHue(s)})`;
+              g.append(svgEl("path", { d: arc(0.3 + j * 0.2333, 0.5333 + j * 0.2333, s * SLICE, (s + 1) * SLICE), fill: css, stroke: css }));
+            }
+            return g;
+          });
+          dial.prepend(...hues);
+        }
+        return hues;
+      };
+      // The slice: across the dial, from the opposite page to the page on the right.
+      const across = (line, s) => {
+        const [x, y] = polar(1.04, midHue(s));
+        line.setAttribute("x1", -x);
+        line.setAttribute("y1", -y);
+        line.setAttribute("x2", x);
+        line.setAttribute("y2", y);
+      };
+      // Round it, just beyond the pointer, the named hues. The slider's value text names the pages for
+      // screen readers.
+      const dialFace = Object.assign(document.createElement("div"), { className: "dial-face" });
+      const dialLabels = NAMED.map(([h, name]) => {
+        const [x, y] = polar(DIAL + 0.06, h);
+        const label = Object.assign(document.createElement("span"), { className: "dial-label", textContent: name });
+        label.dataset.slice = Math.floor(h / SLICE);
+        label.setAttribute("aria-hidden", "true");
+        label.style.left = `${((x + DIAL) / (2 * DIAL)) * 100}%`;
+        label.style.top = `${((y + DIAL) / (2 * DIAL)) * 100}%`;
+        const side = Math.abs(x) < 0.05 ? 0 : Math.sign(x); // outwards: to the left or right, or above or below
+        label.style.setProperty("--dx", ["-100%", "-50%", "0%"][side + 1]);
+        label.style.setProperty("--dy", side ? "-50%" : y < 0 ? "-100%" : "0%");
+        return label;
+      });
+      dialFace.append(dial, ...dialLabels);
+      const dialBox = Object.assign(document.createElement("div"), { className: "dial-box" });
+      dialBox.append(dialFace);
+
+      // The slice's own colours: hovering it, off Wada's colours, shows the colour under the pointer in the
+      // panel. Smooth: exactly there, as the background paints it; Cells: its cell's, outlined (the
+      // squares' cells; under chroma 0.02, the greys', the level's grey). Its CMYK is estimated through
+      // the print profile (estimateCMYK). Clicking it opens its card.
+      let cut = null; // the slice shown, its edge and cells: drawLevel's, or drawPages' two pages
+      const span = (i) => `lightness ${num(rowOf(i)[0])} to ${num(rowOf(i)[1])}`;
+      const colourAt = (e) => {
+        const q = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse()), smooth = surface === "smooth";
+        if (slicing === "level") {
+          const { L, t, cells } = cut, r = Math.hypot(q.x, q.y), h = ((Math.atan2(-q.y, q.x) * 180) / Math.PI + 360) % 360;
+          if (smooth) return { oklch: [L, Math.min((r * edge) ** 2, most(L, h)), h], line: `On the slice across the axis at lightness ${num(L)}. ` };
+          if (r < inner) return { oklch: [L, 0, 0], key: "greys", d: greyDisc(t), line: `Greys, chroma under 0.02, ${span(shown)}. ` };
+          const s = Math.min(cells.length - 1, Math.floor(h / SLICE)), { n, tones } = cells[s], b = ringOf((r - inner) / Math.max(1e-9, edgeAt(t, h) - inner), n);
+          return {
+            oklch: tones[b].oklch, key: `${s} ${b}`, d: levelPiece(t, b / n, (b + 1) / n, s * SLICE, (s + 1) * SLICE),
+            line: `Hue ${s * SLICE}–${(s + 1) * SLICE}°, ring ${b + 1} of ${n} out to the edge, ${span(shown)}. `,
+          };
+        }
+        const page = cut[q.x >= 0 ? 1 : -1], L = Math.min(1, Math.max(0, 0.5 - q.y / PAGE_Y)), x = Math.abs(q.x);
+        if (smooth) return { oklch: [L, Math.min((x * edge) ** 2, most(L, page.h)), page.h], line: `On the page of hue ${page.h}° (${pageName(page.s)}). ` };
+        const i = Math.min(LEVELS, Math.max(0, Math.round((1 - L) * LEVELS)));
+        if (x < inner) return { oklch: [lightOf(i), 0, 0], key: `greys ${i}`, d: greyStrip(cut[1].t, cut[-1].t, i, inner), line: `Greys, chroma under 0.02, ${span(i)}. ` };
+        const { n, tones } = page.cells[i], b = ringOf((x - inner) / Math.max(1e-9, edgeAtL(page.t, L) - inner), n);
+        return {
+          oklch: tones[b].oklch, key: `${page.side} ${i} ${b}`, d: pageStrip(page.t, page.side, i, b / n, (b + 1) / n),
+          line: `Hue ${page.s * SLICE}–${(page.s + 1) * SLICE}°, ring ${b + 1} of ${n} out to the edge, ${span(i)}. `,
+        };
+      };
+      // Its values as Wada's colours' are given (lightness and chroma to 4 places, hue to 2; none for a grey),
+      // its CSS and CMYK.
+      const own = (at) => {
+        const C = +at.oklch[1].toFixed(4), oklch = [+at.oklch[0].toFixed(4), C, C ? +at.oklch[2].toFixed(2) : 0];
+        return { ...at, oklch, css: oklchText(oklch), cmyk: estimateCMYK(oklch) };
+      };
+      const title = () => (surface === "smooth" ? "Slice colour" : "Cell colour");
+      let under = ""; // the colour hovered (its cell, or its values), so as not to show it again
+      gamut.addEventListener("pointermove", (e) => {
+        const at = own(colourAt(e)), key = `${at.key ?? at.css} ${!!at.cmyk}`;
+        if (key === under) return;
+        under = key;
+        if (at.d) outlineAt(at.d, at.oklch[0]);
+        else highlight.removeAttribute("d");
+        panel.querySelector(".detail-swatch").style.setProperty("--color", at.css);
+        const name = panel.querySelector("h2");
+        name.classList.add("named");
+        name.replaceChildren(title(), chipOf(at)); // not one of Wada's: same lines as a colour's, so nothing moves
+        panel.querySelector('[data-field="cmyk"]').textContent = at.cmyk ? `≈ ${cmykText(at.cmyk)}` : "Not in Wada's palette";
+        panel.querySelector('[data-field="oklch"]').textContent = oklchValues(at.oklch);
+        panel.classList.add("show");
+      });
+      gamut.addEventListener("pointerleave", (e) => {
+        under = "";
+        if (e.pointerType !== "touch") hide(); // a touch leaves as the finger lifts: its info stays until the next
+      });
+      gamut.addEventListener("click", (e) => {
+        const at = own(colourAt(e)), where = surface === "smooth" ? "at this point of the slice" : "in the middle of this cell of the slice";
+        showComputedDetail(at, title(), at.cmyk, at.line, `Not one of Wada's colours: OKLCH's own, ${where}${at.cmyk ? ", so its CMYK is an estimate" : ""}.`);
+      });
+
+      // The switches: the view; squares or dots; and, in 2D, how the solid is sliced and how the slice's
+      // own colours show. The view is named; the others are icons: four cells or four dots; the solid's
+      // outline with the slice in it, a level seen a little from the side or the pages standing up; a disc
+      // shading out from its middle, or cut into cells.
+      const at4 = (f) => [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([x, y]) => f(3.6 * x, 3.6 * y)).join("");
+      const MARKS = [
+        ["squares", "Squares: each colour fills its piece of its cell", at4((x, y) => `<rect x="${x - 2.7}" y="${y - 2.7}" width="5.4" height="5.4"/>`)],
+        ["dots", "Dots: each colour at its place (in 2D, its share of the way out to the slice's edge)", at4((x, y) => `<circle cx="${x}" cy="${y}" r="2.5"/>`)],
+      ];
+      const OUTLINE = `<ellipse rx="5" ry="7" fill="none"/>`;
+      const SLICES = [
+        ["level", "Slice across the axis: one lightness, seen from above", `${OUTLINE}<ellipse rx="5" ry="1.7"/>`],
+        ["pages", "Slice through the axis: a hue's page and the opposite hue's, back to back", `${OUTLINE}<ellipse rx="1.7" ry="7"/>`],
+      ];
+      const cellIcons = [[0, 0.9], [1.7, 4], [4.8, 7]].flatMap(([r0, r1], ring) => (ring ? Array.from({ length: 6 }, (_, k) => arc(r0, r1, k * 60 + 5, k * 60 + 55)) : [`M 0.9 0 A 0.9 0.9 0 1 0 -0.9 0 A 0.9 0.9 0 1 0 0.9 0 Z`]));
+      const SURFACES = [
+        ["smooth", "Smooth: hovering the slice shows the colour exactly under the pointer",
+          `<defs><radialGradient id="surface-smooth"><stop offset="0" stop-color="currentColor" stop-opacity="0.15"/><stop offset="1" stop-color="currentColor"/></radialGradient></defs><circle r="7" fill="url(#surface-smooth)" stroke="none"/>`],
+        ["cells", "Cells: the slice in the squares' cells, each its middle's colour", cellIcons.map((d) => `<path d="${d}" stroke="none"/>`).join("")],
+      ];
+      const modes = Object.assign(document.createElement("div"), { className: "view-modes" });
+      modes.innerHTML = `<div class="view-switch" role="group" aria-label="View">`
+        + `<button type="button" data-wheel-view="flat" title="Flat: every colour by hue and chroma, its lightness left out">Flat</button>`
+        + `<button type="button" data-wheel-view="2d" title="2D: a slice of OKLCH's solid, across its axis (one lightness) or through it (two hues' pages)">2D</button></div>`
+        + optionSwitch("Marks", "wheel-marks", MARKS) + optionSwitch("Slice", "wheel-slicing", SLICES) + optionSwitch("Surface", "wheel-surface", SURFACES);
+      const slicingOption = modes.querySelector('[data-option="wheel-slicing"]'), surfaceOption = modes.querySelector('[data-option="wheel-surface"]');
+      layout.append(wheel, control, dialBox, caption, modes);
+      box.append(panel, layout);
+
+      // What's shown, remembered by the page: the view, the marks, the slicing, the surface; the level (8: lightness 0.6)
+      // and the pages (2: red, 20–30°, on the right); and, while the pointer previews another on the
+      // control or the dial, the one shown.
+      const saved = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
+      const save = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
+      let view = saved("wheel-view") === "2d" ? "2d" : "flat", slicing = saved("wheel-slicing") === "pages" ? "pages" : "level";
+      let surface = saved("wheel-surface") === "cells" ? "cells" : "smooth";
+      marksAs = saved("wheel-marks") === "dots" ? "dots" : "squares";
+      let level = Math.min(LEVELS, Math.max(0, Number(saved("wheel-level") ?? 8) | 0)), shown = level;
+      let page = wrap(Number(saved("wheel-page") ?? 2) | 0), pageShown = page;
+      const render = () => {
+        hide();
+        layer.replaceChildren();
+        segments.clear();
+        gamut.removeAttribute("d");
+        gamut.style.fill = "";
+        rim.removeAttribute("d");
+        caption.classList.remove("turns");
+        back.hidden = ahead.hidden = true;
+        captionText.textContent = "";
+        under = "";
+        layout.dataset.view = view === "flat" ? "flat" : slicing;
+        layout.dataset.surface = surface;
+        onSlice = view !== "flat";
+        if (view === "flat") {
+          drawFlat();
+          background = FLAT;
+          captionText.textContent = "Colour wheel: hue around, chroma outwards";
+          svg.setAttribute("aria-label", captionText.textContent);
+        } else {
+          loadPrintTable(); // for the slice's own colours' CMYK
+          if (slicing === "level") drawLevel(shown, level);
+          else drawPages(pageShown, page);
+        }
+        paintBackground();
+      };
+      const setLevel = (i) => {
+        i = Math.min(LEVELS, Math.max(0, i));
+        if (i === level && i === shown) return;
+        level = shown = i;
+        save("wheel-level", level);
+        render();
+      };
+      const preview = (i) => {
+        i = Math.min(LEVELS, Math.max(0, i));
+        if (i === shown) return;
+        shown = i;
+        render();
+      };
+      const setPage = (s) => {
+        s = wrap(s);
+        if (s === page && s === pageShown) return;
+        page = pageShown = s;
+        save("wheel-page", page);
+        render();
+      };
+      const previewPage = (s) => {
+        if (s === pageShown) return;
+        pageShown = s;
+        render();
+      };
+
+      // The level control: drag (or click) along it; arrow keys, Page Up/Down (0.1), Home and End; the
+      // mouse wheel. Hovering previews a level without choosing it.
+      const levelAt = (e) => Math.floor(new DOMPoint(e.clientX, e.clientY).matrixTransform(control.getScreenCTM().inverse()).y / CH);
+      control.addEventListener("pointerdown", (e) => {
+        e.preventDefault(); // no text selection
+        control.focus();
+        control.setPointerCapture(e.pointerId);
+        setLevel(levelAt(e));
+      });
+      control.addEventListener("pointermove", (e) => {
+        if (control.hasPointerCapture(e.pointerId)) setLevel(levelAt(e));
+        else if (e.pointerType !== "touch") preview(levelAt(e));
+      });
+      control.addEventListener("pointerleave", () => preview(level));
+      const KEYS = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1, PageUp: -2, PageDown: 2, Home: -LEVELS, End: LEVELS };
+      control.addEventListener("keydown", (e) => {
+        if (!(e.key in KEYS)) return;
+        e.preventDefault();
+        setLevel(level + KEYS[e.key]);
+      });
+      let spun = 0;
+      control.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        spun += e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+        const steps = Math.trunc(spun / 100);
+        if (steps) { spun -= steps * 100; setLevel(level + steps); }
+      }, { passive: false });
+
+      // The dial: drag (or click) to the hue for the right; arrow keys (right and down clockwise, as in the
+      // Ostwald view: here, to lower hues), Page Up/Down (three pages, 30°), Home (0°); the mouse wheel.
+      // Hovering previews a pair of pages without choosing it.
+      const pageAt = (e) => {
+        const label = e.target.closest?.("[data-slice]");
+        if (label) return +label.dataset.slice;
+        const q = new DOMPoint(e.clientX, e.clientY).matrixTransform(dial.getScreenCTM().inverse());
+        return wrap(Math.floor(((Math.atan2(-q.y, q.x) * 180) / Math.PI + 360) % 360 / SLICE));
+      };
+      dialFace.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        dial.focus();
+        dialFace.setPointerCapture(e.pointerId);
+        setPage(pageAt(e));
+      });
+      dialFace.addEventListener("pointermove", (e) => {
+        if (dialFace.hasPointerCapture(e.pointerId)) setPage(pageAt(e));
+        else if (e.pointerType !== "touch") previewPage(pageAt(e));
+      });
+      dialFace.addEventListener("pointerleave", () => previewPage(page));
+      const TURNS = { ArrowRight: -1, ArrowDown: -1, ArrowLeft: 1, ArrowUp: 1, PageDown: -3, PageUp: 3 };
+      dial.addEventListener("keydown", (e) => {
+        if (!(e.key in TURNS) && e.key !== "Home") return;
+        e.preventDefault();
+        setPage(e.key === "Home" ? 0 : page + TURNS[e.key]);
+      });
+      let spunPages = 0;
+      dialFace.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        spunPages += e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+        const steps = Math.trunc(spunPages / 100);
+        if (steps) { spunPages -= steps * 100; setPage(page - steps); }
+      }, { passive: false });
+
+      const pressed = (key, value) => { for (const b of modes.querySelectorAll(`[data-${key}]`)) b.setAttribute("aria-pressed", b.getAttribute(`data-${key}`) === value); };
+      const setView = (v) => {
+        view = v;
+        shown = level;
+        pageShown = page;
+        slicingOption.hidden = surfaceOption.hidden = v !== "2d";
+        pressed("wheel-view", v);
+        save("wheel-view", v);
+        render();
+      };
+      const setMarks = (m) => {
+        marksAs = m;
+        pressed("wheel-marks", m);
+        save("wheel-marks", m);
+        render();
+      };
+      const setSlicing = (how) => {
+        slicing = how;
+        shown = level;
+        pageShown = page;
+        pressed("wheel-slicing", how);
+        save("wheel-slicing", how);
+        render();
+      };
+      for (const b of modes.querySelectorAll("[data-wheel-view]")) b.addEventListener("click", () => setView(b.dataset.wheelView));
+      for (const b of modes.querySelectorAll("[data-wheel-marks]")) b.addEventListener("click", () => setMarks(b.dataset.wheelMarks));
+      const setSurface = (how) => {
+        surface = how;
+        pressed("wheel-surface", how);
+        save("wheel-surface", how);
+        render();
+      };
+      for (const b of modes.querySelectorAll("[data-wheel-slicing]")) b.addEventListener("click", () => setSlicing(b.dataset.wheelSlicing));
+      for (const b of modes.querySelectorAll("[data-wheel-surface]")) b.addEventListener("click", () => setSurface(b.dataset.wheelSurface));
+      pressed("wheel-marks", marksAs);
+      pressed("wheel-slicing", slicing);
+      pressed("wheel-surface", surface);
+      setView(view);
+      return { panel, wheel, mark, box };
+    }
+
+    // A small segmented switch (the Ostwald view's and the wheel's): its label (shown on touch screens and
+    // phones, where there are no tooltips), then a button per choice ([value, title, icon]), each with
+    // data-<key> set to its value.
+    function optionSwitch(label, key, list) {
+      return `<div class="view-option" data-option="${key}"><span aria-hidden="true">${label}</span><div class="view-switch" role="group" aria-label="${label}">`
+        + list.map(([value, title, svg]) => `<button type="button" data-${key}="${value}" title="${title}" aria-label="${title}"><svg viewBox="-8 -8 16 16" aria-hidden="true">${svg}</svg></button>`).join("")
+        + `</div></div>`;
+    }
+
+    // Paints a wheel's background canvas, laid over its SVG (viewBox -1.02 to 1.02 each way): `at(x, y,
+    // rgb, unit)` writes the pixel's linear sRGB colour into `rgb` and returns how much of the pixel it
+    // covers (0 leaves it clear); `unit` is a pixel's size in the SVG's units. At half the flat wheel's
+    // resolution, scaled up smoothly: it's faded, and its edge is drawn over it, so it looks the same,
+    // and it repaints at every step of the slice.
+    function paintField(canvas, at) {
+      const size = Math.round(canvas.clientWidth * Math.min(devicePixelRatio, 1.5) * 0.5);
+      if (!size) return;
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      const img = ctx.createImageData(size, size), px = img.data;
+      const unit = 2.04 / size, rgb = new Float64Array(3);
+      const encode = (v) => SRGB_ENCODE[v <= 0 ? 0 : v >= 1 ? 4095 : (v * 4095 + 0.5) | 0];
+      for (let j = 0; j < size; j++) {
+        const y = (j + 0.5) * unit - 1.02;
+        for (let i = 0; i < size; i++) {
+          const alpha = at((i + 0.5) * unit - 1.02, y, rgb, unit);
+          if (alpha <= 0) continue;
+          const o = (j * size + i) * 4;
+          px[o] = encode(rgb[0]);
+          px[o + 1] = encode(rgb[1]);
+          px[o + 2] = encode(rgb[2]);
+          px[o + 3] = 255 * alpha;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
     }
 
     // Paints the continuous wheel: at each pixel, hue from the angle and chroma from the radius (same
@@ -1648,7 +2533,7 @@
         return label;
       });
       // The caption; sliced through the axis, with a button each side to turn the slice a page back or on.
-      const caption = Object.assign(document.createElement("p"), { className: "ostwald-caption" });
+      const caption = Object.assign(document.createElement("p"), { className: "view-caption" });
       const captionText = document.createElement("span");
       const turn = (step, d) => {
         const b = Object.assign(document.createElement("button"), { type: "button", className: "page-turn", hidden: true });
@@ -1782,7 +2667,7 @@
       const pointer = svgEl("path", { class: "pointer" });
       control.append(ghost, marker, slice, axisFront, pointer);
       // 2D (the disc) or 3D (the whole solid, made when first asked for).
-      const modes = Object.assign(document.createElement("div"), { className: "ostwald-modes" });
+      const modes = Object.assign(document.createElement("div"), { className: "view-modes" });
       // The cells: every one a dot, Wada's colours' bigger; or, for the empty cells (none of Wada's colours
       // there), hidden; only a dot of the system's own colour; the cell, with that dot; or filled with it.
       // Each choice is drawn as a cell, a diamond as in the solid, dashed where the cell isn't drawn; every
@@ -1809,11 +2694,8 @@
         ["level", "Slice across the axis: one level, seen from above", `${OUTLINE}<ellipse rx="5.5" ry="1.9"/>`],
         ["pages", "Slice through the axis: a hue's page and its complement's, back to back", `${OUTLINE}<path d="M 0 -7 L 2.2 0 L 0 7 L -2.2 0 Z"/>`],
       ];
-      const choices = (label, key, list) => `<div class="ostwald-option" data-option="${key}"><span aria-hidden="true">${label}</span><div class="ostwald-switch" role="group" aria-label="${label}">`
-        + list.map(([value, title, svg]) => `<button type="button" data-${key}="${value}" title="${title}" aria-label="${title}"><svg viewBox="-8 -8 16 16" aria-hidden="true">${svg}</svg></button>`).join("")
-        + `</div></div>`;
-      modes.innerHTML = `<div class="ostwald-switch" role="group" aria-label="View"><button type="button" data-mode="2d">2D</button><button type="button" data-mode="3d">3D</button></div>`
-        + choices("Cells", "empty", EMPTY) + choices("Slice", "slicing", SLICING) + choices("Cut", "cut", CUT);
+      modes.innerHTML = `<div class="view-switch" role="group" aria-label="View"><button type="button" data-mode="2d">2D</button><button type="button" data-mode="3d">3D</button></div>`
+        + optionSwitch("Cells", "empty", EMPTY) + optionSwitch("Slice", "slicing", SLICING) + optionSwitch("Cut", "cut", CUT);
       const cutOption = modes.querySelector('[data-option="cut"]'), slicingOption = modes.querySelector('[data-option="slicing"]');
       layout.append(disc, control, caption, modes);
       box.append(panel, layout);
@@ -1845,22 +2727,7 @@
       // Its card, as a colour's: the same values, with the CSS colour to copy; a note instead of combinations.
       const openCell = (own) => {
         const cmyk = estimates?.[own.code];
-        detail.querySelector(".detail-swatch").style.setProperty("--color", own.css);
-        const name = detail.querySelector("h2");
-        name.classList.add("named");
-        name.replaceChildren(`Ostwald ${own.code.length === 1 ? "grey " : ""}${own.code}`, chipOf(own));
-        detail.querySelector('[data-field="cmyk"]').textContent = cmyk ? `≈ ${cmykText(cmyk)}` : "Not in Wada's palette";
-        detail.querySelector('[data-field="oklch"]').textContent = oklchValues(own.oklch);
-        const copy = detail.querySelector(".copy");
-        copy.dataset.css = oklchText(own.oklch);
-        copy.classList.remove("copied");
-        const note = detail.querySelector(".detail-note");
-        const warning = Object.assign(document.createElement("span"), { className: "detail-warning", textContent: `Not one of Wada's colours: the Ostwald system's own colour for this cell${cmyk ? ", so its CMYK is an estimate" : ""}.` });
-        note.replaceChildren(mix(own), warning);
-        note.hidden = false;
-        detail.querySelector(".detail-combos").replaceChildren();
-        detail.showModal();
-        detail.scrollTop = 0;
+        showComputedDetail(own, `Ostwald ${own.code.length === 1 ? "grey " : ""}${own.code}`, cmyk, mix(own), `Not one of Wada's colours: the Ostwald system's own colour for this cell${cmyk ? ", so its CMYK is an estimate" : ""}.`);
       };
       // One of Wada's colours: its piece of its cell, filled; or, with every cell a dot, its dot (x, y,
       // radius r), the piece unseen round it, to hover.
@@ -2059,7 +2926,7 @@
       // the right), each hue's sector a group, so that the two pages shown can be bright.
       const DIAL = 1.16; // the dial's half-width: the ring (1), and the pointer just outside it
       const dial = svgEl("svg", {
-        class: "ostwald-dial", viewBox: `${-DIAL} ${-DIAL} ${2 * DIAL} ${2 * DIAL}`, role: "slider", tabindex: "0",
+        class: "hue-dial", viewBox: `${-DIAL} ${-DIAL} ${2 * DIAL} ${2 * DIAL}`, role: "slider", tabindex: "0",
         "aria-label": "Pages: the hue on the right, its complement on the left", "aria-valuemin": 0, "aria-valuemax": 23,
       });
       const hues = Array.from({ length: 24 }, (_, k) => {
@@ -2097,7 +2964,7 @@
         return label;
       });
       dialFace.append(dial, ...dialLabels);
-      const dialBox = Object.assign(document.createElement("div"), { className: "ostwald-dial-box" });
+      const dialBox = Object.assign(document.createElement("div"), { className: "dial-box" });
       dialBox.append(dialFace);
       control.after(dialBox);
 
@@ -2936,6 +3803,92 @@
       };
     }
 
+    // CMYK for a colour that isn't one of Wada's, estimated as scripts/ostwald_cmyk.py does for the Ostwald
+    // view's empty cells: OKLCH -> CIE Lab (D50) -> CMYK through the colorimetric table (B2A1) of the print
+    // profile Wada's CMYK is read through (Japan Color 2011 Coated), interpolated trilinearly, as
+    // LittleCMS does for Lab. Only that table is fetched, as a byte range of the profile (340 KB of its
+    // 1.9 MB), once, when first asked for; until it's in (or if it can't be had), estimateCMYK gives null.
+    function loadPrintTable() {
+      printLoading ??= (async () => {
+        const PROFILE = "profiles/JapanColor2011Coated.icc", B2A1 = 0x42324131, MFT2 = 0x6d667432;
+        let whole = null; // a server that ignores ranges sends the whole profile: the table is then in it
+        const bytes = async (start, end) => {
+          if (!whole) {
+            const r = await fetch(PROFILE, { headers: { Range: `bytes=${start}-${end - 1}` } });
+            if (!r.ok) throw new Error(`${PROFILE}: ${r.status}`);
+            const got = await r.arrayBuffer();
+            if (r.status === 206) return new DataView(got);
+            whole = got;
+          }
+          return new DataView(whole, start, end - start);
+        };
+        // The tag table: per tag, its signature, offset and size.
+        const head = await bytes(0, 4096), tags = head.getUint32(128);
+        let tag = null;
+        for (let i = 0; i < tags && !tag; i++) {
+          const at = 132 + 12 * i, offset = head.getUint32(at + 4);
+          if (head.getUint32(at) === B2A1) tag = await bytes(offset, offset + head.getUint32(at + 8));
+        }
+        if (!tag || tag.getUint32(0) !== MFT2 || tag.getUint8(8) !== 3 || tag.getUint8(9) !== 4) throw new Error("no 16-bit Lab -> CMYK table");
+        // A lut16Type: input curves, the grid (first input slowest), output curves; 0..65535 as 0..1.
+        const grid = tag.getUint8(10), inSize = tag.getUint16(48), outSize = tag.getUint16(50);
+        let pos = 52;
+        const read = (n) => {
+          const values = new Float64Array(n);
+          for (let k = 0; k < n; k++, pos += 2) values[k] = tag.getUint16(pos) / 65535;
+          return values;
+        };
+        const inCurves = [read(inSize), read(inSize), read(inSize)], clut = read(grid ** 3 * 4);
+        printTable = { grid, inCurves, clut, outCurves: [read(outSize), read(outSize), read(outSize), read(outSize)] };
+      })().catch(() => {}); // no estimates, then: the panel says the colour isn't in Wada's palette
+      return printLoading;
+    }
+
+    // CMYK in percent for [L, C, h], or null while the table isn't in.
+    function estimateCMYK([L, C, h]) {
+      if (!printTable) return null;
+      const { grid, inCurves, clut, outCurves } = printTable;
+      const curve = (table, x) => { // piecewise linear, x in 0..1
+        const p = Math.min(Math.max(x, 0), 1) * (table.length - 1), i = Math.min(p | 0, table.length - 2);
+        return table[i] + (table[i + 1] - table[i]) * (p - i);
+      };
+      const [l, a, b] = oklchToLab(L, C, h);
+      // ICC v2's 16-bit Lab: L 0..100 as 0..0xFF00; a and b 0 as 0x8000.
+      const x = [(l * 652.8) / 65535, ((a + 128) * 256) / 65535, ((b + 128) * 256) / 65535].map((v, k) => curve(inCurves[k], v));
+      const g = grid - 1, lo = [], frac = [];
+      for (const v of x) {
+        const p = Math.min(Math.max(v, 0), 1) * g, i = Math.min(p | 0, g - 1);
+        lo.push(i);
+        frac.push(p - i);
+      }
+      const y = [0, 0, 0, 0];
+      for (let corner = 0; corner < 8; corner++) { // the cube's 8 nodes round it, each by its nearness
+        let w = 1, node = 0;
+        for (let k = 0; k < 3; k++) {
+          const up = (corner >> k) & 1;
+          w *= up ? frac[k] : 1 - frac[k];
+          node = node * grid + lo[k] + up;
+        }
+        if (w) for (let o = 0; o < 4; o++) y[o] += w * clut[node * 4 + o];
+      }
+      return y.map((v, o) => Math.round(100 * curve(outCurves[o], v)));
+    }
+
+    // OKLCH -> CIE Lab (D50): the inverse of scripts/cmyk_to_oklch.py's maths (CSS Color 4's), with its
+    // matrices inverted as scripts/ostwald_cmyk.py does.
+    function oklchToLab(L, C, h) {
+      const OKLAB_TO_LMS = [[1.00000000239858, 0.39633777716154006, 0.21580375421218242], [0.999999999290284, -0.1055613457521502, -0.06385417190922567], [0.9999999856456103, -0.08948417624532107, -1.2914855294809227]];
+      const LMS_TO_XYZ = [[1.226879875845924, -0.557814994460217, 0.2813910456659646], [-0.040575745214800875, 1.1122868032803173, -0.07171105806551642], [-0.07637293667466001, -0.4214933324022431, 1.5869240198367816]];
+      const D65_TO_D50 = [[1.0479297925449969, 0.02294687060160972, -0.05019226628920526], [0.029627808770055802, 0.99043442675388, -0.017073799063418812], [-0.009243040646204523, 0.015055191490298147, 0.7518742814281371]];
+      const D50 = [0.9642956764295677, 1, 0.8251046025104602]; // the white
+      const times = (m, v) => m.map((row) => row[0] * v[0] + row[1] * v[1] + row[2] * v[2]);
+      const rad = h * (Math.PI / 180);
+      const lms = times(OKLAB_TO_LMS, [L, C * Math.cos(rad), C * Math.sin(rad)]).map((v) => v ** 3);
+      const [X, Y, Z] = times(D65_TO_D50, times(LMS_TO_XYZ, lms)).map((v, k) => v / D50[k]);
+      const f = (t) => (t > 216 / 24389 ? t ** (1 / 3) : ((24389 / 27) * t + 16) / 116);
+      return [116 * f(Y) - 16, 500 * (f(X) - f(Y)), 200 * (f(Y) - f(Z))];
+    }
+
     // Linear sRGB 0..1 (in 4096 steps) -> 8-bit sRGB.
     const SRGB_ENCODE = Uint8ClampedArray.from({ length: 4096 }, (_, i) => {
       const v = i / 4095;
@@ -2953,14 +3906,16 @@
       return out;
     }
 
-    function inSRGB(L, C, h) {
+    // Within sRGB, to within `tolerance` (the OKLCH layout's 2D slices use a strict one: near black
+    // and white, a loose one lets through chroma that isn't there).
+    function inSRGB(L, C, h, tolerance = 1e-4) {
       const rad = (h * Math.PI) / 180;
-      return oklabToLinearSRGB(L, C * Math.cos(rad), C * Math.sin(rad)).every((v) => v >= -1e-4 && v <= 1 + 1e-4);
+      return oklabToLinearSRGB(L, C * Math.cos(rad), C * Math.sin(rad)).every((v) => v >= -tolerance && v <= 1 + tolerance);
     }
 
     // Most vivid sRGB colour per hue (the gamut "cusp"): lightness L and chroma C in half-degree steps,
-    // with entry 720 repeating entry 0 so interpolation wraps around. Computed once.
-    let cusps = null;
+    // with entry 720 repeating entry 0 so interpolation wraps around. Computed once (into `cusps`, set at
+    // the top, as the wheel can need it before the script gets here).
     function cuspTable() {
       if (!cusps) {
         const L = new Float64Array(721), C = new Float64Array(721);
@@ -2976,11 +3931,11 @@
     }
 
     // Largest chroma sRGB can show at this lightness and hue.
-    function maxChroma(L, h) {
+    function maxChroma(L, h, tolerance) {
       let lo = 0, hi = 0.4;
       for (let i = 0; i < 16; i++) { // to within 0.4 / 2^16
         const mid = (lo + hi) / 2;
-        if (inSRGB(L, mid, h)) lo = mid; else hi = mid;
+        if (inSRGB(L, mid, h, tolerance)) lo = mid; else hi = mid;
       }
       return lo;
     }

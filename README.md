@@ -1,6 +1,6 @@
 # Wada Sanzo: A Dictionary of Color Combinations
 
-A static site for browsing Sanzo Wada's *A Dictionary of Color Combinations*: its 159 colours in the book's six families, its 348 combinations of 2, 3 and 4 colours, the 72 seasonal combinations of Volume 2 (with its 11 extra colours), a colour wheel, and a page to compose your own combinations.
+A static site for browsing Sanzo Wada's *A Dictionary of Color Combinations*: its 159 colours in the book's six families, its 348 combinations of 2, 3 and 4 colours, the 72 seasonal combinations of Volume 2 (with its 11 extra colours), the colours laid out in OKLCH and in Ostwald's colour solid, and a page to compose your own combinations.
 
 Live: https://adrian729.github.io/wada-sanzo-colors/
 
@@ -22,7 +22,7 @@ Then open http://localhost:8000.
 - `families.json`: the book's six colour families, in the order of its colour index.
 - `ostwald-cmyk.json`: CMYK estimated for every cell of the Colors › Ostwald view, by its Ostwald code, for the cells none of Wada's colours fill (`scripts/ostwald_cmyk.py`).
 
-OKLCH is computed from CMYK through the Japan Color 2011 Coated profile (`scripts/cmyk_to_oklch.py`). The Ostwald view's estimated CMYK goes the other way, through the same profile (`scripts/ostwald_cmyk.py`); re-run it after changing `colors.json` or the Ostwald computation (`notes/ostwald.py`).
+OKLCH is computed from CMYK through the Japan Color 2011 Coated profile (`scripts/cmyk_to_oklch.py`). The Ostwald view's estimated CMYK goes the other way, through the same profile (`scripts/ostwald_cmyk.py`); re-run it after changing `colors.json` or the Ostwald computation (`notes/ostwald.py`). The OKLCH view's, for any point of its slices, is estimated the same way by the page itself, from the profile's table.
 
 ## Sources
 

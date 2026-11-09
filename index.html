@@ -129,10 +129,28 @@
     .blocks > * { background: var(--color); }
     .blocks .swatch { aspect-ratio: auto; height: 100%; padding: 0.5rem; }
     .blocks .swatch span { white-space: normal; text-align: center; } /* the colour name */
-    /* Sub-navigation choice: only the combinations with that many colours. */
-    #combinations-view[data-show="2"] > :not([data-size="2"]),
-    #combinations-view[data-show="3"] > :not([data-size="3"]),
-    #combinations-view[data-show="4"] > :not([data-size="4"]) { display: none; }
+    /* Sub-navigation choice: only the combinations with that many colours (of yours too: see below). */
+    #combinations-view[data-show="2"] > :not([data-size="2"], .yours),
+    #combinations-view[data-show="3"] > :not([data-size="3"], .yours),
+    #combinations-view[data-show="4"] > :not([data-size="4"], .yours),
+    #combinations-view[data-show="2"] > .yours li:not([data-size="2"]),
+    #combinations-view[data-show="3"] > .yours li:not([data-size="3"]),
+    #combinations-view[data-show="4"] > .yours li:not([data-size="4"]),
+    #combinations-view[data-show="2"] > .yours:not(:has(li[data-size="2"]), :has(.group-heading button)),
+    #combinations-view[data-show="3"] > .yours:not(:has(li[data-size="3"]), :has(.group-heading button)),
+    #combinations-view[data-show="4"] > .yours:not(:has(li[data-size="4"]), :has(.group-heading button)) { display: none; }
+    /* Your combinations (saved in Create), before the book's: as its, under their own heading; each
+       number opens it in Create, and the × after it removes it. 5 to 7 colours are stacked, as in
+       Create, as tall as a cross. */
+    .yours .combo-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .yours .combo-head > .combo-number { margin-bottom: 0; }
+    .yours .remove { display: grid; padding: 0.25rem; margin: -0.25rem; border: 0; background: none; color: var(--muted); cursor: pointer; }
+    .yours .remove:is(:hover, :focus-visible) { color: var(--fg); }
+    .yours .remove svg { width: 0.75rem; height: 0.75rem; fill: none; stroke: currentColor; stroke-width: 1.25; }
+    @media (pointer: coarse) { .yours .remove { padding: 0.75rem; margin: -0.75rem; } } /* a finger's room, nothing moved */
+    .yours .blocks.stack { width: calc(round(down, 100%, 4px) * 0.5625); }
+    .yours .group-heading button { padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+    .yours .group-heading button:is(:hover, :focus-visible) { color: var(--fg); text-decoration: underline; }
     /* ... and only that month's seasonal combinations. */
     #seasons-view[data-show="1"] > :not([data-month="1"]), #seasons-view[data-show="2"] > :not([data-month="2"]),
     #seasons-view[data-show="3"] > :not([data-month="3"]), #seasons-view[data-show="4"] > :not([data-month="4"]),
@@ -253,14 +271,18 @@
       color: var(--muted); font: inherit; text-decoration: none; cursor: pointer;
     }
     .actions :is(a, button):is(:hover, :focus-visible) { color: var(--fg); text-decoration: underline; }
+    .actions .save { min-width: 5ch; text-align: start; } /* Save or Saved: the same room, so nothing moves */
+    .actions .save[aria-pressed="true"] { color: var(--fg); }
+    .actions button:disabled { color: var(--muted); opacity: 0.45; cursor: default; text-decoration: none; }
 
     /* Create: compose a combination of 2 to 7 colours, laid out as in the book (2 to 4 as in Volume 1,
        5 to 7 stacked as the seasonal combinations), the colours' values under them (under each colour
-       for 1 to 3, else in rows of blocks, as many to a row as fit), beside the full set of colours to
-       pick from. On wide screens the composition stays in view while scrolling the colours. */
+       for 1 to 3, else in rows of blocks, as many to a row as fit), beside the colours to pick from (all of
+       Wada's, or OKLCH's or Ostwald's views). On wide screens the two share the width equally, whatever the
+       picker shows, and the composition stays in view while scrolling the colours. */
     #create-view { display: grid; gap: 2.5rem; align-items: start; }
     @media (min-width: 64rem) {
-      #create-view { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 3rem; }
+      #create-view { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; } /* the same whatever the picker shows */
       .create-stage { position: sticky; top: calc(var(--header-height, 3.375rem) + 1.5rem); } /* where it is unscrolled: below the header */
     }
     .create-stage .combo-figure { width: 100%; }
@@ -504,6 +526,40 @@
       .wheel-views > .lightness-levels { grid-column: 2; }
     }
 
+    /* Create, picking from OKLCH or Ostwald (the switch at the picker's top, instead of the grid): their views
+       as on the Colors page, in the picker's column, laid out as on phones (the wheel or disc as big as the
+       column allows, its control beside it, the switches under them), without the info panel: the line
+       above them shows the colour under the pointer. The colours picked are marked on them, numbered. */
+    .picker-source { display: flex; align-items: center; gap: 0.6rem; color: var(--muted); font-size: 0.8rem; }
+    html:has(#create-view:not([hidden])) { scrollbar-gutter: stable; } /* the grid scrolls, the views don't: switching between them moves nothing sideways */
+    #create-view:not([data-show="grid"]) .picker > :is(.grid, .new-colours),
+    #create-view:not([data-show="oklch"]) .picker > .wheel-box,
+    #create-view:not([data-show="ostwald"]) .picker > .ostwald-box { display: none; }
+    .picker { container-type: inline-size; }
+    .picker .wheel-panel { display: none; }
+    /* The view's size (--h, as on the Colors page) from the picker's width: computed there, as a length
+       (registered), so that it's the same inside the dial's box, which measures its own width. */
+    @property --picker-h { syntax: "<length>"; inherits: false; initial-value: 0px; }
+    .picker :is(.wheel-views, .ostwald) { --h: var(--picker-h); grid-template-columns: auto auto; justify-content: center; column-gap: 1rem; }
+    .picker .wheel-views { --picker-h: min(calc(100vh - 18rem), calc((100cqw - 1.5rem) / 1.3)); } /* (the screen's height less the header, the switch, the line above, and the caption and switches below) */
+    .picker .wheel-views[data-view="flat"] { --picker-h: min(calc(100vh - 18rem), 100cqw); grid-template-columns: auto; }
+    .picker .ostwald { --picker-h: min(calc(100vh - 18rem), calc((100cqw - 1.5rem) / 1.47)); }
+    .picker :is(.wheel-views > .wheel, .ostwald-disc, .view-caption) { grid-column: 1; }
+    .picker :is(.lightness-levels, .ostwald-levels, .dial-box) { grid-column: 2; }
+    .picker .dial-box { width: calc(var(--h) * 0.3); min-width: 0; }
+    .picker .view-modes { grid-column: 1 / -1; grid-row: 3; justify-self: center; }
+    .picker .ostwald-disc > .page-label { display: none; } /* no room beside the pages' tips: the caption names their hues */
+    .pick-mark { cursor: pointer; }
+    .pick-mark circle { stroke: var(--fg); }
+    .pick-mark text { font-family: inherit; font-weight: 600; pointer-events: none; }
+    /* The new colours picked, after Wada's in the grid, under a label with a Clear button. */
+    .new-colours { display: grid; gap: 0.5rem; }
+    .new-colours[hidden] { display: none; }
+    .new-colours > .section-label { display: flex; gap: 1.5rem; margin: 0.5rem 0 0; }
+    .new-colours > .section-label button { font: inherit; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+    .new-colours > .section-label button:is(:hover, :focus-visible) { color: var(--fg); text-decoration: underline; }
+    .new-colours > .section-label button[hidden] { display: none; }
+
     dialog {
       width: min(calc(var(--info) + 4.5rem), calc(100% - 2rem)); /* text + padding + copy button */
       margin: auto;
@@ -670,9 +726,18 @@
     const TABS = [["", "Colours"], ["combinations", "Combinations"], ["seasons", "Seasons"], ["wheel", "Wheel"]];
     // The combination being composed: its colours in order (a cross: top, left, right, bottom), the slot
     // selected for swapping or replacing, and a one-off message. In the address as colour numbers in book
-    // order (#create/1-46-89), so it can be shared; also remembered in this browser.
-    const create = { picked: [], active: null, note: "", dragged: false, previewing: false };
+    // order (#create/1-46-89; a new colour by its token, see newColour), so it can be shared; also
+    // remembered in this browser, as are the new colours picked (`news`, see remember).
+    const create = { picked: [], active: null, note: "", dragged: false, previewing: false, news: [] };
+    // Your combinations: those saved in Create, in this browser, by their colours as in the address
+    // (1-46-89), in the order saved; shown first in Combinations (see renderYours). `undo`: the one last
+    // removed there and where it was, until the next change; `section`: theirs in Combinations.
+    const yours = { list: [], undo: null, section: null };
     const pickerButtons = []; // colour index -> its button in the colour picker
+    const pickers = new Map(); // what the picker shows ("oklch", "ostwald") -> that view, made when first shown
+    let showSource = null, renderNews = null; // the picker's (see buildPicker)
+    const newColours = new Map(); // a new colour's token -> the colour, once picked or in the address: the same one everywhere (see oklchColour)
+    let ostwaldCells = null, ostwaldCMYK = null; // for Ostwald's new colours: the system (made when first needed), and its cells' estimated CMYK
     let comboWheel = null; // the combination pages' wheel, made the first time it is shown
     function showView() {
       const [, arg, tab] = location.hash.slice(1).split("/");
@@ -839,6 +904,11 @@
         section.append(heading, ul);
         views.combinations.append(section);
       }
+      // ... after your combinations, if any (see renderYours).
+      yours.section = Object.assign(document.createElement("section"), { className: "yours" });
+      views.combinations.prepend(yours.section);
+      loadYours();
+      renderYours();
 
       // Seasons: month by month, in book order.
       MONTHS.forEach((month, m) => {
@@ -960,7 +1030,7 @@
       for (const c of colors) {
         const name = namedLine(c);
         const cmyk = document.createElement("p");
-        cmyk.textContent = cmykText(c.cmyk);
+        cmyk.textContent = !c.token ? cmykText(c.cmyk) : c.cmyk ? `≈ ${cmykText(c.cmyk)}` : "Not in Wada's palette"; // a new colour's: an estimate
         const oklch = document.createElement("p");
         oklch.className = "oklch-line";
         const values = document.createElement("span");
@@ -973,18 +1043,171 @@
       return info;
     }
 
-    // Colours in an address: their numbers in book order, 1-based, e.g. 1-46-89.
+    // Colours in an address: Wada's by their numbers in book order, 1-based, e.g. 1-46-89; a new colour by
+    // its token (see oklchColour, ostwaldColour).
     function colorsCode(colors) {
-      return colors.map((c) => c.index + 1).join("-");
+      return colors.map(tokenOf).join("-");
     }
-    function parseColors(text) {
+    function parseColors(text, most = MAX_PICKED) {
       const colors = [];
       for (const part of text.split("-")) {
-        const c = /^\d+$/.test(part) ? data.colors[Number(part) - 1] : undefined;
-        if (c && !colors.includes(c) && colors.length < MAX_PICKED) colors.push(c);
+        const c = colourOf(part);
+        if (c && !colors.includes(c) && colors.length < most) colors.push(c);
       }
       return colors;
     }
+
+    // New colours: none of Wada's, picked in Create from OKLCH's slices or Ostwald's cells. Each goes by a
+    // token, in the address and in this browser: OKLCH's by its values, as Wada's are given
+    // (0.7234,0.1203,45.2), and named by them rounded ("OKLCH 0.72 0.12 45°", or "OKLCH grey 0.72");
+    // Ostwald's by its code (16PA, or A for a grey), and named as its card is ("Ostwald 16PA"). Their CMYK
+    // is an estimate: OKLCH's made in the page (estimateCMYK), Ostwald's as the Ostwald view's
+    // (ostwald-cmyk.json); none until it's in.
+    function tokenOf(c) {
+      return c.token ?? String(c.index + 1);
+    }
+    function indexIn(list, c) {
+      return list.findIndex((p) => tokenOf(p) === tokenOf(c));
+    }
+    function oklchColour([L0, C0, h0]) {
+      const oklch = [+L0.toFixed(4), +C0.toFixed(4), +C0.toFixed(4) ? +h0.toFixed(2) % 360 : 0], [L, C, h] = oklch, token = oklch.join(",");
+      return newColours.get(token) ?? {
+        token, oklch, css: oklchText(oklch),
+        name: C ? `OKLCH ${+L.toFixed(2)} ${+C.toFixed(C < 0.01 ? 3 : 2)} ${Math.round(h) % 360}°` : `OKLCH grey ${+L.toFixed(2)}`,
+        get cmyk() { return estimateCMYK(oklch); },
+      };
+    }
+    function ostwaldColour(code) {
+      code = code.toUpperCase();
+      if (newColours.has(code)) return newColours.get(code);
+      if (!ostwaldCells) {
+        ostwaldCells = ostwaldSystem(data.colors);
+        fetch("ostwald-cmyk.json").then((r) => r.json()).then((d) => {
+          if (Math.abs(d.offset - ostwaldCells.offset) >= 1e-4) return; // made for another calibration
+          ostwaldCMYK = d.cmyk;
+          if (!create.previewing) renderStage();
+        }).catch(() => {});
+      }
+      const { LETTERS, cell } = ostwaldCells, m = /^(?:(\d{1,2})([A-P])([A-P])|([A-P]))$/.exec(code);
+      if (!m) return null;
+      const a = LETTERS.indexOf(m[2] ?? m[4]), b = LETTERS.indexOf(m[3] ?? m[4]);
+      const sector = m[4] ? null : Array.from({ length: 24 }, (_, k) => Math.round((k * 100) / 24) % 100).indexOf(Number(m[1])); // as cell() numbers them
+      if (sector === -1 || a < b || (!m[4] && a === b)) return null;
+      const own = cell(sector, a, b);
+      return {
+        token: own.code, oklch: own.oklch, css: oklchText(own.oklch), name: `Ostwald ${a === b ? "grey " : ""}${own.code}`,
+        ostwald: { sector, level: a + b, ring: a - b, code: own.code, white: own.white, black: own.black },
+        get cmyk() { return ostwaldCMYK?.[own.code] ?? null; },
+      };
+    }
+    // The colour of a token (none if it's not one), a new one kept from then on.
+    function colourOf(token) {
+      if (/^\d+$/.test(token)) return data.colors[Number(token) - 1] ?? null;
+      const v = /^([\d.]+),([\d.]+),([\d.]+)$/.exec(token)?.slice(1).map(Number);
+      if (v) return v[0] <= 1 && v[1] <= 0.5 && v[2] < 360 ? kept(oklchColour(v)) : null; // (not a number: none)
+      return /^(\d{1,2}[A-P]{2}|[A-P])$/i.test(token) ? kept(ostwaldColour(token)) : null;
+    }
+    function kept(c) {
+      if (!c?.token) return c;
+      if (!newColours.has(c.token)) newColours.set(c.token, c);
+      return newColours.get(c.token);
+    }
+    // The new colours picked, remembered in this browser, the oldest first: the last 48 (those in the
+    // combination kept).
+    function remember(c) {
+      if (!c.token || create.news.includes(c)) return;
+      create.news.push(c);
+      while (create.news.length > 48) {
+        const k = create.news.findIndex((p) => !create.picked.includes(p));
+        create.news.splice(Math.max(0, k), 1);
+      }
+      saveNews();
+    }
+    function forget(list) {
+      create.news = create.news.filter((c) => !list.includes(c));
+      create.picked = create.picked.filter((c) => !list.includes(c));
+      create.active = null;
+      create.note = "";
+      saveNews();
+      updateCreate();
+    }
+    function saveNews() {
+      try { localStorage.setItem("create-new", colorsCode(create.news)); } catch {}
+    }
+
+    // Your combinations (see yours): read from this browser, changed, and shown in Combinations as a
+    // section of their own before the book's, numbered in the order saved; each number opens it in
+    // Create, and the × removes it (with an undo). Only the size the sub-navigation chooses, as the
+    // book's (5 to 7 colours under All).
+    function loadYours() {
+      let list = null;
+      try { list = JSON.parse(localStorage.getItem("create-saved") ?? "[]"); } catch {}
+      yours.list = Array.isArray(list) ? [...new Set(list.filter((code) => typeof code === "string" && code))] : [];
+    }
+    function saveYours(list, undo = null) {
+      yours.list = list;
+      yours.undo = undo;
+      try { localStorage.setItem("create-saved", JSON.stringify(list)); } catch {}
+      renderYours();
+    }
+    function renderYours() {
+      const heading = Object.assign(document.createElement("h2"), { className: "group-heading", textContent: "Your combinations" });
+      const about = Object.assign(document.createElement("span"), { textContent: "saved in this browser" });
+      if (yours.undo) {
+        const { code, at } = yours.undo;
+        const undo = Object.assign(document.createElement("button"), { type: "button", textContent: "Undo" });
+        undo.setAttribute("aria-label", `Undo removing combination ${at + 1}`);
+        undo.addEventListener("click", () => saveYours(yours.list.toSpliced(at, 0, code)));
+        about.append(" · ", undo);
+      }
+      heading.append(about);
+      const list = document.createElement("ul");
+      list.className = "combos";
+      yours.list.forEach((code, i) => {
+        const colors = parseColors(code);
+        if (colors.length < 2) return;
+        const open = Object.assign(document.createElement("a"), { className: "combo-number", href: `#create/${code}`, textContent: i + 1, title: "Open in Create" });
+        const remove = Object.assign(document.createElement("button"), { type: "button", className: "remove", title: "Remove" });
+        remove.setAttribute("aria-label", `Remove your combination ${i + 1}`);
+        remove.innerHTML = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg>';
+        remove.addEventListener("click", () => {
+          saveYours(yours.list.filter((other) => other !== code), { code, at: i });
+          yours.section.querySelector(".group-heading button").focus();
+        });
+        const head = document.createElement("div");
+        head.className = "combo-head";
+        head.append(open, remove);
+        const blocks = emptyBlocks(colors.length, colors.length > 4); // as in Create
+        for (const c of colors) {
+          const button = namedColorButton(c, c.token ? () => showNewDetail(c) : undefined);
+          button.style.setProperty("--color", c.css);
+          blocks.append(button);
+        }
+        const li = document.createElement("li");
+        li.dataset.size = colors.length; // for the sub-navigation's choice of size
+        li.setAttribute("aria-label", `Your combination ${i + 1}`);
+        li.append(head, blocks);
+        list.append(li);
+      });
+      yours.section.replaceChildren(heading, list);
+      yours.section.hidden = !list.children.length && !yours.undo;
+    }
+    // A new colour's card (in your combinations): its values, as on the view it was picked from.
+    function showNewDetail(c) {
+      const own = c.ostwald ? `the Ostwald system's own colour for cell ${c.ostwald.code}` : "OKLCH's own";
+      const line = c.ostwald ? `white ${Math.round(c.ostwald.white * 100)}% · black ${Math.round(c.ostwald.black * 100)}%` : "";
+      const open = () => showComputedDetail(c, c.name, c.cmyk, line, `Not one of Wada's colours: ${own}${c.cmyk ? ", so its CMYK is an estimate" : ""}.`);
+      if (!c.ostwald && !printTable) loadPrintTable().then(open);
+      else open();
+    }
+    // Saved in another tab: the same here.
+    addEventListener("storage", (e) => {
+      if (e.key !== "create-saved" || !data) return;
+      loadYours();
+      yours.undo = null;
+      renderYours();
+      if (!views.create.hidden && !create.previewing) renderStage();
+    });
 
     // Opens the Create view: with the colours in the address, or else the combination composed last.
     function openCreate(arg) {
@@ -994,8 +1217,10 @@
         try { saved = localStorage.getItem("create"); } catch {}
         create.picked = parseColors(saved ?? "");
       }
+      create.picked.forEach(remember);
       create.active = null;
       create.note = "";
+      showSource();
       updateCreate();
     }
 
@@ -1010,6 +1235,10 @@
         button.setAttribute("aria-pressed", at >= 0);
         button.firstElementChild.textContent = at >= 0 ? at + 1 : "";
       }
+      renderNews();
+      for (const view of pickers.values()) view.numbers(create.picked);
+      // OKLCH's new colours' CMYK, estimated once the print profile's table is in
+      if (!printTable && create.picked.some((c) => c.token && !c.ostwald)) loadPrintTable().then(() => { if (printTable && !create.previewing) renderStage(); });
     }
 
     // The composition: the colours laid out as in the book (2 to 7; empty slots until there are 2),
@@ -1040,12 +1269,15 @@
       else if (active !== null) note.textContent = "Pick a colour to replace it, or select another to swap them.";
       else if (shown.length < 2) note.textContent = `Pick 2 to ${MAX_PICKED} colours.`;
       else {
-        // Book combinations (Volume 1's and the seasonal ones) that have all these colours.
-        const has = (combo) => shown.every((c) => combo.colors.includes(c));
-        const groups = [["", data.combos.filter(has)], ["Seasons:", data.seasons.filter(has)]].filter(([, list]) => list.length);
-        if (!groups.length) note.textContent = "Not together in the book.";
+        // Book combinations (Volume 1's and the seasonal ones) that have all these colours: with new colours,
+        // all of Wada's here.
+        const wada = shown.filter((c) => !c.token), fresh = wada.length < shown.length;
+        const has = (combo) => wada.every((c) => combo.colors.includes(c));
+        const groups = wada.length < 2 ? [] : [["", data.combos.filter(has)], ["Seasons:", data.seasons.filter(has)]].filter(([, list]) => list.length);
+        if (fresh && wada.length < 2) note.textContent = "New colours aren't in the book.";
+        else if (!groups.length) note.textContent = fresh ? "New colours aren't in the book, and Wada's here aren't together in it." : "Not together in the book.";
         else {
-          note.append("Together in the book:");
+          note.append(fresh ? "Wada's colours here, together in the book:" : "Together in the book:");
           groups.forEach(([title, list], g) => {
             if (title) note.append(g ? " · " : " ", title);
             for (const combo of list) {
@@ -1061,6 +1293,18 @@
       const actions = document.createElement("p");
       actions.className = "actions";
       if (picked.length) {
+        // Save: into your combinations (in Combinations), from 2 colours; again, out of them.
+        const code = colorsCode(picked), saved = yours.list.includes(code);
+        const save = Object.assign(document.createElement("button"), { type: "button", className: "save", textContent: saved ? "Saved" : "Save", disabled: picked.length < 2 });
+        save.setAttribute("aria-pressed", saved);
+        save.title = saved ? "Saved in Combinations, under Your combinations (in this browser). Click to remove it."
+          : picked.length < 2 ? "Pick at least 2 colours to save them." : "Save it in Combinations, under Your combinations (in this browser).";
+        save.addEventListener("click", () => {
+          saveYours(saved ? yours.list.filter((other) => other !== code) : [...yours.list, code]);
+          renderStage();
+          views.create.querySelector(".actions .save")?.focus();
+        });
+        actions.append(save);
         const copyLink = Object.assign(document.createElement("button"), { type: "button", textContent: "Copy link" });
         copyLink.addEventListener("click", async () => {
           try { await navigator.clipboard.writeText(location.href); } catch { return; }
@@ -1165,6 +1409,7 @@
     // A colour in the picker: adds it to the composition (or replaces the selected slot); if it is
     // already there, removes it.
     function pick(c) {
+      c = kept(c);
       const { picked } = create;
       const at = picked.indexOf(c);
       create.note = "";
@@ -1172,6 +1417,7 @@
       else if (create.active !== null) picked[create.active] = c;
       else if (picked.length < MAX_PICKED) picked.push(c);
       else create.note = `${MAX_PICKED} colours at most: click a picked colour to remove it, or select one in the combination to replace it.`;
+      if (picked.includes(c)) remember(c);
       create.active = null;
       updateCreate();
     }
@@ -1180,7 +1426,7 @@
     // if c would be removed instead, or there is no room.
     function previewOf(c) {
       const { picked, active } = create;
-      if (picked.includes(c)) return null;
+      if (indexIn(picked, c) >= 0) return null;
       const colors = [...picked];
       const at = active ?? colors.length;
       if (at >= MAX_PICKED) return null;
@@ -1188,14 +1434,17 @@
       return { colors, at };
     }
 
-    // The colour picker: every colour, by family as in the Colors view, small. A picked colour shows
-    // its place in the combination; hovering or focusing one shows its values above, and hovering one
-    // shows it in the composition where picking it would put it.
+    // The colour picker: every colour, by family as in the Colors view, small, then the new colours picked
+    // (remembered); or, as the header's choice says, the OKLCH or Ostwald view, to pick any colour of its
+    // slices. A picked colour shows its place in the combination (on the views, a numbered mark where it
+    // is); hovering or focusing one shows its values above, and hovering one shows it in the composition
+    // where picking it would put it.
     function buildPicker(colors, families) {
       const picker = views.create.querySelector(".picker");
       const status = picker.querySelector(".picker-status");
-      const showStatus = (c) => status.replaceChildren(
-        namedLine(c), Object.assign(document.createElement("p"), { textContent: `${cmykText(c.cmyk)}  ${oklchValues(c.oklch)}` }));
+      const showStatus = (c) => status.replaceChildren(namedLine(c), Object.assign(document.createElement("p"), {
+        textContent: `${c.cmyk ? `${c.token ? "≈ " : ""}${cmykText(c.cmyk)}  ` : ""}${oklchValues(c.oklch)}`, // a new colour's CMYK: an estimate, if any
+      }));
       // Changing the composition moves neither the picker nor the composition. On narrow screens the
       // composition is above the picker: when it changes height, scroll by as much, so the picker stays
       // under the pointer. On wide screens it sticks below the header while the colours scroll, as far
@@ -1213,6 +1462,18 @@
         if (p) steady(() => renderStage(undefined, p));
       };
       const unpreview = () => { if (create.previewing) steady(() => renderStage()); };
+      const wire = (button, c) => {
+        button.addEventListener("pointerenter", (e) => {
+          showStatus(c);
+          if (e.pointerType !== "touch") preview(c); // a tap picks it at once
+        });
+        button.addEventListener("focus", () => showStatus(c));
+        button.addEventListener("pointerleave", () => {
+          status.replaceChildren();
+          unpreview();
+        });
+        button.addEventListener("blur", () => status.replaceChildren());
+      };
       for (const family of families) {
         const ul = document.createElement("ul");
         ul.className = "grid";
@@ -1220,16 +1481,7 @@
           const c = colors[i];
           const button = colorButton(c, () => steady(() => pick(c)));
           button.append(document.createElement("span"));
-          button.addEventListener("pointerenter", (e) => {
-            showStatus(c);
-            if (e.pointerType !== "touch") preview(c); // a tap picks it at once
-          });
-          button.addEventListener("focus", () => showStatus(c));
-          button.addEventListener("pointerleave", () => {
-            status.replaceChildren();
-            unpreview();
-          });
-          button.addEventListener("blur", () => status.replaceChildren());
+          wire(button, c);
           pickerButtons[i] = button;
           const li = document.createElement("li");
           li.append(button);
@@ -1237,6 +1489,110 @@
         }
         picker.append(ul);
       }
+
+      // After Wada's, the new colours picked, as they are; Delete or Backspace forgets one (out of the
+      // combination too), and Clear forgets those not in the combination.
+      const fresh = Object.assign(document.createElement("div"), { className: "new-colours" });
+      const label = Object.assign(document.createElement("p"), { className: "section-label" });
+      const clear = Object.assign(document.createElement("button"), { type: "button", textContent: "Clear", title: "Forget the new colours that aren't in the combination" });
+      clear.addEventListener("click", () => steady(() => forget(create.news.filter((c) => !create.picked.includes(c)))));
+      label.append("New colours", clear);
+      const list = Object.assign(document.createElement("ul"), { className: "grid" });
+      fresh.append(label, list);
+      picker.append(fresh);
+      const items = new Map(); // new colour -> its item
+      const item = (c) => {
+        const button = colorButton(c, () => steady(() => pick(c)));
+        button.append(document.createElement("span"));
+        wire(button, c);
+        button.addEventListener("keydown", (e) => {
+          if (e.key !== "Delete" && e.key !== "Backspace") return;
+          e.preventDefault();
+          const k = create.news.indexOf(c);
+          steady(() => forget([c]));
+          items.get(create.news[Math.min(k, create.news.length - 1)])?.firstChild.focus();
+        });
+        const li = document.createElement("li");
+        li.append(button);
+        items.set(c, li);
+        return li;
+      };
+      renderNews = () => {
+        const lis = create.news.map((c) => items.get(c) ?? item(c));
+        if (lis.length !== list.children.length || lis.some((li, k) => li !== list.children[k])) list.replaceChildren(...lis); // only if changed: a focused one keeps the focus
+        for (const c of items.keys()) if (!create.news.includes(c)) items.delete(c);
+        for (const [c, li] of items) {
+          const at = create.picked.indexOf(c), button = li.firstChild;
+          button.setAttribute("aria-pressed", at >= 0);
+          button.firstElementChild.textContent = at >= 0 ? at + 1 : "";
+        }
+        fresh.hidden = !create.news.length;
+        clear.hidden = create.news.every((c) => create.picked.includes(c));
+      };
+      try { create.news = parseColors(localStorage.getItem("create-new") ?? "", Infinity).filter((c) => c.token); } catch {}
+
+      // OKLCH's and Ostwald's views, for picking (see makeWheel and makeOstwald): each made when first shown.
+      // A picked colour's mark: a disc of it with its number, which shows its values when hovered and takes
+      // it out of the combination when clicked.
+      const NS = "http://www.w3.org/2000/svg";
+      const svgEl = (name, attrs) => {
+        const e = document.createElementNS(NS, name);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        return e;
+      };
+      const badge = (c, n, [x, y], r) => {
+        const g = svgEl("g", { class: "pick-mark", transform: `translate(${x} ${y})`, role: "button", "aria-label": `${c.name}, colour ${n} of the combination: take it out` });
+        const number = svgEl("text", { "font-size": r * 1.2, "text-anchor": "middle", "dominant-baseline": "central", fill: c.oklch[0] > 0.6 ? "rgb(0 0 0 / 0.8)" : "rgb(255 255 255 / 0.95)" });
+        number.textContent = n;
+        g.append(svgEl("circle", { r, fill: c.css, "stroke-width": r * 0.15 }), number);
+        g.addEventListener("pointerenter", () => showStatus(c));
+        g.addEventListener("pointerleave", () => status.replaceChildren());
+        g.addEventListener("click", () => steady(() => pick(c)));
+        return g;
+      };
+      const hooks = {
+        hover: (c, e) => {
+          showStatus(c);
+          if (e?.pointerType && e.pointerType !== "touch") preview(c); // (not on focus: as the grid)
+        },
+        leave: () => {
+          status.replaceChildren();
+          unpreview();
+        },
+        pick: (c) => steady(() => pick(c)),
+        oklch: oklchColour,
+        ostwald: (own) => ostwaldColour(own.code),
+        badge,
+      };
+      showSource = () => {
+        const from = views.create.dataset.show;
+        if ((from === "oklch" || from === "ostwald") && !pickers.has(from)) {
+          const view = from === "oklch" ? makeWheel(colors, { views: true, picker: hooks }) : makeOstwald(colors, { picker: hooks });
+          picker.append(view.box);
+          pickers.set(from, view);
+        }
+        pickers.get(from)?.numbers(create.picked); // now that it's shown, where they are
+      };
+      // What it shows, chosen at its top (and remembered): the grid, OKLCH or Ostwald.
+      const sources = Object.assign(document.createElement("div"), { className: "picker-source" });
+      sources.innerHTML = `<span>Pick from</span><div class="view-switch" role="group" aria-label="Pick from">`
+        + `<button type="button" data-source="grid">Grid</button><button type="button" data-source="oklch">OKLCH</button><button type="button" data-source="ostwald">Ostwald</button></div>`;
+      picker.prepend(sources);
+      const choose = (from) => {
+        views.create.dataset.show = from;
+        for (const b of sources.querySelectorAll("[data-source]")) b.setAttribute("aria-pressed", b.dataset.source === from);
+        try { localStorage.setItem("create-show", from); } catch {}
+      };
+      for (const b of sources.querySelectorAll("[data-source]")) {
+        b.addEventListener("click", () => {
+          choose(b.dataset.source);
+          status.replaceChildren();
+          if (!views.create.hidden) showSource();
+        });
+      }
+      let saved = null;
+      try { saved = localStorage.getItem("create-show"); } catch {}
+      choose(["oklch", "ostwald"].includes(saved) ? saved : "grid");
     }
 
     // Escape cancels a selected slot.
@@ -1430,7 +1786,13 @@
     // through it (a hue's page and the opposite hue's, back to back), with its control beside it. The
     // marks: squares, each colour filling its piece of its cell, as above; or dots, each colour at its
     // exact place.
-    function makeWheel(colors, { views = false } = {}) {
+    // With `picker` (the creator's, with views), it's for picking colours: Flat and 2D only, and hovering
+    // one of Wada's colours or a point or cell of the slice, or clicking it, goes to the picker (hover(colour,
+    // event), leave(), pick(colour); oklch([L, C, h]) makes a colour of the slice's one); and numbers(list)
+    // marks the colours picked where they are on what's shown (badge(colour, number, [x, y], r) makes
+    // each mark). Its choices are saved apart from the Colors page's.
+    function makeWheel(colors, { views = false, picker = null } = {}) {
+      const P = picker ? "create-" : ""; // its saved choices' and its ids' prefix
       const SLICE = 10, BANDS = 8, NEUTRAL_C = 0.02, LEVELS = 20; // (the 2D view's lightness levels: 21, 0.05 apart)
       const RING = [0.25, 1], GREYS = [0.13, 0.23];
       const panel = Object.assign(document.createElement("aside"), { className: "wheel-panel" });
@@ -1454,6 +1816,7 @@
       const layer = svgEl("g"); // the colours
       svg.append(...(views ? [gamut, rim] : []), layer, shape, marks, highlight);
       const segments = new Map(); // colour -> its path, outline, and (if not grey) hue angle and centre
+      const spots = new Map(); // colour -> its dot's centre, where it's a dot
       const pt = polarPoint, arc = ringSector;
       const polar = (r, deg) => [r * Math.cos((deg * Math.PI) / 180), -r * Math.sin((deg * Math.PI) / 180)]; // as polarPoint
       const circle = (x, y, r) => `M ${x + r} ${y} A ${r} ${r} 0 1 0 ${x - r} ${y} A ${r} ${r} 0 1 0 ${x + r} ${y} Z`;
@@ -1469,23 +1832,25 @@
         highlight.classList.toggle("on-dark", onSlice && dark(L));
       };
       const ring = (el, c) => { if (onSlice) el.classList.add(dark(c.oklch[0]) ? "on-dark" : "on-light"); };
-      const hide = () => { highlight.removeAttribute("d"); panel.classList.remove("show"); };
+      const hide = () => { highlight.removeAttribute("d"); panel.classList.remove("show"); picker?.leave(); };
       const target = (el, c, d) => {
         el.setAttribute("tabindex", "0");
         el.setAttribute("role", "button");
         el.setAttribute("aria-label", c.name);
-        const show = () => {
+        const show = (e) => {
           outlineAt(d, c.oklch[0]);
+          if (picker) return picker.hover(c, e);
           fillDetails(panel, c);
           panel.classList.add("show");
         };
+        const open = () => (picker ? picker.pick(c) : showDetail(c));
         el.addEventListener("pointerenter", show);
         el.addEventListener("focus", show);
         el.addEventListener("pointerleave", hide);
         el.addEventListener("blur", hide);
-        el.addEventListener("click", () => showDetail(c));
+        el.addEventListener("click", open);
         el.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showDetail(c); }
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
         });
       };
       const segment = (c, d, angle, centre) => {
@@ -1504,6 +1869,7 @@
         ring(spot, c);
         g.append(svgEl("circle", { class: "dot-hit", cx: x, cy: y, r: reach }), spot);
         target(g, c, circle(x, y, DOT + 0.006));
+        spots.set(c, [x, y]);
         layer.append(g);
       };
       // Dots at their places (`items`: [colour, x, y]), nudged apart until no two overlap: only those that
@@ -2106,17 +2472,26 @@
         return true;
       };
       const openOwn = (at, name, where) => showComputedDetail(at, name, at.cmyk, at.line, `Not one of Wada's colours: OKLCH's own, ${where}${at.cmyk ? ", so its CMYK is an estimate" : ""}.`);
+      // For the picker: the colour shown, and where the pointer was, so that clicking there picks exactly it
+      // (a click's position is rounded to the pixel; the pointer's, as it moves, isn't).
+      let hovered = null;
       gamut.addEventListener("pointermove", (e) => {
         const at = own(colourAt(e));
         if (!showOwn(at, title())) return;
+        if (picker) {
+          hovered = { x: e.clientX, y: e.clientY, colour: picker.oklch(at.oklch) };
+          picker.hover(hovered.colour, e);
+        }
         if (at.d) outlineAt(at.d, at.oklch[0]);
         else highlight.removeAttribute("d");
       });
       gamut.addEventListener("pointerleave", (e) => {
         under = "";
+        hovered = null;
         if (e.pointerType !== "touch") hide(); // a touch leaves as the finger lifts: its info stays until the next
       });
       gamut.addEventListener("click", (e) => {
+        if (picker) return picker.pick(hovered && Math.hypot(e.clientX - hovered.x, e.clientY - hovered.y) < 2 ? hovered.colour : picker.oklch(own(colourAt(e)).oklch));
         openOwn(own(colourAt(e)), title(), surface === "smooth" ? "at this point of the slice" : "in the middle of this cell of the slice");
       });
       // In 3D (makeOklchSolid): an empty cell of a page, or of the greys' column; its own colour, as the
@@ -2142,7 +2517,7 @@
       const cellIcons = [[0, 0.9], [1.7, 4], [4.8, 7]].flatMap(([r0, r1], ring) => (ring ? Array.from({ length: 6 }, (_, k) => arc(r0, r1, k * 60 + 5, k * 60 + 55)) : [`M 0.9 0 A 0.9 0.9 0 1 0 -0.9 0 A 0.9 0.9 0 1 0 0.9 0 Z`]));
       const SURFACES = [
         ["smooth", "Smooth: hovering the slice shows the colour exactly under the pointer",
-          `<defs><radialGradient id="surface-smooth"><stop offset="0" stop-color="currentColor" stop-opacity="0.15"/><stop offset="1" stop-color="currentColor"/></radialGradient></defs><circle r="7" fill="url(#surface-smooth)" stroke="none"/>`],
+          `<defs><radialGradient id="${P}surface-smooth"><stop offset="0" stop-color="currentColor" stop-opacity="0.15"/><stop offset="1" stop-color="currentColor"/></radialGradient></defs><circle r="7" fill="url(#${P}surface-smooth)" stroke="none"/>`],
         ["cells", "Cells: the slice in the squares' cells, each its middle's colour", cellIcons.map((d) => `<path d="${d}" stroke="none"/>`).join("")],
       ];
       // In 3D, where the cut is from: the top (the lower part stays) or the bottom. Each choice is drawn as
@@ -2167,7 +2542,7 @@
       modes.innerHTML = `<div class="view-switch" role="group" aria-label="View">`
         + `<button type="button" data-wheel-view="flat" title="Flat: every colour by hue and chroma, its lightness left out">Flat</button>`
         + `<button type="button" data-wheel-view="2d" title="2D: a slice of OKLCH's solid, across its axis (one lightness) or through it (two hues' pages)">2D</button>`
-        + `<button type="button" data-wheel-view="3d" title="3D: OKLCH's solid, its pages of hue as walls, cut at a lightness; drag to turn it">3D</button></div>`
+        + (picker ? "" : `<button type="button" data-wheel-view="3d" title="3D: OKLCH's solid, its pages of hue as walls, cut at a lightness; drag to turn it">3D</button>`) + `</div>`
         + optionSwitch("Marks", "wheel-marks", MARKS) + optionSwitch("Slice", "wheel-slicing", SLICES) + optionSwitch("Surface", "wheel-surface", SURFACES)
         + optionSwitch("Cells", "wheel-empty", CELLS) + optionSwitch("Cut", "wheel-cut", CUTS);
       const option = (key) => modes.querySelector(`[data-option="${key}"]`);
@@ -2178,9 +2553,9 @@
       // What's shown, remembered by the page: the view, the marks, the slicing, the surface; the level (8: lightness 0.6)
       // and the pages (2: red, 20–30°, on the right); and, while the pointer previews another on the
       // control or the dial, the one shown.
-      const saved = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
-      const save = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
-      let view = ["2d", "3d"].includes(saved("wheel-view")) ? saved("wheel-view") : "flat", slicing = saved("wheel-slicing") === "pages" ? "pages" : "level";
+      const saved = (key) => { try { return localStorage.getItem(P + key); } catch { return null; } };
+      const save = (key, value) => { try { localStorage.setItem(P + key, value); } catch {} };
+      let view = (picker ? ["2d"] : ["2d", "3d"]).includes(saved("wheel-view")) ? saved("wheel-view") : "flat", slicing = saved("wheel-slicing") === "pages" ? "pages" : "level";
       let surface = saved("wheel-surface") === "cells" ? "cells" : "smooth", cutFrom = saved("wheel-cut") === "bottom" ? "bottom" : "top";
       let empties = CELLS.some(([value]) => value === saved("wheel-empty")) ? saved("wheel-empty") : "dots"; // in 3D
       let solid = null, solidTried = false; // the 3D view's (makeOklchSolid), made when first shown; none without WebGL 2
@@ -2191,6 +2566,7 @@
         hide();
         layer.replaceChildren();
         segments.clear();
+        spots.clear();
         gamut.removeAttribute("d");
         gamut.style.fill = "";
         rim.removeAttribute("d");
@@ -2198,6 +2574,7 @@
         back.hidden = ahead.hidden = true;
         captionText.textContent = "";
         under = "";
+        hovered = null;
         solid?.unhover();
         layout.dataset.view = view === "2d" ? slicing : view;
         layout.dataset.surface = surface;
@@ -2216,7 +2593,33 @@
           else drawPages(pageShown, page);
         }
         paintBackground();
+        drawNumbers();
       };
+      // For the picker: the colours picked, numbered where they are on what's shown: Wada's on their own
+      // squares or dots; any other at its hue and chroma (√chroma, as the dots), on the flat wheel or the
+      // slice it's on (its level, or its hue's page), the greys on the axis.
+      const badges = svgEl("g", { class: "pick-marks" });
+      if (picker) svg.append(badges);
+      let numbered = [];
+      function drawNumbers() {
+        if (!picker) return;
+        badges.replaceChildren();
+        numbered.forEach((c, i) => {
+          let at = spots.get(c) ?? null;
+          const path = segments.get(c)?.path;
+          if (!at && path) { const b = path.getBBox(); at = [b.x + b.width / 2, b.y + b.height / 2]; }
+          if (c.index === undefined) { // not one of Wada's
+            const [L, C, h] = c.oklch;
+            if (view === "flat") at = polar(C < NEUTRAL_C ? 0 : Math.min(RING[1], flatR(C)), h);
+            else if (slicing === "level" && levelOf(c) === shown) at = polar(isGrey(c) ? 0 : Math.min(rho(C), edgeAt(cut.t, h)), h);
+            else if (slicing === "pages") {
+              const side = sliceOf(c) === pageShown ? 1 : sliceOf(c) === opposite(pageShown) ? -1 : isGrey(c) ? 0 : null;
+              if (side !== null) at = [side * Math.min(rho(C), edgeAtL(cut[side || 1].t, L)), pageY(L)];
+            }
+          }
+          if (at) badges.append(picker.badge(c, i + 1, at, 0.045));
+        });
+      }
       const setLevel = (i) => {
         i = Math.min(LEVELS, Math.max(0, i));
         if (i === level && i === shown) return;
@@ -2391,7 +2794,7 @@
       pressed("wheel-empty", empties);
       pressed("wheel-cut", cutFrom);
       setView(view);
-      return { panel, wheel, mark, box };
+      return { panel, wheel, mark, box, numbers: (list) => { numbered = list; drawNumbers(); } };
     }
 
     // A small segmented switch (the Ostwald view's and the wheel's): its label (shown on touch screens and
@@ -2559,12 +2962,13 @@
         const h1 = okHue(fullRGB(h)), h2 = okHue(fullRGB(h + 180));
         return mod(-(h1 + (mod(h2 - h1, 360) - 180) / 2) / 3.6, 100);
       };
-      const raw = colors.map((c) => {
-        const [L, C, h] = c.oklch, rad = (h * Math.PI) / 180;
+      const rawOf = ([L, C, h]) => {
+        const rad = (h * Math.PI) / 180;
         const [r, g, b] = Array.from(oklabToLinearSRGB(L, C * Math.cos(rad), C * Math.sin(rad)), (v) => Math.min(1, Math.max(0, v)));
         const hue = hexHue(r, g, b);
         return { n: hue === null ? null : hueNumber(hue), white: Math.min(r, g, b), black: 1 - Math.max(r, g, b) };
-      });
+      };
+      const raw = colors.map((c) => rawOf(c.oklch));
       // Calibration: Wada's orange is 16PA (his 1935 supplement, p. 14).
       const offset = mod(16 - raw[colors.findIndex((c) => c.name === "Orange")].n, 100);
       // The full colours of the 24 hues (sector 0 is yellow): the hexagonal hue whose number is the
@@ -2577,16 +2981,18 @@
         for (let i = 0; i < 50; i++) { const mid = (lo + hi) / 2; if (diff(mid) >= 0) lo = mid; else hi = mid; }
         return fullRGB((lo + hi) / 2);
       });
-      colors.forEach((c, i) => {
-        const { white, black } = raw[i];
+      // Where a colour falls (any colour's [L, C, h], or its raw values): its hue number and sector, its
+      // white and black content, its level and ring, and its code.
+      const notation = (oklch, { n: hueN, white, black } = rawOf(oklch)) => {
         const a = step(white), b = step(1 - black); // a >= b, as white <= 1 - black
-        const n = a === b ? null : mod(raw[i].n + offset, 100); // a === b: no colour at this precision, a grey
-        c.ostwald = {
+        const n = a === b ? null : mod(hueN + offset, 100); // a === b: no colour at this precision, a grey
+        return {
           n, sector: n === null ? null : Math.round((n * 24) / 100) % 24, // 0 is yellow, as in Wada's Figure 1
           white, black, level: a + b, ring: a - b,
           code: n === null ? LETTERS[a] : `${Math.round(n) % 100}${LETTERS[a]}${LETTERS[b]}`,
         };
-      });
+      };
+      colors.forEach((c, i) => { c.ostwald = notation(c.oklch, raw[i]); });
       // A cell's colour: white GREYS[a] plus colour (GREYS[b] - GREYS[a]) times the full colour of the
       // sector's hue. Returned as CSS and OKLCH (rounded as colors.json is), with its white and black
       // content and its code, the hue numbered as in Wada's Figure 1 (sector 1 is 4, sector 3 is 13).
@@ -2605,7 +3011,7 @@
           code: a === b ? LETTERS[a] : `${Math.round((sector * 100) / 24) % 100}${LETTERS[a]}${LETTERS[b]}`,
         };
       };
-      return { GREYS, LETTERS, HUES, cell, offset };
+      return { GREYS, LETTERS, HUES, cell, offset, notation };
     }
 
     // Ostwald layout: one level of the double cone at a time, seen from above. Angle = hue (24 sectors,
@@ -2619,8 +3025,13 @@
     // centre; odd ones fall between two greys, and the middle one, the widest, has the full colours at
     // its rim. Sliced through the axis instead, it shows two pages back to back (a hue's and its
     // complement's), with a dial in the control's place; or, in 3D, the whole solid.
-    function makeOstwald(colors) {
-      const { LETTERS, HUES, cell, offset } = ostwaldSystem(colors);
+    // With `picker` (the creator's), it's for picking colours: 2D only, and hovering a colour or a cell, or
+    // clicking it, goes to the picker (hover(colour, event), leave(), pick(colour); ostwald(cell) makes a
+    // cell's colour one); and numbers(list) marks the colours picked on the slice shown (badge(colour,
+    // number, [x, y], r) makes each mark). Its choices are saved apart from the Colors page's.
+    function makeOstwald(colors, { picker = null } = {}) {
+      const { LETTERS, HUES, cell, offset, notation } = ostwaldSystem(colors);
+      const P = picker ? "create-ostwald" : "ostwald"; // its saved choices' and its ids' prefix
       // CMYK estimated for the empty cells through the print profile (scripts/ostwald_cmyk.py), if it
       // was made for this calibration.
       let estimates = null;
@@ -2702,7 +3113,7 @@
       // the right), and the level previewed under the pointer, in its ghost.
       const section = svgEl("g", { class: "section" });
       const keptPath = svgEl("path");
-      const keptClip = svgEl("clipPath", { id: "ostwald-kept" });
+      const keptClip = svgEl("clipPath", { id: `${P}-kept` });
       keptClip.append(keptPath);
       let right = 6; // the sector on the solid's right, to the nearest
       const step = W / (N - 1);
@@ -2715,7 +3126,7 @@
         const ry = 0.3 * hw; // its near half hides the axis; over its far half, the axis is in front, rim and all
         hidden.push(up > 0 ? [y, y + ry] : [y - ry, y]);
         front.push(up > 0 ? [y - ry - pad, y] : [y, y + ry + pad]);
-        const clip = svgEl("clipPath", { id: `ostwald-face-${section.children.length}` });
+        const clip = svgEl("clipPath", { id: `${P}-face-${section.children.length}` });
         clip.append(svgEl("ellipse", { cx: CX, cy: y, rx: hw, ry: hw * 0.3 }));
         const group = svgEl("g", { "clip-path": `url(#${clip.id})` });
         const facing = rightmost * 15 + 90; // the view's direction, clockwise from north
@@ -2772,7 +3183,7 @@
           : [[CX - hw, y], [CX + hw, y], ...(y < N ? [[CX + W, N]] : []), [CX, 2 * N - 1], ...(y < N ? [[CX - W, N]] : [])];
         keptPath.setAttribute("d", `M ${pts.map((q) => q.join(" ")).join(" L ")} Z`);
         // The section: every cell on the kept side of the cut (the clip trims the rest).
-        const cells = svgEl("g", { "clip-path": "url(#ostwald-kept)" });
+        const cells = svgEl("g", { "clip-path": `url(#${P}-kept)` });
         for (let l = 0; l <= TOP; l++) {
           if (below ? l - 1 > s : l + 1 < s) continue;
           for (let r = l % 2; r <= Math.min(l, TOP - l); r += 2) {
@@ -2826,7 +3237,7 @@
         ["level", "Slice across the axis: one level, seen from above", `${OUTLINE}<ellipse rx="5.5" ry="1.9"/>`],
         ["pages", "Slice through the axis: a hue's page and its complement's, back to back", `${OUTLINE}<path d="M 0 -7 L 2.2 0 L 0 7 L -2.2 0 Z"/>`],
       ];
-      modes.innerHTML = `<div class="view-switch" role="group" aria-label="View"><button type="button" data-mode="2d">2D</button><button type="button" data-mode="3d">3D</button></div>`
+      modes.innerHTML = (picker ? "" : `<div class="view-switch" role="group" aria-label="View"><button type="button" data-mode="2d">2D</button><button type="button" data-mode="3d">3D</button></div>`)
         + optionSwitch("Cells", "empty", EMPTY) + optionSwitch("Slice", "slicing", SLICING) + optionSwitch("Cut", "cut", CUT);
       const cutOption = modes.querySelector('[data-option="cut"]'), slicingOption = modes.querySelector('[data-option="slicing"]');
       layout.append(disc, control, caption, modes);
@@ -2836,7 +3247,7 @@
       // The info panel, for one of Wada's colours or for the system's own colour in an empty cell.
       const field = (name) => panel.querySelector(`[data-field="${name}"]`);
       const mix = ({ white, black }) => `white ${Math.round(white * 100)}% · black ${Math.round(black * 100)}%`;
-      const hide = () => { highlight.removeAttribute("d"); panel.classList.remove("show"); solid?.unhover(); };
+      const hide = () => { highlight.removeAttribute("d"); panel.classList.remove("show"); solid?.unhover(); picker?.leave(); };
       const showColour = (c) => {
         fillDetails(panel, c);
         field("ostwald").textContent = `Ostwald ≈ ${c.ostwald.code}`;
@@ -2865,18 +3276,21 @@
       // radius r), the piece unseen round it, to hover.
       const segment = (c, d, dot) => {
         const path = svgEl("path", { class: dot ? "segment hit" : "segment", d, ...(dot ? {} : { fill: c.css }), tabindex: 0, role: "button", "aria-label": `${c.name}, ${c.ostwald.code}` });
-        const show = () => {
+        const show = (e) => {
           highlight.setAttribute("d", d);
-          showColour(c);
+          if (picker) picker.hover(c, e);
+          else showColour(c);
         };
+        const open = () => (picker ? picker.pick(c) : showDetail(c));
         path.addEventListener("pointerenter", show);
         path.addEventListener("focus", show);
         path.addEventListener("pointerleave", hide);
         path.addEventListener("blur", hide);
-        path.addEventListener("click", () => showDetail(c));
+        path.addEventListener("click", open);
         path.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showDetail(c); }
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
         });
+        placed.set(c, dot ? [dot.x, dot.y] : path);
         cells.append(path);
         if (dot) cells.append(svgEl("circle", { class: "colour-dot", cx: dot.x, cy: dot.y, r: dot.r, fill: c.css }));
       };
@@ -2886,17 +3300,48 @@
       // finger lifts, so its info stays until the next touch.
       const empty = (d, x, y, size, own) => {
         const path = svgEl("path", { class: "empty", d, style: `--own: ${own.css}` });
-        path.addEventListener("pointerenter", () => {
+        path.addEventListener("pointerenter", (e) => {
           highlight.setAttribute("d", d);
-          showCell(own);
+          if (picker) picker.hover(picker.ostwald(own), e);
+          else showCell(own);
         });
         path.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
-        path.addEventListener("click", () => openCell(own));
+        path.addEventListener("click", () => (picker ? picker.pick(picker.ostwald(own)) : openCell(own)));
         cells.append(path, svgEl("circle", { class: "ideal", cx: x, cy: y, r: size, fill: own.css }));
       };
       document.addEventListener("pointerdown", (e) => {
         if (e.pointerType === "touch" && !e.target.classList?.contains("empty")) hide();
       });
+      // For the picker: where each of Wada's colours on the slice shown is (its dot's centre, or its piece
+      // of its cell), and the colours picked, numbered on it: Wada's on their own, any other in the middle
+      // of the cell it falls in (an Ostwald colour's own; another's, by its notation).
+      const placed = new Map();
+      const badges = svgEl("g", { class: "pick-marks" });
+      if (picker) svg.append(badges);
+      let numbered = [];
+      const drawNumbers = () => {
+        if (!picker) return;
+        badges.replaceChildren();
+        numbered.forEach((c, i) => {
+          let at = null;
+          if (c.index !== undefined) { // one of Wada's
+            const spot = placed.get(c);
+            if (Array.isArray(spot)) at = spot;
+            else if (spot) { const b = spot.getBBox(); at = [b.x + b.width / 2, b.y + b.height / 2]; }
+          } else {
+            const { sector, level: s, ring: r } = c.ostwald ?? notation(c.oklch);
+            if (disc.dataset.slicing === "pages") {
+              const k = pageShown, side = r === 0 ? 0 : sector === k ? 1 : sector === wrap(k + 12) ? -1 : null;
+              if (side !== null) at = [side * r * PX, pageY(s)];
+            } else if (s === shown) {
+              const rc = r === 0 ? 0 : (r === 1 ? 1.25 : r) / N, t = ((90 - sector * 15) * Math.PI) / 180;
+              at = [rc * Math.cos(t), -rc * Math.sin(t)];
+            }
+          }
+          if (at) badges.append(picker.badge(c, i + 1, at, 0.06));
+        });
+      };
+
       // A cell: ring r of a sector (24 of 15°, sector 0 at the top, clockwise), its piece k of m.
       // Ring r spans r - 1 to r + 1 of the N steps to the rim; the centre (ring 0) is a disc of 1.
       const cellPath = (sector, r, k = 0, m = 1) => {
@@ -2982,6 +3427,7 @@
       const drawPages = (k, chosen) => {
         hide();
         cells.replaceChildren();
+        placed.clear();
         const { left, count } = describePages(k), dots = disc.dataset.empty === "all";
         // Wada's colours on these pages, by cell: side 1 (k's page), -1 (its complement's), 0 (the greys).
         const groups = new Map();
@@ -3053,6 +3499,7 @@
         const chosenText = describePages(chosen);
         dial.setAttribute("aria-valuenow", chosen);
         dial.setAttribute("aria-valuetext", `${pageName(chosen)} on the right, ${pageName(chosenText.left)} on the left, ${chosenText.count}`);
+        drawNumbers();
       };
       // The dial: the solid's middle level seen from above, as the disc shows it (yellow at the top, red on
       // the right), each hue's sector a group, so that the two pages shown can be bright.
@@ -3104,7 +3551,7 @@
       // over another level of the control (a preview, until clicked).
       let level = MIDDLE;
       try {
-        const saved = localStorage.getItem("ostwald-slice");
+        const saved = localStorage.getItem(`${P}-slice`);
         if (saved !== null) level = Math.min(TOP, Math.max(0, Number(saved) | 0));
       } catch {}
       let shown = level;
@@ -3117,6 +3564,7 @@
       const draw = (level, chosen) => {
         hide();
         cells.replaceChildren();
+        placed.clear();
         const here = colors.filter((c) => c.ostwald.level === level);
         const groups = new Map();
         for (const c of here) {
@@ -3180,13 +3628,14 @@
         control.setAttribute("aria-valuenow", chosen);
         control.setAttribute("aria-valuetext", `${chosenText.where}, ${chosenText.count}`);
         solid?.cut(level);
+        drawNumbers();
       };
       // Sliced through the axis (in 2D): `page`, the hue on the right; `pageShown`, the one shown, which
       // differs while the pointer hovers over another on the dial. 6, red: sea green on the left, as the
       // disc faces.
       let slicing = "level", page = 6;
       try {
-        const saved = localStorage.getItem("ostwald-page");
+        const saved = localStorage.getItem(`${P}-page`);
         if (saved !== null) page = wrap(Number(saved) | 0);
       } catch {}
       let pageShown = page;
@@ -3195,7 +3644,7 @@
         s = Math.min(TOP, Math.max(0, s));
         if (s === level && s === shown) return;
         level = shown = s;
-        try { localStorage.setItem("ostwald-slice", level); } catch {}
+        try { localStorage.setItem(`${P}-slice`, level); } catch {}
         render();
       };
       const preview = (s) => {
@@ -3240,7 +3689,7 @@
         k = wrap(k);
         if (k === page && k === pageShown) return;
         page = pageShown = k;
-        try { localStorage.setItem("ostwald-page", page); } catch {}
+        try { localStorage.setItem(`${P}-page`, page); } catch {}
         render();
       };
       const previewPage = (k) => {
@@ -3307,7 +3756,7 @@
           if (mode === "3d" && right !== page) solid.face(page);
           if (mode === "2d" && disc.dataset.mode === "3d" && right !== page) {
             page = pageShown = right;
-            try { localStorage.setItem("ostwald-page", page); } catch {}
+            try { localStorage.setItem(`${P}-page`, page); } catch {}
           }
         }
         disc.dataset.mode = control.dataset.mode = mode;
@@ -3316,7 +3765,7 @@
         cutOption.hidden = mode !== "3d";
         slicingOption.hidden = mode === "3d";
         for (const b of modes.querySelectorAll("[data-mode]")) b.setAttribute("aria-pressed", b.dataset.mode === mode);
-        try { localStorage.setItem("ostwald-mode", mode); } catch {}
+        try { localStorage.setItem(`${P}-mode`, mode); } catch {}
       };
       const setEmpty = (how) => {
         hide();
@@ -3325,7 +3774,7 @@
         if (redraw) render();
         solid?.empty(how);
         for (const b of modes.querySelectorAll("[data-empty]")) b.setAttribute("aria-pressed", b.dataset.empty === how);
-        try { localStorage.setItem("ostwald-empty", how); } catch {}
+        try { localStorage.setItem(`${P}-empty`, how); } catch {}
       };
       const setSlicing = (how) => {
         slicing = how;
@@ -3334,7 +3783,7 @@
         pageShown = page;
         render();
         for (const b of modes.querySelectorAll("[data-slicing]")) b.setAttribute("aria-pressed", b.dataset.slicing === how);
-        try { localStorage.setItem("ostwald-slicing", how); } catch {}
+        try { localStorage.setItem(`${P}-slicing`, how); } catch {}
       };
       const setCut = (where, animate) => {
         hide();
@@ -3342,19 +3791,19 @@
         drawSection(shown, level);
         solid?.side(where, animate);
         for (const b of modes.querySelectorAll("[data-cut]")) b.setAttribute("aria-pressed", b.dataset.cut === where);
-        try { localStorage.setItem("ostwald-cut", where); } catch {}
+        try { localStorage.setItem(`${P}-cut`, where); } catch {}
       };
       for (const b of modes.querySelectorAll("[data-mode]")) b.addEventListener("click", () => setMode(b.dataset.mode));
       for (const b of modes.querySelectorAll("[data-empty]")) b.addEventListener("click", () => setEmpty(b.dataset.empty));
       for (const b of modes.querySelectorAll("[data-cut]")) b.addEventListener("click", () => setCut(b.dataset.cut, true));
       for (const b of modes.querySelectorAll("[data-slicing]")) b.addEventListener("click", () => setSlicing(b.dataset.slicing));
       let savedMode = null, savedEmpty = null, savedCut = null, savedSlicing = null;
-      try { savedMode = localStorage.getItem("ostwald-mode"); savedEmpty = localStorage.getItem("ostwald-empty"); savedCut = localStorage.getItem("ostwald-cut"); savedSlicing = localStorage.getItem("ostwald-slicing"); } catch {}
+      try { savedMode = localStorage.getItem(`${P}-mode`); savedEmpty = localStorage.getItem(`${P}-empty`); savedCut = localStorage.getItem(`${P}-cut`); savedSlicing = localStorage.getItem(`${P}-slicing`); } catch {}
       setEmpty(EMPTY.some(([value]) => value === savedEmpty) ? savedEmpty : "dots");
       setCut(savedCut === "bottom" ? "bottom" : "top", false);
       setSlicing(savedSlicing === "pages" ? "pages" : "level");
-      setMode(savedMode === "3d" ? "3d" : "2d");
-      return box;
+      setMode(savedMode === "3d" && !picker ? "3d" : "2d");
+      return picker ? { box, numbers: (list) => { numbered = list; drawNumbers(); } } : box;
     }
 
     // For the two solids in 3D (Ostwald's and OKLCH's), drawn with WebGL 2: a program from its two shaders;

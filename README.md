@@ -1,6 +1,6 @@
 # Wada Sanzo: A Dictionary of Color Combinations
 
-A static site for browsing Sanzo Wada's *A Dictionary of Color Combinations*: its 159 colours in the book's six families, its 348 combinations of 2, 3 and 4 colours, the 72 seasonal combinations of Volume 2 (with its 11 extra colours), the colours laid out in OKLCH and in Ostwald's colour solid, and a page to compose your own combinations.
+A static site for browsing Sanzo Wada's *A Dictionary of Color Combinations*: its 159 colours in the book's six families, its 348 combinations of 2, 3 and 4 colours, the 72 seasonal combinations of Volume 2 (with its 12 extra colours), the colours laid out in OKLCH and in Ostwald's colour solid, and a page to compose your own combinations.
 
 Live: https://adrian729.github.io/wada-sanzo-colors/
 
@@ -16,7 +16,7 @@ Then open http://localhost:8000.
 
 ## Data
 
-- `colors.json`: the 170 colours (159 from Volume 1, and 11 only in Volume 2, marked `"volume": 2`), each with its name as printed in the book, its CMYK as given in the book, and OKLCH.
+- `colors.json`: the 171 colours (159 from Volume 1, and 12 only in Volume 2, marked `"volume": 2`), each with its name as printed in the book, its CMYK as given in the book, and OKLCH.
 - `combinations.json`: Volume 1's 348 combinations, as indices into `colors.json`, the colours in the book's order (a row left to right; a cross top, left, right, bottom).
 - `seasons.json`: Volume 2's 72 seasonal combinations (six a month, January first), the colours top to bottom.
 - `families.json`: the book's six colour families, in the order of its colour index.

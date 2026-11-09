@@ -61,8 +61,8 @@ Wada wrote colours in Ostwald's notation, and his colour-name books give every c
 - **The control:** the 16 greys and the cone's outline, with the current slice. The cone runs from the middle of A to the middle of P, as the levels do. The slice's ellipse holds its level's disc, in the system's own colours, seen from the front with yellow at the back and red on the right, as on the disc. The axis goes behind the disc's near half, so that it reads as passing through it. Drag, click, scroll, or use the arrow keys (Page Up and Down move a whole grey). Hovering over it previews a level on the disc without choosing it; a dashed slice, with its own disc, marks the level previewed.
 - **The cells switch:** a second switch, beside the 2D/3D one, shows every cell as a dot, or shows the empty cells as cells with a dot (the default), as the dots alone, filled with the system's own colour, so the disc or solid is complete, or hidden, leaving only Wada's colours. Its first choice is drawn as a dot with smaller ones where a cell's corners would be; the other four are diamonds, a cell drawn each way, dashed where the cell isn't drawn. Their tooltips, or a label on touch screens, say which is which. It works in both views, and the page remembers the choice. With the dots alone, hovering a dot still outlines its cell on the disc.
 - **Every cell a dot:** Wada's colours become dots too, so the view is a lattice of the system's colours with his standing out. His dots are 1.6 times the empty cells' dots, as far as they fit in their cell. Where the cells narrow, they come out smaller: 1.42 to 1.48 times within five rings of the disc's centre, and 1.45 times within two rings of the pole in 3D.
-  - Colours sharing a cell (12 cells: 11 pairs and one of three) are all one size, as big as fits in the cell. On the disc they sit in a row round the circle in hue order, or in a row along the radius, or, for the three, in two rows, one dot inside and two outside: whichever gives the biggest dots. Along the radius each sits as far out as it would in the solid: the less white for its colour, the further out. The pages and the 3D view set them side by side the same way, out from the axis; greys sharing a cell would go one above another, the lightest at the top.
-  - The shared dots come out between an empty cell's dot and a lone colour's: 1.13 to 1.33 times an empty dot on the disc, where the cells are shallow for their dots; on the pages, full size, but 1.26 times for the three; in 3D, full size, but 1.28 times for the pair near the pole and 1.24 times for the three.
+  - Colours sharing a cell (13 cells: 12 pairs and one of three) are all one size, as big as fits in the cell. On the disc they sit in a row round the circle in hue order, or in a row along the radius, or, for the three, in two rows, one dot inside and two outside: whichever gives the biggest dots. Along the radius each sits as far out as it would in the solid: the less white for its colour, the further out. The pages and the 3D view set them side by side the same way, out from the axis; greys sharing a cell go one above another, the lightest at the top (White above Pale King's Blue - B, in A).
+  - The shared dots come out between an empty cell's dot and a lone colour's: 1.09 to 1.33 times an empty dot on the disc, where the cells are shallow for their dots (1.09 for the two greys in A); on the pages, full size, but 1.26 times for the three and 1.35 for the two greys in A; in 3D, full size, but 1.28 times for the pair near the pole, 1.32 for the two greys on it in A, and 1.24 times for the three.
   - Hovering a dot outlines its piece of the cell: on the disc, the cell split halfway between its dots; on the pages, split into equal shares, side by side, as the other choices split it. In 3D, it draws the dot bigger, with a ring, as for the empty cells' dots.
 - **Pages:** a third switch, in 2D only, slices the solid through its axis instead of across it, so the view shows two pages back to back: a hue's on the right, its complement's on the left (Sea green and Red, Ultramarine and Yellow, ...), the greys between, white at the top.
   - Each page is Wada's Figure 2 triangle, equilateral, its cells diamonds, as in the solid, so the two make a rhombus. The hues are named at its tips (on phones, only in the caption, left then right, each with a square of its full colour).
@@ -105,15 +105,15 @@ Wada wrote colours in Ostwald's notation, and his colour-name books give every c
 - **5 of the 10 pairs are within 3 steps,** and they are 4.0 steps off on average. With each colour's own OKLCH hue, whose opposite hues aren't additive complements, only 2 are; with the wavelength scale of Figure 3, none.
 - **Night Green and Rosolane Purple don't fit:** they are 13.0 steps off, about an eighth of the circle.
 - **Perceptual check:** for each colour, the nearest of the system's cell colours in OKLab:
-  - is its own cell for 83 colours, and a neighbouring cell for 80;
+  - is its own cell for 84 colours, and a neighbouring cell for 80;
   - is a cell further off for 7, but closer than its own by at most 0.018;
   - is at a median distance of 0.019 from the colour's own cell colour, and at most 0.071.
 - **A second implementation (one-off check, November 2026):** written separately. It converts through XYZ, takes the hexagonal hue from Python's `colorsys` and the mean hue as a circular mean, and finds each sector's full colour in a table rather than by halving.
-  - It places 168 of the 170 colours as the site does.
+  - It places 168 of the 170 colours it was run on as the site does (Pale King's Blue - B came later; it is A by a clear margin, white content 0.84 against A and B's boundary at 0.80).
   - The other 2 sit on a rounding boundary:
     - Apricot Orange's white content is on the K/L boundary (15KA or 15LA);
     - Pistachio Green's sector is 19.498 against 19.504 (81JF either way, in the sector of 79 or of 83).
-- **Chrome's own conversion (one-off):** each colour in 8-bit sRGB is within one level of ours, for all 170.
+- **Chrome's own conversion (one-off):** each colour in 8-bit sRGB is within one level of ours, for all 170 it was run on (before Pale King's Blue - B).
 - **The drawing (one-off, every level, read from the page):**
   - each colour is drawn once, at its level, in its own value;
   - every point of its outline lies inside its own cell;
@@ -126,21 +126,21 @@ Wada wrote colours in Ostwald's notation, and his colour-name books give every c
 
 - **How:** the cell's colour goes to CIE Lab, then to CMYK through the colorimetric table (B2A1) of the Japan Color 2011 Coated profile. That is the inverse of the table that turns the book's CMYK into our values (`scripts/cmyk_to_oklch.py`). The profile also decides how much black stands in for cyan, magenta and yellow.
 - **Where it comes from:** `scripts/ostwald_cmyk.py` writes the estimates to `ostwald-cmyk.json` and prints the checks below. The page ignores the file if it was made for another calibration, so re-run the script after changing `colors.json`.
-- **Tested on Wada's 170 colours,** whose CMYK the book gives:
-  - every ink is within 5 points of the book's for 101 colours, and within 10 for 125;
+- **Tested on Wada's 171 colours,** whose CMYK the book gives:
+  - every ink is within 5 points of the book's for 102 colours, and within 10 for 126;
   - printed back through the profile, the estimate is the colour itself: within ΔE2000 2.5, median 0.33;
   - the 16 furthest off, by more than 20 points on some ink, are dark colours. The same dark colour can be printed with more black or with more of the other three inks, and the book chose differently from the profile. Black, for example, is C 20 M 10 Y 15 K 100 in the book and C 85 M 83 Y 84 K 76 estimated.
 - **What the press can't print:** 419 of the 2,896 cells are more vivid than Japan Color 2011 Coated allows; their estimate prints more than ΔE2000 3 away. Most are purples (121), ultramarines (94), sea greens (87) and leaf greens (83), towards the full colours. Their CMYK is the nearest colour the press can print, so for them the ≈ is looser.
 
 ## How the colours spread
 
-- **Per level,** white to black: 1, 1, 6, 3, 8, 8, 8, 6, 3, 5, 4, 2, 9, 6, 10, 11, 7, 13, 7, 9, 10, 14, 2, 2, 3, 6, 2, 0, 3, 0, 1.
-- **Per ring,** axis to full colour: 3, 8, 22, 13, 15, 17, 16, 9, 7, 15, 11, 7, 7, 10, 3, 7.
-  - Most of the palette is muted: 103 colours lie in the inner half of the rings, and only 7 are full colours, all between yellow and red-orange, hues 1 to 19 (Yellow, Apricot Yellow, Orange Yellow, Yellow Orange, Orange, Jasper Red and Peach Red).
-  - Only 3 are greys: White (A), Warm Gray (E) and Black (P). The other near-greys keep a step of colour at this scale.
+- **Per level,** white to black: 2, 1, 6, 3, 8, 8, 8, 6, 3, 5, 4, 2, 9, 6, 10, 11, 7, 13, 7, 9, 10, 14, 2, 2, 3, 6, 2, 0, 3, 0, 1.
+- **Per ring,** axis to full colour: 4, 8, 22, 13, 15, 17, 16, 9, 7, 15, 11, 7, 7, 10, 3, 7.
+  - Most of the palette is muted: 104 colours lie in the inner half of the rings, and only 7 are full colours, all between yellow and red-orange, hues 1 to 19 (Yellow, Apricot Yellow, Orange Yellow, Yellow Orange, Orange, Jasper Red and Peach Red).
+  - Only 4 are greys: White and Pale King's Blue - B (A), Warm Gray (E) and Black (P). The other near-greys keep a step of colour at this scale.
 - **Cells:**
-  - the 170 colours fill 157 cells;
-  - 12 cells hold two or more;
+  - the 171 colours fill 157 cells;
+  - 13 cells hold two or more;
   - the most in one cell is 3.
 - **Letters:** all 16 are used. J, the letter Ostwald's scale lacks, is in 12 codes.
 

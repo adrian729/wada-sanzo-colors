@@ -3,7 +3,7 @@
   "checked": {
     "order": "The first and last combination of each month have the same number and colour order as the 1934–35 cards (extracted.json); the book prints the colours at equal size.",
     "shared_cmyk": "No. 1's colours have the same CMYK as in our Volume 1 data (Seashell Pink, White, Sulphur Yellow, Glaucous Green; Grayish Lavender is A).",
-    "variants": "Grayish Lavender and Eugenia Red: the book's colour index lists only A's values, so A everywhere (corrections.json \"variant\"). Except No. 16, which has both under the same name, in the book too: the 4th is B (25 33 20 0), the 6th A (28 28 0 0).",
+    "variants": "Grayish Lavender and Eugenia Red: the book's colour index lists only A's values, so A everywhere (corrections.json \"variant\"). Except No. 16, which has both under the same name, in the book too: the 4th is B (25 33 20 0), the 6th A (28 28 0 0). Pale King's Blue: two colours under this name, Volume 1's 瓶覗 (33 4 7 0) and 藍白 (5 1 9 0, our Pale King's Blue - B); No. 46's 2nd and No. 69's 3rd are 藍白, 5 1 9 0, as their chips' scans say.",
     "spelling": "The book prints Vandar Poel's Blue (and Volume 1 Cerulian, Antwarp, Rosolanc): misspellings of Ridgway's names, fixed in our colors.json, which keeps the printed spelling as bookName. The book prints Deep Violet / Plumbeous (ours: Deep Violet/Plumbeous)."
   },
   "renamed": {
@@ -128,6 +128,25 @@
       ]
     },
     {
+      "name": "Pale King's Blue - B",
+      "cmyk": [
+        5,
+        1,
+        9,
+        0
+      ],
+      "cards": [
+        [
+          46,
+          2
+        ],
+        [
+          69,
+          3
+        ]
+      ]
+    },
+    {
       "name": "Pale Methyl Blue",
       "cmyk": [
         65,
@@ -209,6 +228,7 @@
   ],
   "_new_about": "Colours not in Volume 1, with the CMYK printed in the book; cards: [card number, position from the first colour].",
   "notes": {
-    "Pale Methyl Blue": "the book prints \"Pale Methy Blue\"; the cards and Ridgway have Methyl, which we use"
+    "Pale Methyl Blue": "the book prints \"Pale Methy Blue\"; the cards and Ridgway have Methyl, which we use",
+    "Pale King's Blue - B": "藍白 (あいじろ), 5 1 9 0, checked in the book's colour index; it prints the English name Pale King's Blue, as for Volume 1's 瓶覗, so ours adds - B; the cards name both alike, so the scans found it, not the names"
   }
 }

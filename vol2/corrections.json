@@ -41,7 +41,8 @@
     "Eugenia Red": "the chips can't tell A from B; the book's colour index lists only A",
     "Light Green": "card 34 (m06_r09) prints Light Green; the book has Night Green, 52 0 100 0, as ours",
     "Tawny Olive": "card 32 (m06_r05) prints Tawny Olive; the book has Khaki there, and the chip matches Khaki on cards 9 and 12",
-    "Rosolanc Purple": "card 45 (m08_r07) prints Rosolanc, as does Volume 1; Ridgway's name is Rosolane Purple, which our data now uses"
+    "Rosolanc Purple": "card 45 (m08_r07) prints Rosolanc, as does Volume 1; Ridgway's name is Rosolane Purple, which our data now uses",
+    "Pale King's Blue": "two colours share the name: Volume 1's 瓶覗 (33 4 7 0) and Volume 2's 藍白 (5 1 9 0, our Pale King's Blue - B). No variant: the scan decides, near-white chips (No. 46, 69) 藍白, light blue ones (No. 31, 32, 63, 71) 瓶覗; the book agrees on No. 46 and 69"
   },
   "variant": {
     "Grayish Lavender": "Grayish Lavender - A",

@@ -2824,6 +2824,10 @@
      195,
      210
     ],
+    "same_name": [
+     "Pale King's Blue",
+     "Pale King's Blue - B"
+    ],
     "scan_distance": 0.062
    }
   ]
@@ -2862,6 +2866,10 @@
      167,
      193,
      207
+    ],
+    "same_name": [
+     "Pale King's Blue",
+     "Pale King's Blue - B"
     ],
     "scan_distance": 0.068
    },
@@ -3883,7 +3891,7 @@
     "printed": "Pale King's Blue",
     "ocr": "Pale King's Blue",
     "ocr_conf": 1,
-    "match": 111,
+    "match": 170,
     "band": [
      0.65,
      0.71
@@ -3893,7 +3901,11 @@
      244,
      238
     ],
-    "scan_distance": 0.11
+    "same_name": [
+     "Pale King's Blue - B",
+     "Pale King's Blue"
+    ],
+    "scan_distance": 0.011
    },
    {
     "printed": "Grape Green",
@@ -5172,6 +5184,10 @@
      196,
      211
     ],
+    "same_name": [
+     "Pale King's Blue",
+     "Pale King's Blue - B"
+    ],
     "scan_distance": 0.059
    }
   ]
@@ -5588,7 +5604,7 @@
     "printed": "Pale King's Blue",
     "ocr": "Pale King's Blue",
     "ocr_conf": 1,
-    "match": 111,
+    "match": 170,
     "band": [
      0.75,
      0.895
@@ -5598,7 +5614,11 @@
      246,
      245
     ],
-    "scan_distance": 0.116
+    "same_name": [
+     "Pale King's Blue - B",
+     "Pale King's Blue"
+    ],
+    "scan_distance": 0.013
    }
   ]
  },
@@ -5723,6 +5743,10 @@
      176,
      199,
      212
+    ],
+    "same_name": [
+     "Pale King's Blue",
+     "Pale King's Blue - B"
     ],
     "scan_distance": 0.049
    },

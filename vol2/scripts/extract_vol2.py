@@ -10,7 +10,8 @@ them reliably (widely spaced characters).
 Names: OCR text, fixed by corrections.json (visually verified), then matched to colors.json by name.
 Colours sampled from the scan (90-year-old paper chips, uncalibrated) only check matches; between
 same-name colours (Grayish Lavender A/B, Eugenia Red A/B) the book decides (corrections.json "variant"),
-except on a card that has both (card 16), where the scan does.
+except on a card that has both (card 16), where the scan does; without a "variant" (Pale King's Blue, Volume 1's
+瓶覗 and Volume 2's 藍白), the scan decides too.
 """
 import sys, json, re, difflib, math
 from pathlib import Path

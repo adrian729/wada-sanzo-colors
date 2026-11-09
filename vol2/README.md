@@ -1,6 +1,6 @@
 # Volume 2: seasonal combinations (work in progress)
 
-How Volume 2's 72 seasonal combinations were extracted and checked, and the scripts that feed them to the site: the site's `seasons.json` is built from `extracted.json` by `scripts/build_seasons.py`; the 11 colours not in Volume 1 were added to the site's `colors.json` (marked `"volume": 2`, CMYK from `book.json`) and placed in `families.json` where Volume 2's colour index puts them (Volume 2 has the same six families).
+How Volume 2's 72 seasonal combinations were extracted and checked, and the scripts that feed them to the site: the site's `seasons.json` is built from `extracted.json` by `scripts/build_seasons.py`; the 12 colours not in Volume 1 were added to the site's `colors.json` (marked `"volume": 2`, CMYK from `book.json`) and placed in `families.json` where Volume 2's colour index puts them (Volume 2 has the same six families).
 
 ## Source
 
@@ -36,17 +36,17 @@ Each volume has 15 pages: cover, colophon, then each card followed by its blank 
 - `scripts/build_seasons.py`: writes the site's `seasons.json` (`python scripts/build_seasons.py extracted.json ../colors.json ../seasons.json`).
 - `scripts/review.py`: renders `review/sheet1–6.jpg`, each card's scan beside the extracted colours (red: corrected by hand, renamed, or an A/B pair; blue: new colour).
 - `corrections.json`: OCR misreads fixed by reading the scans (`review/labels.jpg`), card names that are Volume 1 colours under another name (`alias`), and which A/B colour the book uses (`variant`).
-- `book.json`: what was checked in the printed book: the renames, the A/B choice, and the CMYK of the 11 new colours.
+- `book.json`: what was checked in the printed book: the renames, the A/B choice, and the CMYK of the 12 new colours.
 
 The scanned colours are 90-year-old paper chips under the scanner's light, so they are only used to check matches, not as colour values.
 
 ## Findings (checked against the book)
 
 - 72 cards, 330 colours in all: 3 colours on 12 cards, 4 on 22, 5 on 25, 6 on 10, 7 on 3. The book keeps the cards' numbers and colour order (first and last of each month checked) but prints the colours at equal size; the cards show the first one large.
-- 314 of the 330 are Volume 1 colours: 132 of our 159 appear. 60 cards use only Volume 1 colours.
+- 312 of the 330 are Volume 1 colours: 133 of our 159 appear. 59 cards use only Volume 1 colours.
 - Volume 1 colours keep their CMYK in the book (checked on No. 1).
 - Renamed: three card names are Volume 1 colours under another name; the book uses ours. Cerulean Blue is our Cerulian Blue (same CMYK), Light Green (card 34) is Night Green, Tawny Olive (card 32) is Khaki. Recorded in `corrections.json` (`alias`) and `book.json` (`renamed`).
-- Same-name pairs: the book's colour index lists only A, so Grayish Lavender and Eugenia Red are A everywhere (`corrections.json` `variant`). The scans had suggested B for some Grayish Lavender chips; the book disagrees (No. 1). Except No. 16, which has two different Grayish Lavender chips: there the scan decides (4th B, 6th A), and the book agrees: it prints both as Grayish Lavender, 25 33 20 0 then 28 28 0 0.
-- 11 colours are not in Volume 1, used 16 times on 12 cards; their CMYK from the book is in `book.json` (`new`): Dark Perilla Purple, Dull Citrine, Dull Purplish Black, Grape Green, Pale Cinnamon-Pink, Pale Ecru-Drab, Pale Methyl Blue (the book prints "Methy"), Pale Purplish Vinaceous, Pale Turtle Green, Sea-foam Yellow, Violet Ultramarine.
+- Same-name pairs: the book's colour index lists only A, so Grayish Lavender and Eugenia Red are A everywhere (`corrections.json` `variant`). The scans had suggested B for some Grayish Lavender chips; the book disagrees (No. 1). Except No. 16, which has two different Grayish Lavender chips: there the scan decides (4th B, 6th A), and the book agrees: it prints both as Grayish Lavender, 25 33 20 0 then 28 28 0 0. Pale King's Blue names two colours in Volume 2's colour index: Volume 1's 瓶覗 (33 4 7 0) and 藍白 (5 1 9 0), our Pale King's Blue - B. It has no `variant`: the scan decides. Nos. 46 (2nd) and 69 (3rd) have near-white chips, 藍白, and the book agrees (5 1 9 0 on both); Nos. 31, 32, 63 and 71 have 瓶覗's light blue.
+- 12 colours are not in Volume 1, used 18 times on 13 cards; their CMYK from the book is in `book.json` (`new`): Dark Perilla Purple, Dull Citrine, Dull Purplish Black, Grape Green, Pale Cinnamon-Pink, Pale Ecru-Drab, Pale King's Blue - B (藍白; the book prints Pale King's Blue, as for Volume 1's 瓶覗; found in the photos of Volume 2's colour index, as the cards name both alike), Pale Methyl Blue (the book prints "Methy"), Pale Purplish Vinaceous, Pale Turtle Green, Sea-foam Yellow, Violet Ultramarine.
 - 5 Volume 1 combinations have all their colours on a single Volume 2 card: 69 (card 5), 72 (63), 84 (14), 93 (7), 113 (34).
 - Spelling: four names are misspelled in the books (Volume 1 and 2) and fixed in our `colors.json` to Ridgway's (*Color Standards and Color Nomenclature*, 1912), which they come from; the printed spelling is kept as `bookName`: Vandar Poel's Blue (Vanderpoel's Blue; the cards print both Vander Poel's and Vandar Poel's), Cerulian Blue (Cerulean Blue), Antwarp Blue (Antwerp Blue), Rosolanc Purple (Rosolane Purple; card 45 prints Rosolanc too). The book prints "Pale Methy Blue"; we use Methyl. Card 51 misprints Dark Greenish Glaucous as "Grecnish".

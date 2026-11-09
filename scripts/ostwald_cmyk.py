@@ -10,7 +10,8 @@ using its colorimetric table B2A1, the inverse of the A2B1 table used there. The
 fixes how much black replaces cyan, magenta and yellow.
 
 Re-run it after changing colors.json (Wada's Orange fixes the hue's zero point) or the Ostwald
-computation. It also prints how well the estimate does on Wada's own colours, whose CMYK we know.
+computation (notes/ostwald.py, which it imports). It also prints how well the estimate does on
+Wada's own colours, whose CMYK we know.
 Standard library only.
 """
 import json
@@ -137,8 +138,7 @@ def cells():
                 yield letters[a], [G[a]] * 3
                 continue
             for sector in range(24):
-                h = (60 - (sector * 100 / 24 - ostwald.OFFSET) * 3.6) % 360
-                full = [1 - max(0, min((k + h / 60) % 6, 4 - (k + h / 60) % 6, 1)) for k in (5, 3, 1)]
+                full = ostwald.SECTOR_COLOURS[sector]
                 number = int(sector * 100 / 24 + 0.5) % 100  # rounding half up, as Math.round
                 yield f"{number}{letters[a]}{letters[b]}", [G[a] + (G[b] - G[a]) * v for v in full]
 

@@ -22,7 +22,7 @@ Then open http://localhost:8000.
 - `families.json`: the book's six colour families, in the order of its colour index.
 - `ostwald-cmyk.json`: CMYK estimated for every cell of the Colors › Ostwald view, by its Ostwald code, for the cells none of Wada's colours fill (`scripts/ostwald_cmyk.py`).
 
-OKLCH is computed from CMYK through the Japan Color 2011 Coated profile (`scripts/cmyk_to_oklch.py`). The Ostwald view's estimated CMYK goes the other way, through the same profile (`scripts/ostwald_cmyk.py`); re-run it after changing `colors.json`.
+OKLCH is computed from CMYK through the Japan Color 2011 Coated profile (`scripts/cmyk_to_oklch.py`). The Ostwald view's estimated CMYK goes the other way, through the same profile (`scripts/ostwald_cmyk.py`); re-run it after changing `colors.json` or the Ostwald computation (`notes/ostwald.py`).
 
 ## Sources
 

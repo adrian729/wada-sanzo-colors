@@ -7,6 +7,7 @@ notes/ostwald.md. Run from anywhere:
 
 Standard library only.
 """
+import colorsys
 import json
 import math
 from collections import Counter
@@ -49,19 +50,60 @@ def hexagonal_hue(r, g, b):
     return 60 * ((r - g) / d + 4)
 
 
+def oklab(rgb):
+    """Linear sRGB -> OKLab (Ottosson's matrices)."""
+    r, g, b = rgb
+    lms = (0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b, 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b, 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b)
+    l, m, s = (math.copysign(abs(v) ** (1 / 3), v) for v in lms)
+    return (0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s, 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s)
+
+
+def full_colour(h):
+    """The full colour of hexagonal hue h (degrees), in linear sRGB: HSV with saturation and value 1."""
+    return list(colorsys.hsv_to_rgb((h % 360) / 360, 1, 1))
+
+
+def hue_number(h):
+    """Ostwald's 100-step hue of hexagonal hue h, before calibration. Ostwald spaced his circle evenly
+    to the eye, with complements opposite. The full colour's OKLCH hue is even to the eye, and the
+    hexagonal hue puts complements opposite, but sRGB's full colours aren't symmetrical in OKLCH: a
+    full colour and its complement are up to 29 degrees from opposite. So the number takes the mean of
+    the two, the complement's turned half round, and complements stay exactly 50 steps apart. The circle
+    runs the other way round from OKLCH's, a quarter of it (25 steps) per 90 degrees."""
+    def ok_hue(rgb):
+        _, a, b = oklab(rgb)
+        return math.degrees(math.atan2(b, a))
+    h1, h2 = ok_hue(full_colour(h)), ok_hue(full_colour(h + 180))
+    mean = h1 + ((h2 - h1) % 360 - 180) / 2
+    return (-mean / 3.6) % 100
+
+
 def raw(i):
     """White, black and colour content, and the hue on Ostwald's 100-step circle before calibration."""
     r, g, b = linear_srgb(*colors[i]["oklch"])
     w, k = min(r, g, b), 1 - max(r, g, b)
     h = hexagonal_hue(r, g, b)
-    # Ostwald's circle runs from yellow (0) through red (25), ultramarine (50) and sea green (75):
-    # the other way round from the additive hue, a quarter of the circle (25 steps) per 90 degrees.
-    n = None if h is None else ((60 - h) / 3.6) % 100
-    return n, w, k, 1 - w - k
+    return None if h is None else hue_number(h), w, k, 1 - w - k
 
 
 # Calibration: Wada's orange (橙色) is 16PA in his colour-name books (1935 supplement, p. 14).
-OFFSET = 16 - raw(index["Orange"])[0]
+OFFSET = (16 - raw(index["Orange"])[0]) % 100
+
+
+def sector_colour(sector):
+    """The full colour of one of the 24 hues (sector 0 is yellow), in linear sRGB: the hexagonal hue
+    whose number is the sector's, found by halving (the number falls as the hexagonal hue rises)."""
+    def diff(h):
+        return (hue_number(h) + OFFSET - sector * 100 / 24 + 50) % 100 - 50
+    lo = next(x for x in range(360) if diff(x) >= 0 and diff(x + 1) < 0)
+    hi = lo + 1
+    for _ in range(50):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if diff(mid) >= 0 else (lo, mid)
+    return full_colour((lo + hi) / 2)
+
+
+SECTOR_COLOURS = [sector_colour(s) for s in range(24)]
 
 
 def step(v):
@@ -82,7 +124,8 @@ def ostwald(i):
 
 
 if __name__ == "__main__":
-    print(f"Calibration offset: {OFFSET:+.2f} steps (Orange -> 16)\n")
+    print(f"Calibration: Orange -> 16, so hue 0 (yellow) is where the mean OKLCH hue is {OFFSET * 3.6 % 360:.1f} degrees, 3.6 degrees less per step\n")
+    print("The 24 hues' full colours: " + " ".join("#" + "".join(f"{round(255 * (12.92 * v if v <= 0.0031308 else 1.055 * v ** (1 / 2.4) - 0.055)):02x}" for v in c) for c in SECTOR_COLOURS) + "\n")
     o = ostwald(index["Orange"])
     print(f"Orange: {o['code']} (white {o['white']:.3f}, black {o['black']:.3f}); Wada: 16PA (white 0.036, black 0.109)\n")
 
@@ -143,12 +186,6 @@ if __name__ == "__main__":
     print("By chance: " + "; ".join(f"within {t}: {sum(near_by_chance(i, t) for i in range(len(colors))):.0f}" for t in (0.05, 0.1)))
 
     # Perceptual check: is the nearest of the system's cell colours (in OKLab) the colour's own cell?
-    def oklab(rgb):
-        r, g, b = rgb
-        lms = (0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b, 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b, 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b)
-        l, m, s = (math.copysign(abs(v) ** (1 / 3), v) for v in lms)
-        return (0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s, 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s)
-    import colorsys
     ideal = {}
     for a in range(len(GREYS)):
         for b in range(a + 1):
@@ -156,8 +193,7 @@ if __name__ == "__main__":
                 ideal[(2 * a, 0, None)] = oklab([GREYS[a]] * 3)
                 continue
             for sector in range(24):
-                full = colorsys.hsv_to_rgb(((60 - (sector * 100 / 24 - OFFSET) * 3.6) % 360) / 360, 1, 1)
-                ideal[(a + b, a - b, sector)] = oklab([GREYS[a] + (GREYS[b] - GREYS[a]) * v for v in full])
+                ideal[(a + b, a - b, sector)] = oklab([GREYS[a] + (GREYS[b] - GREYS[a]) * v for v in SECTOR_COLOURS[sector]])
     own = neighbour = further = 0
     gaps, dists = [], []
     for i in range(len(colors)):

@@ -11,7 +11,13 @@
       0.881,
       0.0558,
       1.03
-    ]
+    ],
+    "atlas": {
+      "hue": "red",
+      "tone": "tint",
+      "ja": "鴾色",
+      "reading": "toki-iro"
+    }
   },
   {
     "name": "Corinthian Pink",
@@ -137,7 +143,13 @@
       0.7135,
       0.149,
       5.61
-    ]
+    ],
+    "atlas": {
+      "hue": "purple-red",
+      "tone": "tint",
+      "ja": "紅梅色",
+      "reading": "kōbai-iro"
+    }
   },
   {
     "name": "Old Rose",
@@ -193,7 +205,13 @@
       0.6423,
       0.1287,
       66.64
-    ]
+    ],
+    "atlas": {
+      "hue": "orange-yellow",
+      "tone": "shade",
+      "ja": "檜皮色",
+      "reading": "hihada-iro"
+    }
   },
   {
     "name": "Vinaceous Tawny",
@@ -348,7 +366,13 @@
       0.5579,
       0.1582,
       357.38
-    ]
+    ],
+    "atlas": {
+      "hue": "purple-red",
+      "tone": "full colour",
+      "ja": "牡丹色",
+      "reading": "botan-iro"
+    }
   },
   {
     "name": "Pomegranate Purple",
@@ -432,7 +456,13 @@
       0.4932,
       0.1683,
       11.79
-    ]
+    ],
+    "atlas": {
+      "hue": "red",
+      "tone": "full colour",
+      "ja": "赤色",
+      "reading": "aka-iro"
+    }
   },
   {
     "name": "Brown",
@@ -502,7 +532,13 @@
       0.4595,
       0.1191,
       22.69
-    ]
+    ],
+    "atlas": {
+      "hue": "red",
+      "tone": "shade",
+      "ja": "海老茶色",
+      "reading": "ebicha-iro"
+    }
   },
   {
     "name": "Violet Red",
@@ -516,7 +552,13 @@
       0.3991,
       0.1001,
       334.12
-    ]
+    ],
+    "atlas": {
+      "hue": "purple-red",
+      "tone": "shade",
+      "ja": "京紫",
+      "reading": "kyō-murasaki"
+    }
   },
   {
     "name": "Vistoris Lake",
@@ -558,7 +600,13 @@
       0.9614,
       0.079,
       96.23
-    ]
+    ],
+    "atlas": {
+      "hue": "yellow",
+      "tone": "tint",
+      "ja": "淡卵色",
+      "reading": "usu-tamago-iro"
+    }
   },
   {
     "name": "Naples Yellow",
@@ -656,7 +704,13 @@
       0.8578,
       0.123,
       78.34
-    ]
+    ],
+    "atlas": {
+      "hue": "orange-yellow",
+      "tone": "tint",
+      "ja": "卵色",
+      "reading": "tamago-iro"
+    }
   },
   {
     "name": "Golden Yellow",
@@ -698,7 +752,13 @@
       0.7773,
       0.0785,
       64.63
-    ]
+    ],
+    "atlas": {
+      "hue": "orange",
+      "tone": "tint",
+      "ja": "欵冬色",
+      "reading": "fuki-iro"
+    }
   },
   {
     "name": "Isabella Color",
@@ -768,7 +828,13 @@
       0.9458,
       0.2096,
       103.65
-    ]
+    ],
+    "atlas": {
+      "hue": "yellow",
+      "tone": "full colour",
+      "ja": "黃色",
+      "reading": "kiiro"
+    }
   },
   {
     "name": "Lemon Yellow",
@@ -866,7 +932,13 @@
       0.7853,
       0.1647,
       72.87
-    ]
+    ],
+    "atlas": {
+      "hue": "orange-yellow",
+      "tone": "full colour",
+      "ja": "柑子色",
+      "reading": "kōji-iro"
+    }
   },
   {
     "name": "Apricot Orange",
@@ -894,7 +966,13 @@
       0.7016,
       0.1725,
       50.88
-    ]
+    ],
+    "atlas": {
+      "hue": "orange",
+      "tone": "full colour",
+      "ja": "橙色",
+      "reading": "tōshoku"
+    }
   },
   {
     "name": "Peach Red",
@@ -1006,7 +1084,13 @@
       0.6898,
       0.132,
       101.95
-    ]
+    ],
+    "atlas": {
+      "hue": "yellow",
+      "tone": "shade",
+      "ja": "靑朽葉",
+      "reading": "ao-kuchiba"
+    }
   },
   {
     "name": "Buffy Citrine",
@@ -1104,7 +1188,13 @@
       0.607,
       0.0807,
       42.56
-    ]
+    ],
+    "atlas": {
+      "hue": "orange",
+      "tone": "shade",
+      "ja": "丁字茶",
+      "reading": "chōji-cha"
+    }
   },
   {
     "name": "Olive Green",
@@ -1272,7 +1362,13 @@
       0.8301,
       0.129,
       123.71
-    ]
+    ],
+    "atlas": {
+      "hue": "yellow-green",
+      "tone": "full colour",
+      "ja": "若草色",
+      "reading": "wakakusa-iro"
+    }
   },
   {
     "name": "Light Green Yellow",
@@ -1286,7 +1382,13 @@
       0.8396,
       0.1543,
       112.69
-    ]
+    ],
+    "atlas": {
+      "hue": "yellow-green",
+      "tone": "tint",
+      "ja": "鶸色",
+      "reading": "hiwa-iro"
+    }
   },
   {
     "name": "Night Green",
@@ -1370,7 +1472,13 @@
       0.6588,
       0.0619,
       140.96
-    ]
+    ],
+    "atlas": {
+      "hue": "yellow-green",
+      "tone": "shade",
+      "ja": "老綠",
+      "reading": "oi-midori"
+    }
   },
   {
     "name": "Pistachio Green",
@@ -1440,7 +1548,13 @@
       0.62,
       0.1002,
       158.27
-    ]
+    ],
+    "atlas": {
+      "hue": "green",
+      "tone": "full colour",
+      "ja": "綠色",
+      "reading": "midori-iro"
+    }
   },
   {
     "name": "Dull Viridian Green",
@@ -1496,7 +1610,13 @@
       0.5362,
       0.0972,
       143.16
-    ]
+    ],
+    "atlas": {
+      "hue": "green",
+      "tone": "shade",
+      "ja": "萠木色",
+      "reading": "moegi-iro"
+    }
   },
   {
     "name": "Lincoln Green",
@@ -1594,7 +1714,13 @@
       0.7644,
       0.0426,
       258.69
-    ]
+    ],
+    "atlas": {
+      "hue": "blue",
+      "tone": "tint",
+      "ja": "空色",
+      "reading": "sora-iro"
+    }
   },
   {
     "name": "Cobalt Green",
@@ -1608,7 +1734,13 @@
       0.821,
       0.0722,
       153.33
-    ]
+    ],
+    "atlas": {
+      "hue": "green",
+      "tone": "tint",
+      "ja": "靑磁色",
+      "reading": "seiji-iro"
+    }
   },
   {
     "name": "Calamine Blue",
@@ -1622,7 +1754,13 @@
       0.8001,
       0.0734,
       202.9
-    ]
+    ],
+    "atlas": {
+      "hue": "blue-green",
+      "tone": "tint",
+      "ja": "淡淺葱",
+      "reading": "usu-asagi"
+    }
   },
   {
     "name": "Venice Green",
@@ -1679,7 +1817,13 @@
       0.599,
       0.0986,
       206.41
-    ]
+    ],
+    "atlas": {
+      "hue": "blue-green",
+      "tone": "full colour",
+      "ja": "靑竹色",
+      "reading": "aotake-iro"
+    }
   },
   {
     "name": "Olympic Blue",
@@ -1707,7 +1851,13 @@
       0.511,
       0.1534,
       243.03
-    ]
+    ],
+    "atlas": {
+      "hue": "blue",
+      "tone": "full colour",
+      "ja": "靑色",
+      "reading": "ao-iro"
+    }
   },
   {
     "name": "Antwerp Blue",
@@ -1722,7 +1872,13 @@
       0.4912,
       0.141,
       220.16
-    ]
+    ],
+    "atlas": {
+      "hue": "blue-green",
+      "tone": "shade",
+      "ja": "納戶色",
+      "reading": "nando-iro"
+    }
   },
   {
     "name": "Helvetia Blue",
@@ -1778,7 +1934,13 @@
       0.3966,
       0.1208,
       255.76
-    ]
+    ],
+    "atlas": {
+      "hue": "blue",
+      "tone": "shade",
+      "ja": "紺靑",
+      "reading": "konjō"
+    }
   },
   {
     "name": "Violet Blue",
@@ -1877,7 +2039,13 @@
       0.8038,
       0.0492,
       291.32
-    ]
+    ],
+    "atlas": {
+      "hue": "purple-blue",
+      "tone": "tint",
+      "ja": "藤色",
+      "reading": "fuji-iro"
+    }
   },
   {
     "name": "Grayish Lavender - B",
@@ -1919,7 +2087,13 @@
       0.7023,
       0.0799,
       333.79
-    ]
+    ],
+    "atlas": {
+      "hue": "red-purple",
+      "tone": "tint",
+      "ja": "鳩羽紫",
+      "reading": "hatoba-murasaki"
+    }
   },
   {
     "name": "Eupatorium Purple",
@@ -1947,7 +2121,13 @@
       0.6321,
       0.0895,
       318.35
-    ]
+    ],
+    "atlas": {
+      "hue": "purple",
+      "tone": "tint",
+      "ja": "淺紫",
+      "reading": "usu-murasaki"
+    }
   },
   {
     "name": "Aconite Violet",
@@ -2101,7 +2281,13 @@
       0.4237,
       0.105,
       292.01
-    ]
+    ],
+    "atlas": {
+      "hue": "purple",
+      "tone": "full colour",
+      "ja": "紫色",
+      "reading": "murasaki-iro"
+    }
   },
   {
     "name": "Red Violet",
@@ -2115,7 +2301,13 @@
       0.3886,
       0.1144,
       320.86
-    ]
+    ],
+    "atlas": {
+      "hue": "red-purple",
+      "tone": "full colour",
+      "ja": "菖蒲色",
+      "reading": "ayame-iro"
+    }
   },
   {
     "name": "Cotinga Purple",
@@ -2129,7 +2321,13 @@
       0.3652,
       0.0948,
       339.07
-    ]
+    ],
+    "atlas": {
+      "hue": "red-purple",
+      "tone": "shade",
+      "ja": "杜若色",
+      "reading": "kakitsubata-iro"
+    }
   },
   {
     "name": "Dusky Madder Violet",
@@ -2143,7 +2341,13 @@
       0.3652,
       0.0874,
       331.53
-    ]
+    ],
+    "atlas": {
+      "hue": "purple",
+      "tone": "shade",
+      "ja": "黑紫",
+      "reading": "kokushi"
+    }
   },
   {
     "name": "White",
@@ -2392,7 +2596,13 @@
       0.1404,
       301.9
     ],
-    "volume": 2
+    "volume": 2,
+    "atlas": {
+      "hue": "purple-blue",
+      "tone": "full colour",
+      "ja": "濃桔梗色",
+      "reading": "koi-kikyō-iro"
+    }
   },
   {
     "name": "Pale King's Blue - B",

@@ -5,9 +5,10 @@ notes/ostwald.md. Run from anywhere:
 
     python3 notes/ostwald.py
 
-Standard library only.
+Standard library only. Reads colors.json and print-gamut.json (scripts/print_gamut.py): every colour is
+measured against what the press prints, Japan Color 2011 Coated, as Wada's colours were printed.
 """
-import colorsys
+import bisect
 import json
 import math
 from collections import Counter
@@ -16,6 +17,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 colors = json.loads((ROOT / "colors.json").read_text())
 index = {c["name"]: i for i, c in enumerate(colors)}
+PRESS = json.loads((ROOT / "print-gamut.json").read_text())["ostwald"]
+RAYS, ANGLES, STEPS = PRESS["rays"], PRESS["angles"], PRESS["steps"]
 
 # Wada's grey scale (1935 supplement, Figure 2): 16 letters, A to P with J, from Ostwald's white (0.891
 # white content) to his black (0.0355), evenly spaced on a log scale. Ostwald's own scale skips J.
@@ -23,87 +26,153 @@ index = {c["name"]: i for i, c in enumerate(colors)}
 LETTERS = "abcdefghijklmnop"
 GREYS = [0.891 * (0.0355 / 0.891) ** (k / 15) for k in range(16)]
 
-
-def linear_srgb(L, C, h):
-    """OKLCH -> linear sRGB, clipped to 0..1 (Ottosson's matrices)."""
-    a, b = C * math.cos(math.radians(h)), C * math.sin(math.radians(h))
-    l_ = L + 0.3963377774 * a + 0.2158037573 * b
-    m_ = L - 0.1055613458 * a - 0.0638541728 * b
-    s_ = L - 0.0894841775 * a - 1.2914855480 * b
-    l, m, s = l_ ** 3, m_ ** 3, s_ ** 3
-    rgb = (4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
-           -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
-           -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s)
-    return [min(1, max(0, v)) for v in rgb]
-
-
-def hexagonal_hue(r, g, b):
-    """The hue of an additive mixture, in degrees (red 0, yellow 60, green 120, ...): complements are 180 apart."""
-    hi, lo = max(r, g, b), min(r, g, b)
-    d = hi - lo
-    if d == 0:
-        return None
-    if hi == r:
-        return 60 * (((g - b) / d) % 6)
-    if hi == g:
-        return 60 * ((b - r) / d + 2)
-    return 60 * ((r - g) / d + 4)
+# OKLCH <-> CIE XYZ (D65), CSS Color 4's matrices (as scripts/cmyk_to_oklch.py, and inverted); the white
+# is CSS's D65 (Y = 1), the white print-gamut.json measures the press against.
+LMS_TO_OKLAB = [[0.2104542683093140, 0.7936177747023054, -0.0040720430116193],
+                [1.9779985324311684, -2.4285922420485799, 0.4505937096174110],
+                [0.0259040424655478, 0.7827717124575296, -0.8086757660377118]]
+XYZ_TO_LMS = [[0.8190224379967030, 0.3619062600528904, -0.1288737815209879],
+              [0.0329836539323885, 0.9292868615863434, 0.0361446663506424],
+              [0.0481771893596242, 0.2642395317527308, 0.6335478284694309]]
+OKLAB_TO_LMS = [[1.00000000239858, 0.39633777716154006, 0.21580375421218242],
+                [0.999999999290284, -0.1055613457521502, -0.06385417190922567],
+                [0.9999999856456103, -0.08948417624532107, -1.2914855294809227]]
+LMS_TO_XYZ = [[1.226879875845924, -0.557814994460217, 0.2813910456659646],
+              [-0.040575745214800875, 1.1122868032803173, -0.07171105806551642],
+              [-0.07637293667466001, -0.4214933324022431, 1.5869240198367816]]
+WHITE = [0.9504559270516716, 1.0, 1.0890577507598784]
+SW = sum(WHITE)
+XW, YW = WHITE[0] / SW, WHITE[1] / SW
 
 
-def oklab(rgb):
-    """Linear sRGB -> OKLab (Ottosson's matrices)."""
-    r, g, b = rgb
-    lms = (0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b, 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b, 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b)
-    l, m, s = (math.copysign(abs(v) ** (1 / 3), v) for v in lms)
-    return (0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s, 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s)
+def mul(m, v):
+    return [m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2], m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2],
+            m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2]]
 
 
-def full_colour(h):
-    """The full colour of hexagonal hue h (degrees), in linear sRGB: HSV with saturation and value 1."""
-    return list(colorsys.hsv_to_rgb((h % 360) / 360, 1, 1))
+def xyz_of(L, C, h):
+    """OKLCH -> XYZ (D65), as it is: nothing clipped."""
+    lms = mul(OKLAB_TO_LMS, [L, C * math.cos(math.radians(h)), C * math.sin(math.radians(h))])
+    return mul(LMS_TO_XYZ, [v ** 3 for v in lms])
 
 
-def hue_number(h):
-    """Ostwald's 100-step hue of hexagonal hue h, before calibration. Ostwald spaced his circle evenly
-    to the eye, with complements opposite. The full colour's OKLCH hue is even to the eye, and the
-    hexagonal hue puts complements opposite, but sRGB's full colours aren't symmetrical in OKLCH: a
-    full colour and its complement are up to 29 degrees from opposite. So the number takes the mean of
-    the two, the complement's turned half round, and complements stay exactly 50 steps apart. The circle
-    runs the other way round from OKLCH's, a quarter of it (25 steps) per 90 degrees."""
-    def ok_hue(rgb):
-        _, a, b = oklab(rgb)
-        return math.degrees(math.atan2(b, a))
-    h1, h2 = ok_hue(full_colour(h)), ok_hue(full_colour(h + 180))
+def oklab_of(xyz):
+    return mul(LMS_TO_OKLAB, [math.copysign(abs(v) ** (1 / 3), v) for v in mul(XYZ_TO_LMS, xyz)])
+
+
+def oklch_of(xyz):
+    """Rounded as colors.json is."""
+    L, a, b = oklab_of(xyz)
+    C = round(math.hypot(a, b), 4)
+    h = round(math.degrees(math.atan2(b, a)) % 360, 2)
+    return [round(L, 4), C, 0 if C == 0 or h == 360 else h]
+
+
+def between(theta):
+    """The two rays either side of chromaticity angle theta (degrees round the white in xy), and how far
+    theta is from the first to the second (print-gamut.json's rays: one per degree, and one at each ink
+    alone and each two at 100%, where the full colours turn a corner)."""
+    x = theta % 360
+    k = bisect.bisect_right(ANGLES, x)
+    j0, j1 = (k - 1) % len(ANGLES), k % len(ANGLES)
+    a0, a1 = ANGLES[j0], ANGLES[j1] + (360 if k == len(ANGLES) else 0)
+    return RAYS[j0], RAYS[j1], (x - a0) / (a1 - a0)
+
+
+def ray(theta):
+    """The press's full colour and tint edge at theta, between the rays: the full colour's distance from
+    the white and its X + Y + Z, and the tint edge (Y at each share of full colour)."""
+    a, b, t = between(theta)
+    return (a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]), [p + t * (q - p) for p, q in zip(a[3], b[3])])
+
+
+def full_hue(theta):
+    """The OKLCH hue of the press's full colour at theta, between the rays (the shorter way round)."""
+    a, b, t = between(theta)
+    return a[2] + t * ((b[2] - a[2] + 180) % 360 - 180)
+
+
+def tint_edge(edge, r):
+    """The brightest the press prints (Y) at share r of full colour, between the table's 1/32 steps."""
+    x = min(max(r, 0), 1) * STEPS
+    k = min(int(x), STEPS - 1)
+    return edge[k] + (x - k) * (edge[k + 1] - edge[k])
+
+
+def hue_number(theta):
+    """Ostwald's 100-step hue at chromaticity angle theta, before calibration. Ostwald spaced his circle
+    evenly to the eye, with complements opposite. Complements, mixed, give grey, so they are at opposite
+    chromaticity angles. The full colour's OKLCH hue is even to the eye, but the press's full colours aren't
+    symmetrical in it: a full colour and its complement are up to 37 degrees from opposite. So the number
+    takes the mean of the two, the complement's turned half round, and complements stay exactly 50 steps
+    apart. The circle runs the other way round from OKLCH's, a quarter of it (25 steps) per 90 degrees."""
+    h1, h2 = full_hue(theta), full_hue(theta + 180)
     mean = h1 + ((h2 - h1) % 360 - 180) / 2
     return (-mean / 3.6) % 100
 
 
+def measure(xyz):
+    """Where a colour falls against the press: its chromaticity angle (None for a grey), its share of full
+    colour against white r (Ostwald's discs: the colour is a W + b F, white and the full colour, so r =
+    b / (a + b)), and its white, black and colour content. Black is how far it is below the tint edge,
+    1 - Y / Ymax(r): a tint has none, and its shadow series, the same chromaticity darker, more. Beyond
+    what the press prints, purer than its full colour or brighter than its tint edge, it is measured at
+    the edge (`outside` says by how much: the share past 1, and the black below 0)."""
+    s = sum(xyz)
+    dx, dy = xyz[0] / s - XW, xyz[1] / s - YW
+    d = math.hypot(dx, dy)
+    if d < 1e-6:
+        return dict(theta=None, r=0.0, white=xyz[1], black=1 - xyz[1], colour=0.0, outside=(0.0, 0.0))
+    theta = math.degrees(math.atan2(dy, dx)) % 360
+    dF, sF, edge = ray(theta)
+    u = d / dF
+    r_raw = SW * u / (SW * u + sF * (1 - u)) if u < 1 else 1 + (u - 1)  # (past the full colour: by its purity)
+    r = min(r_raw, 1.0)
+    black_raw = 1 - xyz[1] / tint_edge(edge, r)
+    black = max(black_raw, 0.0)
+    return dict(theta=theta, r=r, white=(1 - r) * (1 - black), black=black, colour=r * (1 - black),
+                outside=(max(r_raw - 1, 0.0), max(-black_raw, 0.0)))
+
+
 def raw(i):
     """White, black and colour content, and the hue on Ostwald's 100-step circle before calibration."""
-    r, g, b = linear_srgb(*colors[i]["oklch"])
-    w, k = min(r, g, b), 1 - max(r, g, b)
-    h = hexagonal_hue(r, g, b)
-    return None if h is None else hue_number(h), w, k, 1 - w - k
+    m = measure(xyz_of(*colors[i]["oklch"]))
+    return None if m["theta"] is None else hue_number(m["theta"]), m["white"], m["black"], m["colour"]
 
 
 # Calibration: Wada's orange (橙色) is 16PA in his colour-name books (1935 supplement, p. 14).
 OFFSET = (16 - raw(index["Orange"])[0]) % 100
 
 
-def sector_colour(sector):
-    """The full colour of one of the 24 hues (sector 0 is yellow), in linear sRGB: the hexagonal hue
-    whose number is the sector's, found by halving (the number falls as the hexagonal hue rises)."""
-    def diff(h):
-        return (hue_number(h) + OFFSET - sector * 100 / 24 + 50) % 100 - 50
+def sector_angle(sector):
+    """The chromaticity angle of one of the 24 hues (sector 0 is yellow): where the number is the sector's,
+    found by halving (the number falls as the angle rises)."""
+    def diff(theta):
+        return (hue_number(theta) + OFFSET - sector * 100 / 24 + 50) % 100 - 50
     lo = next(x for x in range(360) if diff(x) >= 0 and diff(x + 1) < 0)
     hi = lo + 1
     for _ in range(50):
         mid = (lo + hi) / 2
         lo, hi = (mid, hi) if diff(mid) >= 0 else (lo, mid)
-    return full_colour((lo + hi) / 2)
+    return (lo + hi) / 2
 
 
-SECTOR_COLOURS = [sector_colour(s) for s in range(24)]
+SECTOR_ANGLES = [sector_angle(s) for s in range(24)]
+
+
+def cell_xyz(sector, a, b):
+    """A cell's own colour: white GREYS[a], 1 - black GREYS[b], so colour GREYS[b] - GREYS[a]. Its share of
+    full colour is r = colour / (white + colour), at the sector's chromaticity angle, and it is as far below
+    the press's tint edge as its black says: Y = (1 - black) Ymax(r). A grey (a == b) is GREYS[a] white."""
+    if a == b or sector is None:
+        return [GREYS[a] * v for v in WHITE]
+    theta = SECTOR_ANGLES[sector]
+    dF, sF, edge = ray(theta)
+    r = (GREYS[b] - GREYS[a]) / GREYS[b]
+    u = r * sF / (SW * (1 - r) + r * sF)  # the purity of share r: the inverse of measure()'s
+    Y = GREYS[b] * tint_edge(edge, r)
+    x, y = XW + u * dF * math.cos(math.radians(theta)), YW + u * dF * math.sin(math.radians(theta))
+    return [x * Y / y, Y, (1 - x - y) * Y / y]
 
 
 def step(v):
@@ -125,19 +194,53 @@ def ostwald(i):
 
 if __name__ == "__main__":
     print(f"Calibration: Orange -> 16, so hue 0 (yellow) is where the mean OKLCH hue is {OFFSET * 3.6 % 360:.1f} degrees, 3.6 degrees less per step\n")
-    print("The 24 hues' full colours: " + " ".join("#" + "".join(f"{round(255 * (12.92 * v if v <= 0.0031308 else 1.055 * v ** (1 / 2.4) - 0.055)):02x}" for v in c) for c in SECTOR_COLOURS) + "\n")
+    print("The 24 hues' full colours (OKLCH): " + "; ".join(" ".join(f"{v:g}" for v in oklch_of(cell_xyz(s, 15, 0))) for s in range(24)) + "\n")
     o = ostwald(index["Orange"])
     print(f"Orange: {o['code']} (white {o['white']:.3f}, black {o['black']:.3f}); Wada: 16PA (white 0.036, black 0.109)\n")
+    print("Yellow, Red, Sea Green: " + ", ".join(f"{ostwald(index[n])['n']:.1f} ({ostwald(index[n])['code']})" for n in ("Yellow", "Red", "Sea Green")) + "\n")
+
+    # How far a full colour and its complement are from opposite in OKLCH hue.
+    skew = max(abs(((full_hue(t + 180) - full_hue(t)) % 360) - 180) for t in range(360))
+    print(f"A full colour and its complement: up to {skew:.0f} degrees of OKLCH hue from opposite")
+    spans = sorted(((full_hue(SECTOR_ANGLES[s]) - full_hue(SECTOR_ANGLES[(s + 1) % 24])) % 360, s) for s in range(24))
+    print(f"From one sector's full colour to the next: {spans[0][0]:.1f} to {spans[-1][0]:.1f} degrees of OKLCH hue: "
+          f"narrowest from sector {spans[0][1]} to {(spans[0][1] + 1) % 24}, widest from {spans[-1][1]} to {(spans[-1][1] + 1) % 24}\n")
 
     pairs = [("Spectrum Red", "Sea Green"), ("Red Orange", "Green Blue"), ("Orange", "Peacock Blue"),
              ("Yellow Orange", "Antwerp Blue"), ("Apricot Yellow", "Blue"), ("Yellow", "Deep Lyons Blue"),
              ("Lemon Yellow", "Violet Ultramarine"), ("Light Green Yellow", "Violet"),
              ("Yellow Green", "Red Violet"), ("Night Green", "Rosolane Purple")]
     print("Wada's complementary pairs (1935, p. 22): hue numbers, and how far from opposite (50 steps apart)")
+    offs = []
     for a, b in pairs:
         na, nb = ostwald(index[a])["n"], ostwald(index[b])["n"]
         gap = abs(na - nb) % 100
-        print(f"  {a:18s} {na:5.1f}   {b:18s} {nb:5.1f}   off by {abs(50 - min(gap, 100 - gap)):4.1f}")
+        offs.append(abs(50 - min(gap, 100 - gap)))
+        print(f"  {a:18s} {na:5.1f}   {b:18s} {nb:5.1f}   off by {offs[-1]:4.1f}")
+    print(f"  within 3 steps: {sum(o <= 3 for o in offs)} of {len(offs)}; on average {sum(offs) / len(offs):.1f} off")
+
+    # Plate 8 of the 1935 atlas (Hama and Wada): 12 hues, each as tint, full colour ("as saturated as
+    # possible") and shade, with the names of Wada's books (colors.json's "atlas").
+    plate = {h: {} for h in ("yellow", "orange-yellow", "orange", "red", "purple-red", "red-purple", "purple",
+                             "purple-blue", "blue", "blue-green", "green", "yellow-green")}  # the plate's order
+    for i, c in enumerate(colors):
+        if "atlas" in c:
+            plate[c["atlas"]["hue"]][c["atlas"]["tone"]] = ostwald(i)
+    print("\nPlate 8 of the 1935 atlas: tint, full colour and shade per hue (codes, then hue numbers)")
+    at_rim = tint_fuller = close = tint_a = 0
+    for hue, tones in plate.items():
+        row = [tones.get(t) for t in ("tint", "full colour", "shade")]
+        here = [o for o in row if o]
+        ns = [o["n"] for o in here]
+        spread = max((b - a) % 100 for a in ns for b in ns if (b - a) % 100 <= 50)
+        tint, full = tones["tint"], tones["full colour"]  # every hue has both; purple-blue has no shade
+        at_rim += full["code"].endswith("PA")
+        tint_fuller += tint["colour"] > full["colour"]
+        tint_a += tint["code"].endswith("A")
+        close += spread <= 4
+        print(f"  {hue:13s} " + " ".join(f"{o['code'] if o else '-':5s}" for o in row) + "   " + " ".join(f"{o['n']:5.1f}" if o else "    -" for o in row) + f"   spread {spread:4.1f}")
+    print(f"Full colours at the rim (PA): {at_rim} of {len(plate)}; tints with no black (second letter A): {tint_a}; "
+          f"tint with more colour than its full colour: {tint_fuller}; tint, full colour and shade within 4 steps of hue: {close}")
 
     placed = [ostwald(i) for i in range(len(colors))]
     levels = Counter(p["level"] for p in placed)
@@ -147,15 +250,14 @@ if __name__ == "__main__":
     print(f"\nColours per level (0 = white ... {top} = black):", [levels[s] for s in range(top + 1)])
     print(f"Colours per ring (0 = greys on the axis ... {len(GREYS) - 1} = pure colour):", [rings[r] for r in range(len(GREYS))])
     print(f"Cells used: {len(cells)}; with 2 or more colours: {sum(1 for v in cells.values() if v > 1)}; most in one: {max(cells.values())}")
+    full = sorted((p["n"], colors[i]["name"]) for i, p in enumerate(placed) if p["ring"] == 15)
+    print(f"Full colours (ring 15): {len(full)}: " + ", ".join(f"{n} ({h:.1f})" for h, n in full))
+    print("Greys: " + ", ".join(f"{colors[i]['name']} ({p['code']})" for i, p in enumerate(placed) if p["n"] is None))
+    print(f"Codes using J: {sum('J' in p['code'] for p in placed)}")
 
-    # Colours outside sRGB, clipped before they are measured.
-    def unclipped(i):
-        L, C, h = colors[i]["oklch"]
-        a, b = C * math.cos(math.radians(h)), C * math.sin(math.radians(h))
-        l, m, s = ((L + x * a + y * b) ** 3 for x, y in ((0.3963377774, 0.2158037573), (-0.1055613458, -0.0638541728), (-0.0894841775, -1.2914855480)))
-        return (4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s)
-    out = sorted(((min(min(v), 0) - max(max(v) - 1, 0), c["name"]) for c, v in ((c, unclipped(i)) for i, c in enumerate(colors)) if min(v) < -1e-3 or max(v) > 1 + 1e-3))
-    print(f"\nOutside sRGB (clipped): {len(out)}; furthest: " + ", ".join(f"{n} ({d:+.3f})" for d, n in out[:3]))
+    # Beyond the press: purer than its full colour, or brighter than its tint edge (measured at the edge).
+    out = sorted(((max(m["outside"]), colors[i]["name"], m["outside"]) for i, m in ((i, measure(xyz_of(*c["oklch"]))) for i, c in enumerate(colors)) if max(m["outside"]) > 0), reverse=True)
+    print(f"\nBeyond the press's tint edge or full colour: {len(out)}; furthest: " + ", ".join(f"{n} (share {o[0]:+.4f}, black {-o[1]:+.4f})" for _, n, o in out[:4]))
 
     # How close each colour is to a neighbouring cell: the distance to the nearest boundary, in steps
     # (log steps for the letters, sectors for the hue).
@@ -190,16 +292,16 @@ if __name__ == "__main__":
     for a in range(len(GREYS)):
         for b in range(a + 1):
             if a == b:
-                ideal[(2 * a, 0, None)] = oklab([GREYS[a]] * 3)
+                ideal[(2 * a, 0, None)] = oklab_of(cell_xyz(None, a, b))
                 continue
             for sector in range(24):
-                ideal[(a + b, a - b, sector)] = oklab([GREYS[a] + (GREYS[b] - GREYS[a]) * v for v in SECTOR_COLOURS[sector]])
+                ideal[(a + b, a - b, sector)] = oklab_of(cell_xyz(sector, a, b))
     own = neighbour = further = 0
     gaps, dists = [], []
     for i in range(len(colors)):
         o = ostwald(i)
         cell = (o["level"], o["ring"], o["sector"])
-        lab = oklab(linear_srgb(*colors[i]["oklch"]))
+        lab = oklab_of(xyz_of(*colors[i]["oklch"]))
         d = {k: math.dist(lab, v) for k, v in ideal.items()}
         best = min(d, key=d.get)
         dists.append(d[cell])
@@ -213,5 +315,5 @@ if __name__ == "__main__":
             further += 1
             gaps.append(d[cell] - d[best])
     dists.sort()
-    print(f"Nearest cell colour (OKLab) is its own: {own}; a neighbouring cell: {neighbour}; further off: {further}, closer by at most {max(gaps):.3f}")
+    print(f"Nearest cell colour (OKLab) is its own: {own}; a neighbouring cell: {neighbour}; further off: {further}" + (f", closer by at most {max(gaps):.3f}" if gaps else ""))
     print(f"Distance to its own cell's colour: median {dists[len(dists) // 2]:.3f}, largest {dists[-1]:.3f}")

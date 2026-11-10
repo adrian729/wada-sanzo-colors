@@ -174,6 +174,52 @@ def lab_to_oklch(lab):
     return [round(L, 4), round(C, 4), round(h, 2)]
 
 
+# --- Lab (D50) -> CMYK through the profile's B2A1 table, the inverse of A2B1 (for ostwald_cmyk.py) --
+
+class Lut3(Lut):
+    """A 3-input table (Lab in), interpolated trilinearly, as LittleCMS does for Lab input."""
+
+    def __call__(self, device):  # here the encoded Lab
+        x = [self.curve(t, v) for t, v in zip(self.in_curves, device)]
+        g = self.grid - 1
+        lo, frac = [], []
+        for v in x:
+            p = min(max(v, 0.0), 1.0) * g
+            i = min(int(p), g - 1)
+            lo.append(i)
+            frac.append(p - i)
+        y = [0.0] * self.n_out
+        for corner in range(8):
+            d = [(corner >> k) & 1 for k in range(3)]
+            w = math.prod(f if dk else 1 - f for f, dk in zip(frac, d))
+            if w:
+                y = [o + w * n for o, n in zip(y, self.node([i + dk for i, dk in zip(lo, d)]))]
+        return [self.curve(t, v) for t, v in zip(self.out_curves, y)]
+
+
+def load_tag(sig):
+    data = PROFILE.read_bytes()
+    (count,) = struct.unpack(">I", data[128:132])
+    for i in range(count):
+        s, offset, size = struct.unpack(">4sII", data[132 + 12 * i:144 + 12 * i])
+        if s == sig:
+            return data[offset:offset + size]
+    raise ValueError(f"profile has no {sig.decode()} table")
+
+
+def lab_to_cmyk(lut, lab):
+    """Media-relative CIE Lab (D50) -> CMYK in percent."""
+    L, a, b = lab
+    if not lut.is16:
+        raise ValueError("expected a 16-bit B2A1 table")
+    # ICC v2 legacy 16-bit Lab: L 0..100 <-> 0x0000..0xFF00, a/b 0 <-> 0x8000
+    return [100 * v for v in lut([L * 652.80 / 65535, (a + 128) * 256 / 65535, (b + 128) * 256 / 65535])]
+
+
+def load_b2a1():
+    return Lut3(load_tag(b"B2A1"))
+
+
 def main():
     lut = load_a2b1(PROFILE)
     colors = json.loads(COLORS.read_text())

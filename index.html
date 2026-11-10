@@ -142,12 +142,15 @@
     /* Your combinations (saved in Create), before the book's: as its, under their own heading; each
        number opens it in Create, and the × after it removes it. 5 to 7 colours are stacked, as in
        Create, as tall as a cross. */
-    .yours .combo-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-    .yours .combo-head > .combo-number { margin-bottom: 0; }
-    .yours .remove { display: grid; padding: 0.25rem; margin: -0.25rem; border: 0; background: none; color: var(--muted); cursor: pointer; }
-    .yours .remove:is(:hover, :focus-visible) { color: var(--fg); }
-    .yours .remove svg { width: 0.75rem; height: 0.75rem; fill: none; stroke: currentColor; stroke-width: 1.25; }
-    @media (pointer: coarse) { .yours .remove { padding: 0.75rem; margin: -0.75rem; } } /* a finger's room, nothing moved */
+    /* A combination's number with an icon button at the other end of its line: your combinations' ×
+       (remove), the ＋ of the book's under Create's composition (use it there). */
+    .combo-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .combo-head > .combo-number { margin-bottom: 0; }
+    .combo-head button { display: grid; padding: 0.25rem; margin: -0.25rem; border: 0; background: none; color: var(--muted); cursor: pointer; }
+    .combo-head button:is(:hover, :focus-visible) { color: var(--fg); }
+    .combo-head button:disabled { opacity: 0.35; cursor: default; color: var(--muted); }
+    .combo-head svg { width: 0.75rem; height: 0.75rem; fill: none; stroke: currentColor; stroke-width: 1.25; }
+    @media (pointer: coarse) { .combo-head button { padding: 0.75rem; margin: -0.75rem; } } /* a finger's room, nothing moved */
     .yours .blocks.stack { width: calc(round(down, 100%, 4px) * 0.5625); }
     .yours .group-heading button { padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
     .yours .group-heading button:is(:hover, :focus-visible) { color: var(--fg); text-decoration: underline; }
@@ -265,6 +268,8 @@
     .section-label { margin-top: 1.5rem; color: var(--muted); font-size: 0.8rem; }
     .section-label a { color: inherit; }
     .section-label a:hover, .section-label a:focus-visible { color: var(--fg); }
+    .section-label .undo { padding: 0; border: 0; background: none; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
+    .section-label .undo:is(:hover, :focus-visible) { color: var(--fg); }
     .actions { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.8rem; }
     .actions :is(a, button) {
       padding: 0; border: 0; background: none;
@@ -278,13 +283,40 @@
     /* Create: compose a combination of 2 to 7 colours, laid out as in the book (2 to 4 as in Volume 1,
        5 to 7 stacked as the seasonal combinations), the colours' values under them (under each colour
        for 1 to 3, else in rows of blocks, as many to a row as fit), beside the colours to pick from (all of
-       Wada's, or OKLCH's or Ostwald's views). On wide screens the two share the width equally, whatever the
-       picker shows, and the composition stays in view while scrolling the colours. */
+       Wada's, or OKLCH's or Ostwald's views). Under the composition, the book's combinations with its
+       colours (see renderRelated). On wide screens the two share the width equally, whatever the picker
+       shows, each as tall as the screen below the header and scrolling on its own; on narrow ones, one
+       under another, the book's combinations last (so the picker stays near the composition). */
     #create-view { display: grid; gap: 2.5rem; align-items: start; }
+    .create-main { display: contents; }
+    .create-related { order: 1; }
     @media (min-width: 64rem) {
-      #create-view { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; } /* the same whatever the picker shows */
-      .create-stage { position: sticky; top: calc(var(--header-height, 3.375rem) + 1.5rem); } /* where it is unscrolled: below the header */
+      #create-view {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 3rem; /* the same whatever the picker shows */
+        height: calc(100dvh - var(--header-height, 3.375rem) - 3rem); align-items: stretch; /* the screen below the header, less main's padding */
+      }
+      .create-main { display: block; }
+      #create-view > :is(.create-main, .picker) { overflow: hidden auto; overscroll-behavior: contain; scrollbar-gutter: stable; } /* never sideways */
+      /* Room inside its scrolling box for what stands out of the combinations at its edges (the dots
+         marking shared colours, the ＋'s larger target), the content where it was. */
+      .create-main { padding-inline: 0.75rem; margin-inline: -0.75rem; }
+      .create-related { margin-top: 3rem; }
     }
+    /* The book's combinations with the composition's colours: as on a combination's page, smaller, a
+       row for each kind (2, 3 and 4 colours, seasonal), at most 3 to a row (4 seasonal ones), each with a
+       ＋ to use it instead. */
+    .create-related { display: grid; gap: 2rem; }
+    .create-related > .section-label { margin: 0; }
+    .create-related > * { min-width: 0; } /* as wide as the column: its rows hold as many as fit, up to their most */
+    .create-related:empty { display: none; }
+    .create-related .group-heading { display: flex; align-items: center; gap: 1ch; margin-bottom: 0.75rem; }
+    .create-related .group-heading span { margin-left: 0; }
+    .create-related .group-heading .chip { margin-right: 1ch; }
+    .create-related .combos { --w: 9rem; --most: 3; grid-template-columns: repeat(auto-fill, var(--w)); gap: 1.25rem 2rem; max-width: calc(var(--most) * (var(--w) + 2rem) - 2rem); }
+    .create-related .combos[data-kind="4"] { --w: 7.5rem; }
+    .create-related .combos.seasons { --w: 5.5rem; --most: 4; grid-template-columns: repeat(auto-fill, var(--w)); }
+    .related-kind { margin: 0 0 0.5rem; color: var(--muted); font-size: 0.75rem; }
+    .create-related .combos + .related-kind { margin-top: 1.25rem; }
     .create-stage .combo-figure { width: 100%; }
     /* A cross or a stack is centred in the composition's column, and under it its values' rows, the
        message and the actions: as many values to a row as fit (in balanced rows, as on a combination's
@@ -309,7 +341,7 @@
     .create-stage .dragging { position: relative; z-index: 1; cursor: grabbing; }
     .blocks .empty { border: 1px dashed var(--muted); }
     .blocks .empty + .empty { border-left: 0; }
-    .picker { display: grid; gap: 1rem; }
+    .picker { display: grid; gap: 1rem; align-content: start; } /* (on wide screens it is as tall as the screen) */
     .picker .grid { grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr)); }
     .picker .swatch span { opacity: 1; transform: none; } /* a picked colour's place in the combination */
     .picker-status { min-height: 3em; font-size: 0.8rem; line-height: 1.5; white-space: pre; font-variant-numeric: tabular-nums; }
@@ -531,7 +563,7 @@
        column allows, its control beside it, the switches under them), without the info panel: the line
        above them shows the colour under the pointer. The colours picked are marked on them, numbered. */
     .picker-source { display: flex; align-items: center; gap: 0.6rem; color: var(--muted); font-size: 0.8rem; }
-    html:has(#create-view:not([hidden])) { scrollbar-gutter: stable; } /* the grid scrolls, the views don't: switching between them moves nothing sideways */
+    html:has(#create-view:not([hidden])) { scrollbar-gutter: stable; } /* the page scrolls on narrow screens, and the others' do: coming here or switching what the picker shows moves nothing sideways */
     #create-view:not([data-show="grid"]) .picker > :is(.grid, .new-colours),
     #create-view:not([data-show="oklch"]) .picker > .wheel-box,
     #create-view:not([data-show="ostwald"]) .picker > .ostwald-box { display: none; }
@@ -666,7 +698,10 @@
     <section id="seasons-view" hidden></section>
     <section id="season-view" hidden></section>
     <section id="create-view" hidden>
-      <div class="create-stage"></div>
+      <div class="create-main">
+        <div class="create-stage"></div>
+        <div class="create-related"></div>
+      </div>
       <div class="picker" role="group" aria-label="Colours">
         <div class="picker-status" aria-hidden="true"></div>
       </div>
@@ -719,7 +754,7 @@
     const SECTIONS = [[2, "Two-colour combinations", "2色の配色帖"], [3, "Three-colour combinations", "3色の配色帖"], [4, "Four-colour combinations", "4色の配色帖"]];
     const MAX_PICKED = 7; // as many colours as the largest combination in the book
     const BIG = 1.6, DOT_GAP = 2.3; // Ostwald layout, every cell a dot: see along() below
-    let cusps = null; // the wheel's table of each hue's most vivid colour: see cuspTable() below
+    let press = null; // what the press prints (print-gamut.json): the Print view's edge, and Ostwald's system; see gamut() below
     let printTable = null, printLoading = null; // the print profile's table, for CMYK estimates: see loadPrintTable() below
     // A combination's pages: its colours on their own, the combinations of each kind that share a colour
     // with it, and its colours on the wheel. Address suffix and name.
@@ -728,7 +763,7 @@
     // selected for swapping or replacing, and a one-off message. In the address as colour numbers in book
     // order (#create/1-46-89; a new colour by its token, see newColour), so it can be shared; also
     // remembered in this browser, as are the new colours picked (`news`, see remember).
-    const create = { picked: [], active: null, note: "", dragged: false, previewing: false, news: [] };
+    const create = { picked: [], active: null, note: "", dragged: false, previewing: false, news: [], replaced: null };
     // Your combinations: those saved in Create, in this browser, by their colours as in the address
     // (1-46-89), in the order saved; shown first in Combinations (see renderYours). `undo`: the one last
     // removed there and where it was, until the next change; `section`: theirs in Combinations.
@@ -737,8 +772,227 @@
     const pickers = new Map(); // what the picker shows ("oklch", "ostwald") -> that view, made when first shown
     let showSource = null, renderNews = null; // the picker's (see buildPicker)
     const newColours = new Map(); // a new colour's token -> the colour, once picked or in the address: the same one everywhere (see oklchColour)
-    let ostwaldCells = null, ostwaldCMYK = null; // for Ostwald's new colours: the system (made when first needed), and its cells' estimated CMYK
+    let ostwaldCells = null, ostwaldCMYK = null; // Ostwald's system (see ostwaldShared), and its cells' estimated CMYK
     let comboWheel = null; // the combination pages' wheel, made the first time it is shown
+    // Colour: OKLab and linear sRGB, the two ranges the OKLCH view shows, the widest canvases, and XYZ (here,
+    // above the rest, as the views use them as they're made, before the script gets further).
+    // Linear sRGB 0..1 (in 4096 steps) -> 8-bit sRGB.
+    const SRGB_ENCODE = Uint8ClampedArray.from({ length: 4096 }, (_, i) => {
+      const v = i / 4095;
+      return 255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055);
+    });
+    // Linear -> encoded with sRGB's curve, 0..1 (in 4096 steps, between them in a line); and beyond, as
+    // extended sRGB (CSS Color 4's): mirrored below 0, its formula above 1. The float canvases' encoding.
+    const SRGB_CURVE = Float32Array.from({ length: 4097 }, (_, i) => {
+      const v = i / 4096;
+      return v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055;
+    });
+    function extendedCurve(v) {
+      const a = Math.abs(v);
+      if (a > 1) return Math.sign(v) * (1.055 * a ** (1 / 2.4) - 0.055);
+      const q = a * 4096, k = Math.min(4095, q | 0), e = SRGB_CURVE[k] + (SRGB_CURVE[k + 1] - SRGB_CURVE[k]) * (q - k);
+      return v < 0 ? -e : e;
+    }
+
+    // OKLab -> linear sRGB (Ottosson's matrices), written into `out`: any colour, outside sRGB with values
+    // beyond 0..1.
+    function oklabToLinearSRGB(L, a, b, out = new Float64Array(3)) {
+      const l_ = L + 0.3963377774 * a + 0.2158037573 * b, l = l_ * l_ * l_;
+      const m_ = L - 0.1055613458 * a - 0.0638541728 * b, m = m_ * m_ * m_;
+      const s_ = L - 0.0894841775 * a - 1.291485548 * b, s = s_ * s_ * s_;
+      out[0] = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+      out[1] = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+      out[2] = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+      return out;
+    }
+    const linearOf = ([L, C, h]) => oklabToLinearSRGB(L, C * Math.cos((h * Math.PI) / 180), C * Math.sin((h * Math.PI) / 180));
+    // Linear sRGB -> linear Rec. 2020 and linear Display P3 (all D65; CSS Color 4's matrices, multiplied).
+    const SRGB_TO_REC2020 = [[0.6274038959, 0.3292830384, 0.0433130657], [0.0690972894, 0.9195403951, 0.0113623156], [0.0163914389, 0.0880133079, 0.8955952532]];
+    const SRGB_TO_P3 = [[0.8224621209, 0.1775378791, 0], [0.0331941989, 0.9668058011, 0], [0.0170826307, 0.0723974407, 0.9105199286]];
+    const times3 = (m, v, out = new Float64Array(3)) => {
+      const [x, y, z] = v;
+      for (let r = 0; r < 3; r++) out[r] = m[r][0] * x + m[r][1] * y + m[r][2] * z;
+      return out;
+    };
+
+    // The two gamuts the OKLCH view can show (its Screen and Print switch), each its edge, most(L, h): the
+    // most chroma it holds at that lightness and hue, strictly (none at white, or beyond its darkest);
+    // `darkest`, the darkest lightness it reaches; cusp(): its most vivid colour per half degree of hue,
+    // lightness L and chroma C (entry 720 repeating 0, so interpolation wraps round); and NAMED, the hues
+    // of its primaries and secondaries (OKLCH's hue of its pure red, ...), with orange and violet halfway
+    // between, as the dial names them.
+    // Screen: Rec. 2020, the widest standard screen gamut, a fixed one (not the screen in front of you): it
+    // holds all of Wada's colours, and all the press prints, so nothing is lost. A screen that shows less
+    // clips the rest itself. Print: Japan Color 2011 Coated, what Wada's colours were printed with, as
+    // scripts/print_gamut.py measured it (print-gamut.json): per hue, the edge as a line through
+    // [lightness, chroma] points; between two hues, the two lines blended, at each lightness, by hue.
+    const gamuts = {};
+    function gamut(name) {
+      return (gamuts[name] ??= name === "print" ? printGamut() : screenGamut());
+    }
+    function withCusp(g) {
+      let cusps = null;
+      g.cusp = () => {
+        if (!cusps) {
+          const L = new Float64Array(721), C = new Float64Array(721);
+          for (let k = 0; k < 720; k++) [L[k], C[k]] = g.peak(k / 2);
+          L[720] = L[0];
+          C[720] = C[0];
+          cusps = { L, C };
+        }
+        return cusps;
+      };
+      const mean = (a, b) => (a + ((((b - a) % 360) + 540) % 360 - 180) / 2 + 360) % 360; // halfway, the shorter way round
+      const [R, Y, G, Cy, B, M] = g.primaries;
+      g.NAMED = [[R, "Red"], [mean(R, Y), "Orange"], [Y, "Yellow"], [G, "Green"], [Cy, "Cyan"], [B, "Blue"], [mean(B, M), "Violet"], [M, "Magenta"]];
+      return g;
+    }
+    function screenGamut() {
+      const v = new Float64Array(3), w = new Float64Array(3);
+      const most = (L, h) => {
+        if (L <= 0 || L >= 1) return 0;
+        const rad = (h * Math.PI) / 180, cos = Math.cos(rad), sin = Math.sin(rad);
+        let lo = 0, hi = 0.5;
+        for (let i = 0; i < 17; i++) { // to within 0.5 / 2^17
+          const mid = (lo + hi) / 2;
+          times3(SRGB_TO_REC2020, oklabToLinearSRGB(L, mid * cos, mid * sin, v), w);
+          if (w[0] >= -1e-9 && w[0] <= 1 + 1e-9 && w[1] >= -1e-9 && w[1] <= 1 + 1e-9 && w[2] >= -1e-9 && w[2] <= 1 + 1e-9) lo = mid;
+          else hi = mid;
+        }
+        return lo;
+      };
+      const peak = (h) => { // max chroma rises then falls with lightness: a ternary search finds the peak
+        let lo = 0.2, hi = 1;
+        for (let i = 0; i < 24; i++) { // to within 0.8 × (2/3)^24 ≈ 0.00005
+          const m1 = lo + (hi - lo) / 3, m2 = hi - (hi - lo) / 3;
+          if (most(m1, h) < most(m2, h)) lo = m1; else hi = m2;
+        }
+        const L = (lo + hi) / 2;
+        return [L, most(L, h)];
+      };
+      // The primaries' and secondaries' hues: Rec. 2020's red, yellow, green, cyan, blue and magenta.
+      const inverse = (m) => {
+        const [[a, b, c], [d, e, f], [g, h, i]] = m, det = a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g);
+        return [[e * i - f * h, c * h - b * i, b * f - c * e], [f * g - d * i, a * i - c * g, c * d - a * f], [d * h - e * g, b * g - a * h, a * e - b * d]].map((r) => r.map((x) => x / det));
+      };
+      const toSRGB = inverse(SRGB_TO_REC2020);
+      const primaries = [[1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 1]].map((c) => oklchOfLinear(times3(toSRGB, c))[2]);
+      return withCusp({ name: "screen", darkest: 0, most, peak, primaries });
+    }
+    function printGamut() {
+      const { hues, columns: raw, scale } = press.chroma, n = hues.length;
+      // Each hue's line: its lightnesses and chromas.
+      const columns = raw.map((c) => ({ L: Float64Array.from({ length: c.length / 2 }, (_, k) => c[2 * k] / scale), C: Float64Array.from({ length: c.length / 2 }, (_, k) => c[2 * k + 1] / scale) }));
+      const at = ({ L: Ls, C: Cs }, L) => { // its chroma at lightness L (at a step straight up, the top of it)
+        if (L < Ls[0] || L > Ls[Ls.length - 1]) return 0;
+        let lo = 0, hi = Ls.length; // the first point lighter than L
+        while (lo < hi) { const mid = (lo + hi) >> 1; if (Ls[mid] <= L) lo = mid + 1; else hi = mid; }
+        if (lo >= Ls.length) return Cs[Ls.length - 1];
+        const L0 = Ls[lo - 1], L1 = Ls[lo];
+        return L1 === L0 ? Cs[lo - 1] : Cs[lo - 1] + ((Cs[lo] - Cs[lo - 1]) * (L - L0)) / (L1 - L0);
+      };
+      const either = (h) => { // the two lines either side of hue h, and how far h is from the first
+        const x = ((h % 360) + 360) % 360;
+        let lo = 0, hi = n; // the first hue past x
+        while (lo < hi) { const mid = (lo + hi) >> 1; if (hues[mid] <= x) lo = mid + 1; else hi = mid; }
+        const j0 = (lo - 1 + n) % n, j1 = lo % n, h0 = hues[j0], h1 = hues[j1] + (lo === n ? 360 : 0);
+        return [columns[j0], columns[j1], (x - h0) / (h1 - h0)];
+      };
+      const most = (L, h) => {
+        if (L >= 1) return 0;
+        const [a, b, t] = either(h);
+        return (1 - t) * at(a, L) + t * at(b, L);
+      };
+      const peak = (h) => { // the most vivid point: at one of the two lines' points
+        const [a, b] = either(h);
+        let best = [0.5, 0];
+        for (const L of [...a.L, ...b.L]) { const C = most(L, h); if (C > best[1]) best = [L, C]; }
+        return best;
+      };
+      const { R, Y, G, C, B, M } = press.inks; // the inks' hues: red is magenta and yellow at 100%, ...
+      return withCusp({ name: "print", darkest: press.darkest, most, peak, primaries: [R, Y, G, C, B, M] });
+    }
+
+    // The widest canvas the browser has: "float", 16-bit floating point, which holds any colour (as
+    // extended sRGB), so the browser and the screen show it as they show the page's other colours,
+    // clipping only what the screen can't show; or else "p3" (Display P3) or "srgb", 8-bit, which hold
+    // only their own colours, so the rest is clipped, each channel to 0..1, before the screen sees it.
+    let canvasKind = null;
+    function canvasSpace() {
+      if (canvasKind) return canvasKind;
+      canvasKind = "srgb";
+      try {
+        const test = document.createElement("canvas").getContext("2d", { colorSpace: "srgb", colorType: "float16" });
+        if (test.getContextAttributes().colorType === "float16" && test.createImageData(1, 1, { colorSpace: "srgb", pixelFormat: "rgba-float16" }).pixelFormat === "rgba-float16") canvasKind = "float";
+      } catch {}
+      if (canvasKind === "srgb") {
+        try {
+          if (document.createElement("canvas").getContext("2d", { colorSpace: "display-p3" }).getContextAttributes().colorSpace === "display-p3") canvasKind = "p3";
+        } catch {}
+      }
+      return canvasKind;
+    }
+    // A canvas's 2D context, the widest (always asked for the same way: a canvas keeps its first); an image
+    // for it; and how a pixel is written: `put(px, o, rgb, alpha)`, linear sRGB (any colour) at offset o.
+    function wide2d(canvas) {
+      const kind = canvasSpace();
+      const ctx = canvas.getContext("2d", kind === "float" ? { colorSpace: "srgb", colorType: "float16" } : kind === "p3" ? { colorSpace: "display-p3" } : undefined);
+      const image = (w, h) => (kind === "float" ? ctx.createImageData(w, h, { colorSpace: "srgb", pixelFormat: "rgba-float16" }) : ctx.createImageData(w, h, kind === "p3" ? { colorSpace: "display-p3" } : undefined));
+      const encode8 = (v) => SRGB_ENCODE[v <= 0 ? 0 : v >= 1 ? 4095 : (v * 4095 + 0.5) | 0];
+      const p3 = new Float64Array(3);
+      const put = kind === "float"
+        ? (px, o, rgb, alpha) => { px[o] = extendedCurve(rgb[0]); px[o + 1] = extendedCurve(rgb[1]); px[o + 2] = extendedCurve(rgb[2]); px[o + 3] = alpha; }
+        : (px, o, rgb, alpha) => {
+          const c = kind === "p3" ? times3(SRGB_TO_P3, rgb, p3) : rgb;
+          px[o] = encode8(c[0]); px[o + 1] = encode8(c[1]); px[o + 2] = encode8(c[2]); px[o + 3] = 255 * alpha;
+        };
+      return { ctx, image, put };
+    }
+    // A WebGL 2 canvas's drawing buffer, the widest (as above; float: RGBA16F, extended sRGB). Returns how to
+    // write a colour for it: screen(rgb), linear sRGB (any colour), and fromEncoded(rgb), sRGB as CSS gives
+    // it (0..1), each as the three channels its shaders write.
+    function wideGL(gl) {
+      let kind = "srgb";
+      try {
+        if (gl.getExtension("EXT_color_buffer_float") && gl.drawingBufferStorage) {
+          gl.drawingBufferStorage(gl.RGBA16F, gl.drawingBufferWidth, gl.drawingBufferHeight);
+          if (gl.drawingBufferFormat === gl.RGBA16F) kind = "float";
+        }
+      } catch {}
+      if (kind === "srgb" && "drawingBufferColorSpace" in gl) {
+        try { gl.drawingBufferColorSpace = "display-p3"; } catch {}
+        if (gl.drawingBufferColorSpace === "display-p3") kind = "p3";
+      }
+      const curve = (v) => SRGB_CURVE[Math.round(Math.min(1, Math.max(0, v)) * 4096)];
+      const screen = kind === "float" ? (rgb) => Array.from(rgb, extendedCurve) : (rgb) => Array.from(kind === "p3" ? times3(SRGB_TO_P3, rgb) : rgb, curve);
+      const decode = (v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+      const fromEncoded = kind === "p3" ? (rgb) => screen(rgb.map(decode)) : (rgb) => [...rgb];
+      return { kind, screen, fromEncoded };
+    }
+
+    // CIE XYZ (D65) <-> OKLCH, CSS Color 4's matrices (as scripts/cmyk_to_oklch.py, and inverted, as
+    // notes/ostwald.py): for Ostwald's system, measured against the press. Nothing is clipped.
+    const OKLAB_TO_LMS = [[1.00000000239858, 0.39633777716154006, 0.21580375421218242], [0.999999999290284, -0.1055613457521502, -0.06385417190922567], [0.9999999856456103, -0.08948417624532107, -1.2914855294809227]];
+    const LMS_TO_XYZ = [[1.226879875845924, -0.557814994460217, 0.2813910456659646], [-0.040575745214800875, 1.1122868032803173, -0.07171105806551642], [-0.07637293667466001, -0.4214933324022431, 1.5869240198367816]];
+    const XYZ_TO_LMS = [[0.819022437996703, 0.3619062600528904, -0.1288737815209879], [0.0329836539323885, 0.9292868615863434, 0.0361446663506424], [0.0481771893596242, 0.2642395317527308, 0.6335478284694309]];
+    const LMS_TO_OKLAB = [[0.210454268309314, 0.7936177747023054, -0.0040720430116193], [1.9779985324311684, -2.42859224204858, 0.450593709617411], [0.0259040424655478, 0.7827717124575296, -0.8086757660377118]];
+    const XYZ_TO_SRGB = [[3.2409699419045226, -1.537383177570094, -0.4986107602930034], [-0.9692436362808796, 1.8759675015077202, 0.04155505740717559], [0.05563007969699366, -0.20397695888897652, 1.0569715142428786]];
+    function xyzOf([L, C, h]) {
+      const rad = h * (Math.PI / 180);
+      return times3(LMS_TO_XYZ, Array.from(times3(OKLAB_TO_LMS, [L, C * Math.cos(rad), C * Math.sin(rad)]), (v) => v * v * v));
+    }
+    function oklchOfXYZ(xyz) { // rounded as colors.json is (and in the same steps as notes/ostwald.py)
+      const [L, a, b] = times3(LMS_TO_OKLAB, Array.from(times3(XYZ_TO_LMS, xyz), (v) => Math.sign(v) * Math.abs(v) ** (1 / 3)));
+      const deg = Math.atan2(b, a) * (180 / Math.PI) % 360, C = +Math.hypot(a, b).toFixed(4), h = +(deg < 0 ? deg + 360 : deg).toFixed(2);
+      return [+L.toFixed(4), C, C === 0 || h === 360 ? 0 : h];
+    }
+    function oklchOfLinear(rgb) { // linear sRGB -> OKLCH (Ottosson's matrices), not rounded
+      const [r, g, b] = rgb;
+      const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b), m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b), s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+      const L = 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, A = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, B = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+      return [L, Math.hypot(A, B), (((Math.atan2(B, A) * 180) / Math.PI) % 360 + 360) % 360];
+    }
+
     function showView() {
       const [, arg, tab] = location.hash.slice(1).split("/");
       const name = showHeader(); // the header's script (in the page, so as to show the header right from the start)
@@ -809,9 +1063,15 @@
       const copy = detail.querySelector(".copy");
       copy.dataset.css = color.css;
       copy.classList.remove("copied");
-      // Only in Volume 2, or misspelled in the book: say so.
-      const note = detail.querySelector(".detail-note");
-      note.textContent = [color.volume === 2 && "From Volume 2", color.bookName && `Printed as ${color.bookName}`].filter(Boolean).join(". ");
+      // Only in Volume 2, or misspelled in the book: say so. On Plate 8 of Hama and Wada's colour atlas
+      // (1935): its hue and tone there, and the plate's Japanese name with its reading.
+      const note = detail.querySelector(".detail-note"), { atlas } = color;
+      const parts = [color.volume === 2 && "From Volume 2", color.bookName && `Printed as ${color.bookName}`].filter(Boolean);
+      note.replaceChildren(parts.join(". "));
+      if (atlas) {
+        note.append(`${parts.length ? ". " : ""}Colour atlas (1935), Plate 8: ${atlas.tone} of ${atlas.hue}, `,
+          Object.assign(document.createElement("span"), { lang: "ja", textContent: atlas.ja }), ` (${atlas.reading})`);
+      }
       note.hidden = !note.textContent;
       // The colour's combinations, small, Volume 1's then the seasonal ones; each opens its page.
       const list = detail.querySelector(".detail-combos");
@@ -864,9 +1124,10 @@
     detail.addEventListener("click", (e) => { if (e.target === detail) detail.close(); });
 
     try {
-      const [colors, families, combinations, seasonal] = await Promise.all(
-        ["colors.json", "families.json", "combinations.json", "seasons.json"].map((f) => fetch(f).then((r) => r.json()))
+      const [colors, families, combinations, seasonal, printed] = await Promise.all(
+        ["colors.json", "families.json", "combinations.json", "seasons.json", "print-gamut.json"].map((f) => fetch(f).then((r) => r.json()))
       );
+      press = printed;
       colors.forEach((c, i) => Object.assign(c, { index: i, css: oklchText(c.oklch) }));
       const combos = combinations.map((ids, i) => ({ kind: "combination", number: i + 1, colors: ids.map((k) => colors[k]) }));
       // Seasonal combinations: six a month, January first.
@@ -925,7 +1186,7 @@
       buildPicker(colors, families);
       views.colors.append(makeWheel(colors, { views: true }).box, makeOstwald(colors));
       // Prepare the wheel background's hue table while the page is idle, so opening the wheel is quick.
-      (window.requestIdleCallback ?? setTimeout)(() => cuspTable());
+      (window.requestIdleCallback ?? setTimeout)(() => gamut("screen").cusp());
       showView(); // a #combination/<number> (or #season, #create) link opened directly needs the data
     } catch (error) {
       console.error(error);
@@ -985,8 +1246,9 @@
     }
 
     // A combination in a list: its number (a link to its page) above its colours; those in `shared`
-    // marked (the colours it shares with the combination whose page this is).
-    function combinationItem(combo, shared = []) {
+    // marked (the colours it shares with the combination whose page this is). `named`: each colour's name
+    // shown on hover (not where the colours are too small for it).
+    function combinationItem(combo, shared = [], named = true) {
       const link = document.createElement("a");
       link.className = "combo-number";
       link.href = comboHref(combo);
@@ -994,7 +1256,7 @@
       const li = document.createElement("li");
       li.setAttribute("aria-label", `${combo.kind === "season" ? "Seasonal combination" : "Combination"} ${combo.number}`);
       li.append(link, blocksFor(combo, (c) => {
-        const button = namedColorButton(c);
+        const button = named ? namedColorButton(c) : colorButton(c);
         if (shared.includes(c)) button.classList.add("shared");
         return button;
       }));
@@ -1044,7 +1306,7 @@
     }
 
     // Colours in an address: Wada's by their numbers in book order, 1-based, e.g. 1-46-89; a new colour by
-    // its token (see oklchColour, ostwaldColour).
+    // its token, its OKLCH values (see oklchColour).
     function colorsCode(colors) {
       return colors.map(tokenOf).join("-");
     }
@@ -1058,11 +1320,11 @@
     }
 
     // New colours: none of Wada's, picked in Create from OKLCH's slices or Ostwald's cells. Each goes by a
-    // token, in the address and in this browser: OKLCH's by its values, as Wada's are given
-    // (0.7234,0.1203,45.2), and named by them rounded ("OKLCH 0.72 0.12 45°", or "OKLCH grey 0.72");
-    // Ostwald's by its code (16PA, or A for a grey), and named as its card is ("Ostwald 16PA"). Their CMYK
-    // is an estimate: OKLCH's made in the page (estimateCMYK), Ostwald's as the Ostwald view's
-    // (ostwald-cmyk.json); none until it's in.
+    // token, in the address and in this browser: its OKLCH values, as Wada's are given (0.7234,0.1203,45.2).
+    // An OKLCH colour is named by them rounded ("OKLCH 0.72 0.12 45°", or "OKLCH grey 0.72"); an Ostwald
+    // cell's own colour (its OKLCH exactly a cell's) as its card is ("Ostwald 16PA", or "Ostwald grey A"),
+    // so its code is never stored, only found again. Their CMYK is an estimate: OKLCH's made in the page
+    // (estimateCMYK), Ostwald's as the Ostwald view's (ostwald-cmyk.json); none until it's in.
     function tokenOf(c) {
       return c.token ?? String(c.index + 1);
     }
@@ -1071,41 +1333,39 @@
     }
     function oklchColour([L0, C0, h0]) {
       const oklch = [+L0.toFixed(4), +C0.toFixed(4), +C0.toFixed(4) ? +h0.toFixed(2) % 360 : 0], [L, C, h] = oklch, token = oklch.join(",");
-      return newColours.get(token) ?? {
+      if (newColours.has(token)) return newColours.get(token);
+      const own = ostwaldShared().cellOf(token);
+      if (own) {
+        return {
+          token, oklch, css: oklchText(oklch), name: `Ostwald ${own.sector === null ? "grey " : ""}${own.code}`,
+          ostwald: { sector: own.sector, level: own.a + own.b, ring: own.a - own.b, code: own.code, white: own.white, black: own.black },
+          get cmyk() { return ostwaldCMYK?.[own.code] ?? null; },
+        };
+      }
+      return {
         token, oklch, css: oklchText(oklch),
         name: C ? `OKLCH ${+L.toFixed(2)} ${+C.toFixed(C < 0.01 ? 3 : 2)} ${Math.round(h) % 360}°` : `OKLCH grey ${+L.toFixed(2)}`,
         get cmyk() { return estimateCMYK(oklch); },
       };
     }
-    function ostwaldColour(code) {
-      code = code.toUpperCase();
-      if (newColours.has(code)) return newColours.get(code);
+    // Ostwald's system (made when first needed, by the Ostwald view or a new colour), with its cells'
+    // estimated CMYK fetched once it is.
+    function ostwaldShared() {
       if (!ostwaldCells) {
         ostwaldCells = ostwaldSystem(data.colors);
         fetch("ostwald-cmyk.json").then((r) => r.json()).then((d) => {
           if (Math.abs(d.offset - ostwaldCells.offset) >= 1e-4) return; // made for another calibration
           ostwaldCMYK = d.cmyk;
-          if (!create.previewing) renderStage();
+          if (!views.create.hidden && !create.previewing && create.picked.some((c) => c.token && c.ostwald)) renderStage();
         }).catch(() => {});
       }
-      const { LETTERS, cell } = ostwaldCells, m = /^(?:(\d{1,2})([A-P])([A-P])|([A-P]))$/.exec(code);
-      if (!m) return null;
-      const a = LETTERS.indexOf(m[2] ?? m[4]), b = LETTERS.indexOf(m[3] ?? m[4]);
-      const sector = m[4] ? null : Array.from({ length: 24 }, (_, k) => Math.round((k * 100) / 24) % 100).indexOf(Number(m[1])); // as cell() numbers them
-      if (sector === -1 || a < b || (!m[4] && a === b)) return null;
-      const own = cell(sector, a, b);
-      return {
-        token: own.code, oklch: own.oklch, css: oklchText(own.oklch), name: `Ostwald ${a === b ? "grey " : ""}${own.code}`,
-        ostwald: { sector, level: a + b, ring: a - b, code: own.code, white: own.white, black: own.black },
-        get cmyk() { return ostwaldCMYK?.[own.code] ?? null; },
-      };
+      return ostwaldCells;
     }
     // The colour of a token (none if it's not one), a new one kept from then on.
     function colourOf(token) {
       if (/^\d+$/.test(token)) return data.colors[Number(token) - 1] ?? null;
       const v = /^([\d.]+),([\d.]+),([\d.]+)$/.exec(token)?.slice(1).map(Number);
-      if (v) return v[0] <= 1 && v[1] <= 0.5 && v[2] < 360 ? kept(oklchColour(v)) : null; // (not a number: none)
-      return /^(\d{1,2}[A-P]{2}|[A-P])$/i.test(token) ? kept(ostwaldColour(token)) : null;
+      return v && v[0] <= 1 && v[1] <= 0.5 && v[2] < 360 ? kept(oklchColour(v)) : null; // (not a number: none)
     }
     function kept(c) {
       if (!c?.token) return c;
@@ -1211,6 +1471,7 @@
 
     // Opens the Create view: with the colours in the address, or else the combination composed last.
     function openCreate(arg) {
+      create.replaced = null;
       if (arg !== undefined) create.picked = parseColors(arg);
       else if (!create.picked.length) {
         let saved = null;
@@ -1230,6 +1491,7 @@
       history.replaceState(null, "", code ? `#create/${code}` : "#create");
       try { localStorage.setItem("create", code); } catch {}
       renderStage(focusSlot);
+      renderRelated();
       for (const c of data.colors) {
         const at = create.picked.indexOf(c), button = pickerButtons[c.index];
         button.setAttribute("aria-pressed", at >= 0);
@@ -1239,6 +1501,84 @@
       for (const view of pickers.values()) view.numbers(create.picked);
       // OKLCH's new colours' CMYK, estimated once the print profile's table is in
       if (!printTable && create.picked.some((c) => c.token && !c.ostwald)) loadPrintTable().then(() => { if (printTable && !create.previewing) renderStage(); });
+    }
+
+    // Under the composition: the book's combinations with any of its colours (Wada's: new colours aren't
+    // in the book), as a colour's card lists them: first those with several of them, the most first;
+    // then each colour's, in the composition's order. In each, a row per kind: 2, 3 and 4 colours, then
+    // the seasonal ones (with their month). Its colours in
+    // them are marked, as on a combination's page. Each number opens its page; each ＋ puts that
+    // combination here instead (see useCombination).
+    function renderRelated() {
+      const box = views.create.querySelector(".create-related");
+      const wada = create.picked.filter((c) => !c.token);
+      const shares = (combo) => combo.colors.filter((c) => wada.includes(c)).length;
+      const all = [...data.combos, ...data.seasons].filter((combo) => shares(combo) > 0);
+      const groups = [];
+      for (let n = wada.length; n > 1; n--) {
+        const list = all.filter((combo) => shares(combo) === n);
+        if (list.length) groups.push([n === wada.length ? (n === 2 ? "With both" : `With all ${n}`) : `With ${n} of them`, list]);
+      }
+      for (const c of wada) {
+        const list = all.filter((combo) => shares(combo) === 1 && combo.colors.includes(c));
+        if (list.length) groups.push([c, list]);
+      }
+      const here = colorsCode(create.picked);
+      const parts = [];
+      if (all.length) parts.push(Object.assign(document.createElement("p"), {
+        className: "section-label",
+        textContent: `In the book: ${all.length} combination${all.length === 1 ? "" : "s"} with ${wada.length === 1 ? "this colour" : "these colours"}.`,
+      }));
+      for (const [title, list] of groups) {
+        const heading = document.createElement("h2");
+        heading.className = "group-heading";
+        if (typeof title === "string") heading.append(title);
+        else heading.append(`With ${title.name}`, chipOf(title));
+        heading.append(Object.assign(document.createElement("span"), { textContent: list.length }));
+        const group = document.createElement("section");
+        group.append(heading);
+        for (const [kind, label] of [[2, "2 colours"], [3, "3 colours"], [4, "4 colours"], ["season", "Seasonal"]]) {
+          const ofKind = list.filter((combo) => (kind === "season" ? combo.kind === "season" : combo.kind === "combination" && combo.colors.length === kind));
+          if (!ofKind.length) continue;
+          const ul = document.createElement("ul");
+          ul.className = kind === "season" ? "combos seasons" : "combos";
+          ul.dataset.kind = kind;
+          ul.append(...ofKind.map((combo) => {
+            const li = combinationItem(combo, wada, false); // too small for the colours' names
+            if (combo.month) Object.assign(li.querySelector(".combo-number"), { textContent: `${comboLabel(combo)} · ${combo.month.slice(0, 3)}`, title: combo.month });
+            const use = Object.assign(document.createElement("button"), { type: "button", className: "use", disabled: colorsCode(combo.colors) === here });
+            use.title = use.disabled ? "Your combination is this one" : "Use it here, in place of your combination";
+            use.setAttribute("aria-label", `Use ${combo.kind === "season" ? "seasonal combination" : "combination"} ${combo.number} in place of yours`);
+            use.innerHTML = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1.5v9M1.5 6h9"/></svg>';
+            use.addEventListener("click", () => useCombination(combo));
+            const head = document.createElement("div");
+            head.className = "combo-head";
+            head.append(li.querySelector(".combo-number"), use);
+            li.prepend(head);
+            return li;
+          }));
+          group.append(Object.assign(document.createElement("p"), { className: "related-kind", textContent: label }), ul);
+        }
+        parts.push(group);
+      }
+      box.replaceChildren(...parts);
+    }
+
+    // A combination of the book in place of the composition: the note offers to undo it, until the
+    // composition changes. The composition is shown from its top.
+    function useCombination(combo) {
+      create.replaced = {
+        previous: [...create.picked], code: colorsCode(combo.colors),
+        label: combo.kind === "season" ? `seasonal combination ${comboLabel(combo)}` : `combination ${comboLabel(combo)}`,
+      };
+      create.picked = [...combo.colors];
+      create.active = null;
+      create.note = "";
+      updateCreate();
+      const main = views.create.querySelector(".create-main");
+      if (matchMedia("(min-width: 64rem)").matches) main.scrollTo({ top: 0 });
+      else scrollTo({ top: 0 });
+      views.create.querySelector(".create-stage .undo")?.focus({ preventScroll: true });
     }
 
     // The composition: the colours laid out as in the book (2 to 7; empty slots until there are 2),
@@ -1265,7 +1605,18 @@
       const note = document.createElement("p");
       note.className = "section-label";
       note.setAttribute("aria-live", "polite");
-      if (create.note) note.textContent = create.note;
+      const replaced = create.replaced?.code === colorsCode(picked) ? create.replaced : null; // until the composition changes
+      if (replaced && !preview) {
+        const undo = Object.assign(document.createElement("button"), { type: "button", className: "undo", textContent: "Undo" });
+        undo.addEventListener("click", () => {
+          create.picked = replaced.previous;
+          create.replaced = null;
+          create.active = null;
+          create.picked.forEach(remember);
+          updateCreate();
+        });
+        note.append(`In place of your combination: ${replaced.label}. `, undo);
+      } else if (create.note) note.textContent = create.note;
       else if (active !== null) note.textContent = "Pick a colour to replace it, or select another to swap them.";
       else if (shown.length < 2) note.textContent = `Pick 2 to ${MAX_PICKED} colours.`;
       else {
@@ -1445,16 +1796,12 @@
       const showStatus = (c) => status.replaceChildren(namedLine(c), Object.assign(document.createElement("p"), {
         textContent: `${c.cmyk ? `${c.token ? "≈ " : ""}${cmykText(c.cmyk)}  ` : ""}${oklchValues(c.oklch)}`, // a new colour's CMYK: an estimate, if any
       }));
-      // Changing the composition moves neither the picker nor the composition. On narrow screens the
-      // composition is above the picker: when it changes height, scroll by as much, so the picker stays
-      // under the pointer. On wide screens it sticks below the header while the colours scroll, as far
-      // as the view goes: grown taller than the colours, it would stop and jump up; the view grows instead.
+      // Changing the composition doesn't move the picker. On narrow screens the composition is above it:
+      // when it changes height, scroll by as much, so the picker stays under the pointer. (On wide ones
+      // each scrolls on its own.)
       const steady = (change) => {
-        const stage = views.create.querySelector(".create-stage");
-        const top = picker.getBoundingClientRect().top, stageTop = stage.getBoundingClientRect().top;
+        const top = picker.getBoundingClientRect().top;
         change();
-        const jump = stageTop - stage.getBoundingClientRect().top;
-        if (jump > 0.5) views.create.style.minHeight = `${views.create.getBoundingClientRect().height + jump}px`;
         scrollBy(0, picker.getBoundingClientRect().top - top);
       };
       const preview = (c) => {
@@ -1561,7 +1908,7 @@
         },
         pick: (c) => steady(() => pick(c)),
         oklch: oklchColour,
-        ostwald: (own) => ostwaldColour(own.code),
+        ostwald: (own) => oklchColour(own.oklch),
         badge,
       };
       showSource = () => {
@@ -1793,6 +2140,9 @@
     // each mark). Its choices are saved apart from the Colors page's.
     function makeWheel(colors, { views = false, picker = null } = {}) {
       const P = picker ? "create-" : ""; // its saved choices' and its ids' prefix
+      // The range shown, Screen (Rec. 2020) or Print (the press), as the switch says (see gamut()); the
+      // combination pages' wheel, without the switch, shows Screen's.
+      let range = "screen", G = gamut(range);
       const SLICE = 10, BANDS = 8, NEUTRAL_C = 0.02, LEVELS = 20; // (the 2D view's lightness levels: 21, 0.05 apart)
       const RING = [0.25, 1], GREYS = [0.13, 0.23];
       const panel = Object.assign(document.createElement("aside"), { className: "wheel-panel" });
@@ -1810,11 +2160,11 @@
       };
       const overlay = (name) => svgEl("path", { class: name }); // drawn over the colours
       const shape = overlay("shape"), marks = overlay("marks"), highlight = overlay("highlight");
-      // Under the colours, in 2D: the slice's edge (as far as the screen's colours go) and, across the axis,
+      // Under the colours, in 2D: the slice's edge (as far as the range shown goes) and, across the axis,
       // the rim, for scale.
-      const gamut = svgEl("path", { class: "gamut" }), rim = svgEl("path", { class: "rim" });
+      const sliceEdge = svgEl("path", { class: "gamut" }), rim = svgEl("path", { class: "rim" });
       const layer = svgEl("g"); // the colours
-      svg.append(...(views ? [gamut, rim] : []), layer, shape, marks, highlight);
+      svg.append(...(views ? [sliceEdge, rim] : []), layer, shape, marks, highlight);
       const segments = new Map(); // colour -> its path, outline, and (if not grey) hue angle and centre
       const spots = new Map(); // colour -> its dot's centre, where it's a dot
       const pt = polarPoint, arc = ringSector;
@@ -1948,8 +2298,8 @@
       // (the flat wheel, and the last KEEP slices), so that going back to it, from another view or slice,
       // takes no painting.
       const canvas = wheel.querySelector(".wheel-bg");
-      const FLAT = { key: "flat", paint: () => { delete canvas.dataset.painted; return paintWheel(canvas, RING, lo, hi); } };
-      let background = FLAT, painted = ""; // what the background shows; what it was last painted with, at what size
+      const flat = () => ({ key: `flat ${range}`, paint: () => { delete canvas.dataset.painted; return paintWheel(canvas, RING, lo, hi, G); } });
+      let background = flat(), painted = ""; // what the background shows; what it was last painted with, at what size
       const kept = new Map(), KEEP = 12; // pictures by what they show, the last shown last
       const paintBackground = () => {
         const key = `${background.key} ${canvas.clientWidth} ${devicePixelRatio}`;
@@ -1961,7 +2311,7 @@
           kept.set(key, picture);
           canvas.width = picture.width;
           canvas.height = picture.height;
-          canvas.getContext("2d").putImageData(picture, 0, 0);
+          wide2d(canvas).ctx.putImageData(picture, 0, 0);
           return;
         }
         const painting = background.paint(); // its pixels (none if there was nothing to paint)
@@ -1984,25 +2334,30 @@
         drawFlat();
         return { panel, wheel, mark };
       }
+      // Its choices, remembered by the page (see below); the range first, as everything's drawn in it.
+      const saved = (key) => { try { return localStorage.getItem(P + key); } catch { return null; } };
+      const save = (key, value) => { try { localStorage.setItem(P + key, value); } catch {} };
+      range = saved("wheel-range") === "print" ? "print" : "screen";
+      G = gamut(range);
 
-      // 2D: OKLCH's solid. Out from the axis, √chroma, as on the wheel, out to the rim: 11 of its rings, not
-      // 8, so as to reach the screen's most vivid colours (chroma 0.32, blue to magenta) past Wada's
-      // (0.22), and show the slice's whole shape. The greys are on the axis, in a cell as narrow as the
+      // 2D: OKLCH's solid. Out from the axis, √chroma, as on the wheel, out to the rim: 14 of its rings, not
+      // 8, so as to reach Rec. 2020's most vivid colours (chroma 0.47, green), far past Wada's (0.22), and
+      // show the slice's whole shape, in either range, at the same scale. The greys are on the axis, in a cell as narrow as the
       // rings (their chroma, under 0.02, would take 0.24 of the radius). Its 21 levels, 0 (white,
       // lightness 1) to 20 (black, 0), are 0.05 apart, each holding the colours within 0.025 of it.
-      const SOLID_RINGS = 11, AXIS = 0.08;
+      const SOLID_RINGS = 14, AXIS = 0.08;
       const edge = lo + (SOLID_RINGS * (hi - lo)) / BANDS; // the rim's √chroma
       const rho = (C) => Math.sqrt(C) / edge;
       const lightOf = (i) => 1 - i / LEVELS, levelOf = (c) => Math.round((1 - c.oklch[0]) * LEVELS);
       const count = (n) => `${n} colour${n === 1 ? "" : "s"}`;
       const num = (v) => String(+v.toFixed(3));
-      const most = (L, h) => (L <= 0 || L >= 1 ? 0 : maxChroma(L, h, 1e-9)); // the most chroma the screen can show, strictly (none at black and white)
+      const most = (L, h) => (L <= 0 || L >= 1 ? 0 : G.most(L, h)); // the most chroma the range holds, strictly (none at black and white)
       // The cells, which the squares fill, follow the slice's shape: per 10° slice of hue (through the
       // axis, per level), rings from chroma 0.02 (`inner`, where the greys end) out to the slice's own
       // edge, each the same share of the way out at every hue (or lightness), as many as fit about a
       // wheel's ring (`step`), at least one. A colour's ring is its share of the way out to the edge at
       // its own lightness and hue: inside the shape, then, or in the outermost ring if it's more vivid
-      // than the screen can show (16 of Wada's printed colours are).
+      // than the range holds (in Print, a few of Wada's colours are, by a hair: the table's precision).
       const inner = lo / edge, step = (hi - lo) / BANDS / edge;
       const out = (u, e) => inner + u * Math.max(0, e - inner); // the radius `u` of the way out to edge e
       const ringsIn = (far) => Math.max(1, Math.round((far - inner) / step));
@@ -2016,8 +2371,8 @@
         return ps;
       };
       // Of those, where a cell has room: where the edge, e(p), is past `inner`, with where it crosses it
-      // (the cell ends there in a point). Past black and white, and for some hues near them, the screen
-      // shows less than chroma 0.02 there.
+      // (the cell ends there in a point). Past black and white, and for some hues near them, the range
+      // holds less than chroma 0.02 there.
       const room = (all, e) => {
         const ps = [];
         let before = 0, eBefore = 0;
@@ -2033,7 +2388,7 @@
         const e = rho(most(c.oklch[0], c.oklch[2]));
         return e > inner ? Math.min(1, Math.max(0, (rho(c.oklch[1]) - inner) / (e - inner))) : 1;
       };
-      // A cell's own colour: its middle's, at as much chroma as the screen can show there if less.
+      // A cell's own colour: its middle's, at as much chroma as the range holds there if less.
       const tone = (L, r, h) => {
         const C = Math.min((r * edge) ** 2, most(L, h)), rad = (h * Math.PI) / 180;
         return { oklch: [L, C, h], rgb: oklabToLinearSRGB(L, C * Math.cos(rad), C * Math.sin(rad)) };
@@ -2054,7 +2409,7 @@
       caption.append(back, captionText, ahead);
 
       // Across the axis: one level, seen from above, as the wheel. Its colours, and the slice of what the
-      // screen can show at that lightness: its edge per half degree of hue (entry 720 repeats 0).
+      // range holds at that lightness: its edge per half degree of hue (entry 720 repeats 0).
       const levelEdge = (L) => {
         const t = new Float64Array(721);
         for (let k = 0; k < 720; k++) t[k] = rho(most(L, k / 2));
@@ -2121,7 +2476,7 @@
       const drawLevel = (i, chosen) => {
         const L = lightOf(i), here = colors.filter((c) => levelOf(c) === i);
         const list = here.filter((c) => !isGrey(c)), greyList = here.filter(isGrey);
-        const t = levelEdge(L), point = !t.some((v) => v > 0), cells = levelCells(L, t);
+        const t = levelEdge(L), none = L < G.darkest, point = !none && !t.some((v) => v > 0), cells = levelCells(L, t); // none: darker than the press prints
         cut = { L, t, cells };
         // Dots (levelDots); squares: each colour's cell split by hue, as the wheel's are; the greys a disc on
         // the axis, split as the wheel's ring is.
@@ -2143,16 +2498,16 @@
           for (const [c, d0, d1] of greyPieces(greyList)) segment(c, greyList.length === 1 ? circle(0, 0, axis) : arc(0, axis, d0, d1)).classList.add("on-axis");
         }
         // At black and white, the slice is the axis alone, a point: a small disc of that grey, not faded,
-        // as it's all there is.
-        gamut.setAttribute("d", point ? circle(0, 0, 0.04) : `M ${Array.from({ length: 720 }, (_, k) => polar(t[k], k / 2).map((v) => v.toFixed(4)).join(" ")).join(" L ")} Z`); // per half degree, as the cells
-        if (point) gamut.style.fill = `oklch(${L} 0 0)`;
+        // as it's all there is. Darker than the press prints, in Print, there's nothing.
+        if (!none) sliceEdge.setAttribute("d", point ? circle(0, 0, 0.04) : `M ${Array.from({ length: 720 }, (_, k) => polar(t[k], k / 2).map((v) => v.toFixed(4)).join(" ")).join(" L ")} Z`); // per half degree, as the cells
+        if (point) sliceEdge.style.fill = `oklch(${L} 0 0)`;
         rim.setAttribute("d", circle(0, 0, 1));
-        background = { key: `level ${i} ${surface}`, paint: () => paintLevel(L, t, surface === "cells" && cells) };
+        background = { key: `level ${i} ${surface} ${range}`, paint: () => paintLevel(L, t, surface === "cells" && cells) };
         const where = (i) => {
           const range = `lightness ${num(Math.max(0, lightOf(i) - 0.025))} to ${num(Math.min(1, lightOf(i) + 0.025))}`;
           return i === 0 ? `White, ${range}` : i === LEVELS ? `Black, ${range}` : range[0].toUpperCase() + range.slice(1);
         };
-        captionText.textContent = `${where(i)} · ${count(here.length)}`;
+        captionText.textContent = `${where(i)} · ${count(here.length)}${none ? ` · too dark to print (darkest: ${num(G.darkest)})` : ""}`;
         svg.setAttribute("aria-label", `A slice of OKLCH's colour solid: ${where(i).toLowerCase()}`);
         // The control: the chosen level, and a ghost of the one previewed.
         const place = (el, i) => {
@@ -2198,7 +2553,8 @@
             return W * rho(widest);
           });
           const yAt = (k) => levelY((1 - k / 100) * LEVELS);
-          const side = (sign) => widths.map((w, k) => `${CX + sign * w} ${yAt(k)}`);
+          const from = Math.max(0, widths.findIndex((w) => w > 0) - 1); // (in Print, nothing below the press's darkest)
+          const side = (sign) => widths.slice(from).map((w, k) => `${CX + sign * w} ${yAt(from + k)}`);
           outline.setAttribute("d", `M ${[...side(1), ...side(-1).reverse()].join(" L ")} Z`);
         }
         const q = L * 100, k = Math.min(99, q | 0);
@@ -2212,7 +2568,7 @@
 
       // Through the axis: hue slice s's page on the right, the opposite slice's (s + 18) on the left, the
       // greys between, white at the top; across, √chroma as on the disc; up, lightness. Each page's
-      // background is its middle hue's: what the screen can show of it, per 1/512 of lightness.
+      // background is its middle hue's: what the range holds of it, per 1/512 of lightness.
       const PAGE_Y = 2 / 1.05; // lightness -0.025 (y = 1) to 1.025 (y = -1): the levels' cells, whole
       const pageY = (L) => (0.5 - L) * PAGE_Y;
       const wrap = (s) => ((s % 36) + 36) % 36, opposite = (s) => (s + 18) % 36, midHue = (s) => s * SLICE + SLICE / 2;
@@ -2272,13 +2628,11 @@
           return alpha;
         });
       };
-      // The hues of the screen's primaries and secondaries (OKLCH's hue of sRGB's pure red, ...), and orange
-      // and violet halfway between, named round the dial. A page is named by its hues alone.
-      const NAMED = [[29.2, "Red"], [52.8, "Orange"], [109.8, "Yellow"], [142.5, "Green"], [194.8, "Cyan"], [264.1, "Blue"], [293.8, "Violet"], [328.4, "Magenta"]];
+      // Round the dial, the range's primaries and secondaries (G.NAMED). A page is named by its hues alone.
       const pageName = (s) => `${s * SLICE}–${(s + 1) * SLICE}°`;
       const vivid = (s) => { // the page's most vivid colour, for its square
-        const { L, C } = cuspTable(), k = midHue(s) * 2;
-        return { css: `oklch(${L[k]} ${C[k]} ${midHue(s)})` };
+        const { L, C } = G.cusp(), k = midHue(s) * 2;
+        return { css: `oklch(${+L[k].toFixed(4)} ${+C[k].toFixed(4)} ${midHue(s)})` };
       };
       const onPages = (s) => colors.filter((c) => isGrey(c) || sliceOf(c) === s || sliceOf(c) === opposite(s)).length;
       const drawPages = (s, chosen) => {
@@ -2339,9 +2693,10 @@
           return true;
         };
         if (marksAs === "dots") drawDots(items, keepIn);
-        const sideLine = (t, sign) => Array.from({ length: 513 }, (_, k) => `${(sign * t[k]).toFixed(4)} ${pageY(k / 512).toFixed(4)}`); // per 512th, as the cells'
-        gamut.setAttribute("d", `M ${[...sideLine(tr, 1), ...sideLine(tl, -1).reverse()].join(" L ")} Z`);
-        background = { key: `pages ${s} ${surface}`, paint: () => paintPages(midHue(s), midHue(left), tr, tl, surface === "cells" && [pages[1].cells, pages[-1].cells]) };
+        const from = Math.max(0, tr.findIndex((v, k) => v > 0 || tl[k] > 0) - 1); // (in Print, nothing below the press's darkest)
+        const sideLine = (t, sign) => Array.from({ length: 513 - from }, (_, k) => `${(sign * t[from + k]).toFixed(4)} ${pageY((from + k) / 512).toFixed(4)}`); // per 512th, as the cells'
+        sliceEdge.setAttribute("d", `M ${[...sideLine(tr, 1), ...sideLine(tl, -1).reverse()].join(" L ")} Z`);
+        background = { key: `pages ${s} ${surface} ${range}`, paint: () => paintPages(midHue(s), midHue(left), tr, tl, surface === "cells" && [pages[1].cells, pages[-1].cells]) };
         svg.setAttribute("aria-label", `Two pages of OKLCH's colour solid, back to back: hues ${pageName(left)} and ${pageName(s)}`);
         // The caption, with a square of each page's most vivid colour.
         const hue = (s) => {
@@ -2381,7 +2736,7 @@
       let hues = null;
       const dialHues = () => {
         if (!hues) {
-          const { L, C } = cuspTable();
+          const { L, C } = G.cusp();
           hues = Array.from({ length: 36 }, (_, s) => {
             const g = svgEl("g", { class: "hue" }), k = midHue(s) * 2;
             for (let j = 0; j < 3; j++) {
@@ -2402,12 +2757,12 @@
         line.setAttribute("x2", x);
         line.setAttribute("y2", y);
       };
-      // Round it, just beyond the pointer, the named hues. The slider's value text names the pages for
-      // screen readers.
+      // Round it, just beyond the pointer, the named hues (the range's: placed again when it changes). The
+      // slider's value text names the pages for screen readers.
       const dialFace = Object.assign(document.createElement("div"), { className: "dial-face" });
-      const dialLabels = NAMED.map(([h, name]) => {
-        const [x, y] = polar(DIAL + 0.06, h);
-        const label = Object.assign(document.createElement("span"), { className: "dial-label", textContent: name });
+      const dialLabels = G.NAMED.map(([, name]) => Object.assign(document.createElement("span"), { className: "dial-label", textContent: name }));
+      const placeDialLabels = () => G.NAMED.forEach(([h], k) => {
+        const [x, y] = polar(DIAL + 0.06, h), label = dialLabels[k];
         label.dataset.slice = Math.floor(h / SLICE);
         label.setAttribute("aria-hidden", "true");
         label.style.left = `${((x + DIAL) / (2 * DIAL)) * 100}%`;
@@ -2415,8 +2770,8 @@
         const side = Math.abs(x) < 0.05 ? 0 : Math.sign(x); // outwards: to the left or right, or above or below
         label.style.setProperty("--dx", ["-100%", "-50%", "0%"][side + 1]);
         label.style.setProperty("--dy", side ? "-50%" : y < 0 ? "-100%" : "0%");
-        return label;
       });
+      placeDialLabels();
       dialFace.append(dial, ...dialLabels);
       const dialBox = Object.assign(document.createElement("div"), { className: "dial-box" });
       dialBox.append(dialFace);
@@ -2475,7 +2830,7 @@
       // For the picker: the colour shown, and where the pointer was, so that clicking there picks exactly it
       // (a click's position is rounded to the pixel; the pointer's, as it moves, isn't).
       let hovered = null;
-      gamut.addEventListener("pointermove", (e) => {
+      sliceEdge.addEventListener("pointermove", (e) => {
         const at = own(colourAt(e));
         if (!showOwn(at, title())) return;
         if (picker) {
@@ -2485,12 +2840,12 @@
         if (at.d) outlineAt(at.d, at.oklch[0]);
         else highlight.removeAttribute("d");
       });
-      gamut.addEventListener("pointerleave", (e) => {
+      sliceEdge.addEventListener("pointerleave", (e) => {
         under = "";
         hovered = null;
         if (e.pointerType !== "touch") hide(); // a touch leaves as the finger lifts: its info stays until the next
       });
-      gamut.addEventListener("click", (e) => {
+      sliceEdge.addEventListener("click", (e) => {
         if (picker) return picker.pick(hovered && Math.hypot(e.clientX - hovered.x, e.clientY - hovered.y) < 2 ? hovered.colour : picker.oklch(own(colourAt(e)).oklch));
         openOwn(own(colourAt(e)), title(), surface === "smooth" ? "at this point of the slice" : "in the middle of this cell of the slice");
       });
@@ -2543,6 +2898,9 @@
         + `<button type="button" data-wheel-view="flat" title="Flat: every colour by hue and chroma, its lightness left out">Flat</button>`
         + `<button type="button" data-wheel-view="2d" title="2D: a slice of OKLCH's solid, across its axis (one lightness) or through it (two hues' pages)">2D</button>`
         + (picker ? "" : `<button type="button" data-wheel-view="3d" title="3D: OKLCH's solid, its pages of hue as walls, cut at a lightness; drag to turn it">3D</button>`) + `</div>`
+        + `<div class="view-switch" role="group" aria-label="Range">`
+        + `<button type="button" data-wheel-range="screen" title="Screen: the widest screens' colours (Rec. 2020), which hold all of Wada's and all the press prints; a screen that shows fewer clips the rest">Screen</button>`
+        + `<button type="button" data-wheel-range="print" title="Print: the press's colours (Japan Color 2011 Coated), as Wada's colours were printed">Print</button></div>`
         + optionSwitch("Marks", "wheel-marks", MARKS) + optionSwitch("Slice", "wheel-slicing", SLICES) + optionSwitch("Surface", "wheel-surface", SURFACES)
         + optionSwitch("Cells", "wheel-empty", CELLS) + optionSwitch("Cut", "wheel-cut", CUTS);
       const option = (key) => modes.querySelector(`[data-option="${key}"]`);
@@ -2550,15 +2908,13 @@
       layout.append(wheel, control, dialBox, caption, modes);
       box.append(panel, layout);
 
-      // What's shown, remembered by the page: the view, the marks, the slicing, the surface; the level (8: lightness 0.6)
+      // What's shown, remembered by the page: the range, the view, the marks, the slicing, the surface; the level (8: lightness 0.6)
       // and the pages (2: red, 20–30°, on the right); and, while the pointer previews another on the
       // control or the dial, the one shown.
-      const saved = (key) => { try { return localStorage.getItem(P + key); } catch { return null; } };
-      const save = (key, value) => { try { localStorage.setItem(P + key, value); } catch {} };
       let view = (picker ? ["2d"] : ["2d", "3d"]).includes(saved("wheel-view")) ? saved("wheel-view") : "flat", slicing = saved("wheel-slicing") === "pages" ? "pages" : "level";
       let surface = saved("wheel-surface") === "cells" ? "cells" : "smooth", cutFrom = saved("wheel-cut") === "bottom" ? "bottom" : "top";
       let empties = CELLS.some(([value]) => value === saved("wheel-empty")) ? saved("wheel-empty") : "dots"; // in 3D
-      let solid = null, solidTried = false; // the 3D view's (makeOklchSolid), made when first shown; none without WebGL 2
+      let solid = null, solidTried = false, solidFrom = null; // the 3D view's (makeOklchSolid), made when first shown (none without WebGL 2); and where the last one was seen from
       marksAs = saved("wheel-marks") === "dots" ? "dots" : "squares";
       let level = Math.min(LEVELS, Math.max(0, Number(saved("wheel-level") ?? 8) | 0)), shown = level;
       let page = wrap(Number(saved("wheel-page") ?? 2) | 0), pageShown = page;
@@ -2567,8 +2923,8 @@
         layer.replaceChildren();
         segments.clear();
         spots.clear();
-        gamut.removeAttribute("d");
-        gamut.style.fill = "";
+        sliceEdge.removeAttribute("d");
+        sliceEdge.style.fill = "";
         rim.removeAttribute("d");
         caption.classList.remove("turns");
         back.hidden = ahead.hidden = true;
@@ -2581,7 +2937,7 @@
         onSlice = view !== "flat";
         if (view === "flat") {
           drawFlat();
-          background = FLAT;
+          background = flat();
           captionText.textContent = "Colour wheel: hue around, chroma outwards";
           svg.setAttribute("aria-label", captionText.textContent);
         } else {
@@ -2597,7 +2953,8 @@
       };
       // For the picker: the colours picked, numbered where they are on what's shown: Wada's on their own
       // squares or dots; any other at its hue and chroma (√chroma, as the dots), on the flat wheel or the
-      // slice it's on (its level, or its hue's page), the greys on the axis.
+      // slice it's on (its level, or its hue's page; outside the slice if the range doesn't hold it), the
+      // greys on the axis.
       const badges = svgEl("g", { class: "pick-marks" });
       if (picker) svg.append(badges);
       let numbered = [];
@@ -2611,10 +2968,10 @@
           if (c.index === undefined) { // not one of Wada's
             const [L, C, h] = c.oklch;
             if (view === "flat") at = polar(C < NEUTRAL_C ? 0 : Math.min(RING[1], flatR(C)), h);
-            else if (slicing === "level" && levelOf(c) === shown) at = polar(isGrey(c) ? 0 : Math.min(rho(C), edgeAt(cut.t, h)), h);
+            else if (slicing === "level" && levelOf(c) === shown) at = polar(isGrey(c) ? 0 : rho(C), h); // (beyond the slice's edge, if it's beyond the range)
             else if (slicing === "pages") {
               const side = sliceOf(c) === pageShown ? 1 : sliceOf(c) === opposite(pageShown) ? -1 : isGrey(c) ? 0 : null;
-              if (side !== null) at = [side * Math.min(rho(C), edgeAtL(cut[side || 1].t, L)), pageY(L)];
+              if (side !== null) at = [side * rho(C), pageY(L)];
             }
           }
           if (at) badges.append(picker.badge(c, i + 1, at, 0.045));
@@ -2721,7 +3078,8 @@
           solidTried = true;
           solid = makeOklchSolid({
             colors,
-            walls: { LEVELS, SLICE, PAGE_Y, AXIS, inner, out, room, steps, lightOf, rowOf, levelOf, isGrey, sliceOf, shareOf, ringOf, midHue, pageEdge, edgeAtL, pageCells, NAMED, vivid, pageName },
+            walls: { LEVELS, SLICE, PAGE_Y, AXIS, inner, out, room, steps, lightOf, rowOf, levelOf, isGrey, sliceOf, shareOf, ringOf, midHue, pageEdge, edgeAtL, pageCells, NAMED: G.NAMED, vivid, pageName },
+            start: solidFrom,
             onColour: (c) => { under = ""; fillDetails(panel, c); panel.classList.add("show"); },
             onCell: (t) => showOwn(own(cellColour(t)), "Cell colour"),
             onLeave: () => { under = ""; hide(); },
@@ -2748,6 +3106,30 @@
         save("wheel-view", v);
         render();
       };
+      // The range: everything's drawn again in it, the 3D solid made again (seen from where it was).
+      const setRange = (r) => {
+        if (r === range) return;
+        range = r;
+        G = gamut(r);
+        pressed("wheel-range", r);
+        save("wheel-range", r);
+        widths = null; // the level control's outline
+        hues?.forEach((g) => g.remove()); // the dial's colours
+        hues = null;
+        placeDialLabels();
+        if (solid) {
+          solidFrom = solid.state();
+          solid.canvas.remove();
+          solid.labels.forEach((b) => b.remove());
+          solid.dispose();
+          solid = null;
+          solidTried = false;
+          if (view === "3d") solidMade();
+        }
+        if (view === "2d" && slicing === "pages") dialHues();
+        render();
+      };
+      for (const b of modes.querySelectorAll("[data-wheel-range]")) b.addEventListener("click", () => setRange(b.dataset.wheelRange));
       const setMarks = (m) => {
         marksAs = m;
         pressed("wheel-marks", m);
@@ -2788,6 +3170,7 @@
       for (const b of modes.querySelectorAll("[data-wheel-surface]")) b.addEventListener("click", () => setSurface(b.dataset.wheelSurface));
       for (const b of modes.querySelectorAll("[data-wheel-empty]")) b.addEventListener("click", () => setEmpty(b.dataset.wheelEmpty));
       for (const b of modes.querySelectorAll("[data-wheel-cut]")) b.addEventListener("click", () => setCut(b.dataset.wheelCut, true));
+      pressed("wheel-range", range);
       pressed("wheel-marks", marksAs);
       pressed("wheel-slicing", slicing);
       pressed("wheel-surface", surface);
@@ -2807,28 +3190,23 @@
     }
 
     // Paints a wheel's background canvas, laid over its SVG (viewBox -1.02 to 1.02 each way): `at(x, y,
-    // rgb, unit)` writes the pixel's linear sRGB colour into `rgb` and returns how much of the pixel it
-    // covers (0 leaves it clear); `unit` is a pixel's size in the SVG's units. At half the flat wheel's
+    // rgb, unit)` writes the pixel's linear sRGB colour into `rgb` (any colour: beyond 0..1 where sRGB
+    // can't show it, kept as it is on the widest canvas the browser has, see wide2d) and returns how much
+    // of the pixel it covers (0 leaves it clear); `unit` is a pixel's size in the SVG's units. At half the flat wheel's
     // resolution, scaled up smoothly: it's faded, and its edge is drawn over it, so it looks the same,
     // and it repaints at every step of the slice.
     function paintField(canvas, at) {
       const size = Math.round(canvas.clientWidth * Math.min(devicePixelRatio, 1.5) * 0.5);
       if (!size) return;
       canvas.width = canvas.height = size;
-      const ctx = canvas.getContext("2d");
-      const img = ctx.createImageData(size, size), px = img.data;
+      const { ctx, image, put } = wide2d(canvas);
+      const img = image(size, size), px = img.data;
       const unit = 2.04 / size, rgb = new Float64Array(3);
-      const encode = (v) => SRGB_ENCODE[v <= 0 ? 0 : v >= 1 ? 4095 : (v * 4095 + 0.5) | 0];
       for (let j = 0; j < size; j++) {
         const y = (j + 0.5) * unit - 1.02;
         for (let i = 0; i < size; i++) {
           const alpha = at((i + 0.5) * unit - 1.02, y, rgb, unit);
-          if (alpha <= 0) continue;
-          const o = (j * size + i) * 4;
-          px[o] = encode(rgb[0]);
-          px[o + 1] = encode(rgb[1]);
-          px[o + 2] = encode(rgb[2]);
-          px[o + 3] = 255 * alpha;
+          if (alpha > 0) put(px, (j * size + i) * 4, rgb, alpha);
         }
       }
       ctx.putImageData(img, 0, 0);
@@ -2836,19 +3214,18 @@
     }
 
     // Paints the continuous wheel: at each pixel, hue from the angle and chroma from the radius (same
-    // mapping as the segments), at that hue's most vivid lightness, limited to what sRGB can show.
-    // Only repaints when the size changes: a hidden canvas keeps its picture.
-    function paintWheel(canvas, [R0, R1], lo, hi) {
+    // mapping as the segments), at that hue's most vivid lightness, limited to what the range `g` holds
+    // (see gamut()). Only repaints when the size changes: a hidden canvas keeps its picture.
+    function paintWheel(canvas, [R0, R1], lo, hi, g = gamut("screen")) {
       const size = Math.round(canvas.clientWidth * Math.min(devicePixelRatio, 1.5));
       if (!size || (size === canvas.width && canvas.dataset.painted)) return; // hidden, or already painted
       canvas.width = canvas.height = size;
       canvas.dataset.painted = "1";
-      const ctx = canvas.getContext("2d");
-      const img = ctx.createImageData(size, size), px = img.data;
+      const { ctx, image, put } = wide2d(canvas);
+      const img = image(size, size), px = img.data;
       const unit = 2.04 / size; // matches the SVG viewBox
-      const { L: cuspL, C: cuspC } = cuspTable();
+      const { L: cuspL, C: cuspC } = g.cusp();
       const rgb = new Float64Array(3);
-      const encode = (v) => SRGB_ENCODE[v <= 0 ? 0 : v >= 1 ? 4095 : (v * 4095 + 0.5) | 0];
       for (let j = 0; j < size; j++) {
         const y = (j + 0.5) * unit - 1.02;
         for (let i = 0; i < size; i++) {
@@ -2861,11 +3238,7 @@
           const c = lo + ((r - R0) / (R1 - R0)) * (hi - lo);
           const C = Math.min(c * c, cuspC[k0] + (cuspC[k0 + 1] - cuspC[k0]) * t);
           oklabToLinearSRGB(L, (C * x) / r, (-C * y) / r, rgb); // a = C cos h, b = C sin h
-          const o = (j * size + i) * 4;
-          px[o] = encode(rgb[0]);
-          px[o + 1] = encode(rgb[1]);
-          px[o + 2] = encode(rgb[2]);
-          px[o + 3] = 255 * alpha;
+          put(px, (j * size + i) * 4, rgb, alpha);
         }
       }
       ctx.putImageData(img, 0, 0);
@@ -2927,65 +3300,91 @@
     function ostwaldSystem(colors) {
       const LETTERS = "ABCDEFGHIJKLMNOP";
       const GREYS = Array.from(LETTERS, (_, k) => 0.891 * (0.0355 / 0.891) ** (k / 15)); // white content
-      const HUES = [[0, "Yellow"], [12.5, "Orange"], [25, "Red"], [37.5, "Purple"], [50, "Ultramarine"], [62.5, "Turquoise"], [75, "Sea green"], [87.5, "Leaf green"]];
+      // Named as in Wada's Figure 1, his German translated literally: Gelb, Kress (cress: orange), Rot, Veil
+      // (violet), Ublau (ultramarine), Eisblau (ice blue), Seegrün, Laubgrün.
+      const HUES = [[0, "Yellow"], [12.5, "Orange"], [25, "Red"], [37.5, "Violet"], [50, "Ultramarine"], [62.5, "Ice blue"], [75, "Sea green"], [87.5, "Leaf green"]];
       const mod = (x, m) => ((x % m) + m) % m;
-      // The hue of an additive mixture (red 0°, yellow 60°, green 120°, ...): complements are 180° apart.
-      const hexHue = (r, g, b) => {
-        const hi = Math.max(r, g, b), d = hi - Math.min(r, g, b);
-        if (d === 0) return null;
-        if (hi === r) return 60 * mod((g - b) / d, 6);
-        return hi === g ? 60 * ((b - r) / d + 2) : 60 * ((r - g) / d + 4);
+      // The press's full colours and tint edge, round the white (print-gamut.json, scripts/print_gamut.py):
+      // a ray from the white in CIE xy (D65, CSS's) per degree, and one at each ink alone and each two at
+      // 100%, where the full colours turn a corner. A hue's plane is one ray, its complement's the opposite
+      // one: complements, mixed, give grey.
+      const { rays: RAYS, angles: ANGLES, steps: STEPS } = press.ostwald;
+      const WHITE = [0.9504559270516716, 1, 1.0890577507598784], SW = WHITE[0] + WHITE[1] + WHITE[2], XW = WHITE[0] / SW, YW = WHITE[1] / SW;
+      const RAD = Math.PI / 180, DEG = 180 / Math.PI; // (as Python's math.radians and math.degrees)
+      // The two rays either side of chromaticity angle theta, and how far theta is from the first.
+      const between = (theta) => {
+        const x = mod(theta, 360);
+        let lo = 0, hi = ANGLES.length; // the first ray past x
+        while (lo < hi) { const mid = (lo + hi) >> 1; if (ANGLES[mid] <= x) lo = mid + 1; else hi = mid; }
+        const n = ANGLES.length, j0 = (lo - 1 + n) % n, j1 = lo % n, a0 = ANGLES[j0], a1 = ANGLES[j1] + (lo === n ? 360 : 0);
+        return [RAYS[j0], RAYS[j1], (x - a0) / (a1 - a0)];
       };
-      // The nearest grey, on a log scale.
-      const step = (v) => {
-        const at = (k) => Math.abs(Math.log(Math.max(v, 1e-3) / GREYS[k]));
-        let best = 0;
-        for (let k = 1; k < GREYS.length; k++) if (at(k) < at(best)) best = k;
-        return best;
+      // At theta: the full colour's distance from the white and its X + Y + Z, and the tint edge (the
+      // brightest the press prints, Y, at each 1/32 share of full colour).
+      const ray = (theta) => {
+        const [a, b, t] = between(theta);
+        return [a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]), a[3].map((p, k) => p + t * (b[3][k] - p))];
       };
-      // The full colour of hexagonal hue h, in linear sRGB: HSV with saturation and value 1.
-      const fullRGB = (h) => [5, 3, 1].map((k) => { const t = mod(k + h / 60, 6); return 1 - Math.max(0, Math.min(t, 4 - t, 1)); });
-      const oklab = ([r, g, b]) => { // Ottosson's matrices
-        const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
-        const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
-        const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
-        return [0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s];
+      const fullHue = (theta) => { // the OKLCH hue of the press's full colour at theta
+        const [a, b, t] = between(theta);
+        return a[2] + t * (mod(b[2] - a[2] + 180, 360) - 180);
       };
-      // Ostwald's 100-step hue of hexagonal hue h, before calibration. He spaced his circle evenly to
-      // the eye, with complements opposite. The full colour's OKLCH hue is even to the eye, but sRGB's
-      // full colours aren't symmetrical in it: a full colour and its complement are up to 29° from
+      const tintEdge = (edge, r) => {
+        const x = Math.min(Math.max(r, 0), 1) * STEPS, k = Math.min(Math.trunc(x), STEPS - 1);
+        return edge[k] + (x - k) * (edge[k + 1] - edge[k]);
+      };
+      // Ostwald's 100-step hue at chromaticity angle theta, before calibration. He spaced his circle evenly
+      // to the eye, with complements opposite. The full colour's OKLCH hue is even to the eye, but the
+      // press's full colours aren't symmetrical in it: a full colour and its complement are up to 37° from
       // opposite. So the number takes the mean of the two, the complement's turned half round, and
-      // complements stay exactly 50 steps apart. Ostwald's circle runs the other way round, a quarter
-      // of it (25 steps) per 90°. notes/ostwald.py's hue_number does the same.
-      const hueNumber = (h) => {
-        const okHue = (rgb) => { const [, A, B] = oklab(rgb); return (Math.atan2(B, A) * 180) / Math.PI; };
-        const h1 = okHue(fullRGB(h)), h2 = okHue(fullRGB(h + 180));
+      // complements stay exactly 50 steps apart. Ostwald's circle runs the other way round, a quarter of it
+      // (25 steps) per 90°. notes/ostwald.py's hue_number does the same.
+      const hueNumber = (theta) => {
+        const h1 = fullHue(theta), h2 = fullHue(theta + 180);
         return mod(-(h1 + (mod(h2 - h1, 360) - 180) / 2) / 3.6, 100);
       };
-      const rawOf = ([L, C, h]) => {
-        const rad = (h * Math.PI) / 180;
-        const [r, g, b] = Array.from(oklabToLinearSRGB(L, C * Math.cos(rad), C * Math.sin(rad)), (v) => Math.min(1, Math.max(0, v)));
-        const hue = hexHue(r, g, b);
-        return { n: hue === null ? null : hueNumber(hue), white: Math.min(r, g, b), black: 1 - Math.max(r, g, b) };
+      // Where a colour falls against the press: its hue number before calibration (null for a grey), and
+      // its white and black content. Its share of full colour against white, r, comes from how pure it is:
+      // Ostwald's discs mix white and full colour, so a colour a W + b F is r = b / (a + b) of the way, and
+      // its purity is r's weighted by the two's X + Y + Z. Its black is how far it is below the tint edge,
+      // 1 - Y / Ymax(r): a tint has none, and its shadow series, the same chromaticity darker, more. Beyond
+      // what the press prints (purer than its full colour, or brighter than the tint edge) it is measured
+      // at the edge. notes/ostwald.py's measure does the same.
+      const rawOf = (oklch) => {
+        const xyz = xyzOf(oklch), s = xyz[0] + xyz[1] + xyz[2];
+        const dx = xyz[0] / s - XW, dy = xyz[1] / s - YW, d = Math.hypot(dx, dy);
+        if (d < 1e-6) return { n: null, white: xyz[1], black: 1 - xyz[1], colour: 0 };
+        const theta = mod(Math.atan2(dy, dx) * DEG, 360), [dF, sF, edge] = ray(theta), u = d / dF;
+        const r = Math.min(u < 1 ? (SW * u) / (SW * u + sF * (1 - u)) : u, 1);
+        const black = Math.max(1 - xyz[1] / tintEdge(edge, r), 0);
+        return { n: hueNumber(theta), white: (1 - r) * (1 - black), black, colour: r * (1 - black) };
       };
       const raw = colors.map((c) => rawOf(c.oklch));
       // Calibration: Wada's orange is 16PA (his 1935 supplement, p. 14).
       const offset = mod(16 - raw[colors.findIndex((c) => c.name === "Orange")].n, 100);
-      // The full colours of the 24 hues (sector 0 is yellow): the hexagonal hue whose number is the
-      // sector's, found by halving (the number falls as the hexagonal hue rises).
-      const FULL = Array.from({ length: 24 }, (_, sector) => {
-        const diff = (h) => mod(hueNumber(h) + offset - (sector * 100) / 24 + 50, 100) - 50;
+      // The chromaticity angles of the 24 hues (sector 0 is yellow): where the number is the sector's,
+      // found by halving (the number falls as the angle rises).
+      const SECTOR_ANGLES = Array.from({ length: 24 }, (_, sector) => {
+        const diff = (theta) => mod(hueNumber(theta) + offset - (sector * 100) / 24 + 50, 100) - 50;
         let lo = 0;
         while (lo < 359 && !(diff(lo) >= 0 && diff(lo + 1) < 0)) lo++;
         let hi = lo + 1;
         for (let i = 0; i < 50; i++) { const mid = (lo + hi) / 2; if (diff(mid) >= 0) lo = mid; else hi = mid; }
-        return fullRGB((lo + hi) / 2);
+        return (lo + hi) / 2;
       });
+      // The nearest grey, on a log scale.
+      const step = (v) => {
+        const at = (k) => Math.abs(Math.log(Math.max(v, 1e-3)) - Math.log(GREYS[k]));
+        let best = 0;
+        for (let k = 1; k < GREYS.length; k++) if (at(k) < at(best)) best = k;
+        return best;
+      };
       // Where a colour falls (any colour's [L, C, h], or its raw values): its hue number and sector, its
       // white and black content, its level and ring, and its code.
       const notation = (oklch, { n: hueN, white, black } = rawOf(oklch)) => {
-        const a = step(white), b = step(1 - black); // a >= b, as white <= 1 - black
-        const n = a === b ? null : mod(hueN + offset, 100); // a === b: no colour at this precision, a grey
+        let a = step(white), b = step(1 - black); // a >= b, as white <= 1 - black
+        if (a <= b || hueN === null) a = b = Math.round((a + b) / 2); // no colour at this precision: a grey
+        const n = a === b ? null : mod(hueN + offset, 100);
         return {
           n, sector: n === null ? null : Math.round((n * 24) / 100) % 24, // 0 is yellow, as in Wada's Figure 1
           white, black, level: a + b, ring: a - b,
@@ -2993,25 +3392,44 @@
         };
       };
       colors.forEach((c, i) => { c.ostwald = notation(c.oklch, raw[i]); });
-      // A cell's colour: white GREYS[a] plus colour (GREYS[b] - GREYS[a]) times the full colour of the
-      // sector's hue. Returned as CSS and OKLCH (rounded as colors.json is), with its white and black
-      // content and its code, the hue numbered as in Wada's Figure 1 (sector 1 is 4, sector 3 is 13).
-      const encode = (v) => Math.round(255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055));
-      const toOklch = (rgb) => {
-        const [L, A, B] = oklab(rgb);
-        const C = +Math.hypot(A, B).toFixed(4);
-        const h = +mod((Math.atan2(B, A) * 180) / Math.PI, 360).toFixed(2);
-        return [+L.toFixed(4), C, C === 0 || h === 360 ? 0 : h];
+      // A cell's own colour: white GREYS[a] and black 1 - GREYS[b], so colour GREYS[b] - GREYS[a]. Its share
+      // of full colour is r = colour / (white + colour), at the sector's angle, and it is as far below the
+      // press's tint edge as its black says: Y = (1 - black) Ymax(r). A grey is GREYS[a] of the white.
+      // Returned as CSS and OKLCH (rounded as colors.json is), linear sRGB (beyond 0..1 where sRGB can't
+      // show it), its white and black content and its code, the hue numbered as in Wada's Figure 1 (sector
+      // 1 is 4, sector 3 is 13). notes/ostwald.py's cell_xyz does the same.
+      const cellXYZ = (sector, a, b) => {
+        if (a === b || sector === null) return WHITE.map((v) => GREYS[a] * v);
+        const theta = SECTOR_ANGLES[sector], [dF, sF, edge] = ray(theta), r = (GREYS[b] - GREYS[a]) / GREYS[b];
+        const u = (r * sF) / (SW * (1 - r) + r * sF), Y = GREYS[b] * tintEdge(edge, r);
+        const x = XW + u * dF * Math.cos(theta * RAD), y = YW + u * dF * Math.sin(theta * RAD);
+        return [(x * Y) / y, Y, ((1 - x - y) * Y) / y];
       };
       const cell = (sector, a, b) => {
-        const w = GREYS[a], c = GREYS[b] - GREYS[a];
-        const rgb = (sector === null ? [0, 0, 0] : FULL[sector]).map((v) => w + c * v), rgb8 = rgb.map(encode);
+        const xyz = cellXYZ(sector, a, b), oklch = oklchOfXYZ(xyz);
         return {
-          css: `rgb(${rgb8.join(" ")})`, rgb8, oklch: toOklch(rgb), white: w, black: 1 - GREYS[b],
+          css: oklchText(oklch), oklch, rgb: times3(XYZ_TO_SRGB, xyz), white: GREYS[a], black: 1 - GREYS[b],
           code: a === b ? LETTERS[a] : `${Math.round((sector * 100) / 24) % 100}${LETTERS[a]}${LETTERS[b]}`,
+          sector: a === b ? null : sector, a, b,
         };
       };
-      return { GREYS, LETTERS, HUES, cell, offset, notation };
+      // The cell whose own colour this is, exactly (its OKLCH as cell() rounds it, joined by commas), if any.
+      let cells = null;
+      const cellOf = (token) => {
+        if (!cells) {
+          cells = new Map();
+          for (let a = 0; a < GREYS.length; a++) {
+            for (let b = 0; b <= a; b++) {
+              for (const sector of a === b ? [null] : SECTOR_ANGLES.keys()) {
+                const own = cell(sector, a, b);
+                cells.set(own.oklch.join(","), own);
+              }
+            }
+          }
+        }
+        return cells.get(token) ?? null;
+      };
+      return { GREYS, LETTERS, HUES, cell, cellOf, offset, notation };
     }
 
     // Ostwald layout: one level of the double cone at a time, seen from above. Angle = hue (24 sectors,
@@ -3030,12 +3448,10 @@
     // cell's colour one); and numbers(list) marks the colours picked on the slice shown (badge(colour,
     // number, [x, y], r) makes each mark). Its choices are saved apart from the Colors page's.
     function makeOstwald(colors, { picker = null } = {}) {
-      const { LETTERS, HUES, cell, offset, notation } = ostwaldSystem(colors);
+      const { LETTERS, HUES, cell, notation } = ostwaldShared();
       const P = picker ? "create-ostwald" : "ostwald"; // its saved choices' and its ids' prefix
-      // CMYK estimated for the empty cells through the print profile (scripts/ostwald_cmyk.py), if it
-      // was made for this calibration.
-      let estimates = null;
-      fetch("ostwald-cmyk.json").then((r) => r.json()).then((d) => { if (Math.abs(d.offset - offset) < 1e-4) estimates = d.cmyk; }).catch(() => {});
+      // (The empty cells' CMYK, estimated through the print profile by scripts/ostwald_cmyk.py: ostwaldCMYK,
+      // once fetched, if made for this calibration.)
       const N = LETTERS.length, TOP = 2 * (N - 1), MIDDLE = N - 1; // levels 0 (white) to TOP (black)
       const NS = "http://www.w3.org/2000/svg";
       const svgEl = (name, attrs = {}) => {
@@ -3260,7 +3676,7 @@
         const name = panel.querySelector("h2");
         name.classList.add("named");
         name.replaceChildren(`Ostwald ${own.code.length === 1 ? "grey " : ""}${own.code}`, chipOf(own));
-        const cmyk = estimates?.[own.code];
+        const cmyk = ostwaldCMYK?.[own.code];
         field("cmyk").textContent = cmyk ? `≈ ${cmykText(cmyk)}` : "Not in Wada's palette"; // an estimate, so ≈
         field("oklch").textContent = oklchValues(own.oklch);
         field("ostwald").textContent = `Ostwald = ${own.code}`; // exactly its code: same lines as a colour's, so nothing moves
@@ -3269,7 +3685,7 @@
       };
       // Its card, as a colour's: the same values, with the CSS colour to copy; a note instead of combinations.
       const openCell = (own) => {
-        const cmyk = estimates?.[own.code];
+        const cmyk = ostwaldCMYK?.[own.code];
         showComputedDetail(own, `Ostwald ${own.code.length === 1 ? "grey " : ""}${own.code}`, cmyk, mix(own), `Not one of Wada's colours: the Ostwald system's own colour for this cell${cmyk ? ", so its CMYK is an estimate" : ""}.`);
       };
       // One of Wada's colours: its piece of its cell, filled; or, with every cell a dot, its dot (x, y,
@@ -3907,6 +4323,7 @@
       canvas.setAttribute("aria-label", "Ostwald's colour solid in 3D, cut at the level chosen. Drag, or use the arrow keys, to turn it.");
       const gl = canvas.getContext("webgl2", { antialias: true });
       if (!gl) return null;
+      const wide = wideGL(gl); // colours as its drawing buffer takes them, the widest it has
 
       // Units: radius 1 at the full colours' outer tips. A ring step is 1/N across and a level step
       // 1/(N√3) down, so that the triangle is equilateral. Angles run clockwise from north (yellow), seen
@@ -3922,7 +4339,7 @@
       // cut level; DOT, an empty cell's dot on a page's face, hidden at the cut level (the cap has one).
       const BODY = 0, CAP = 1, DOT = 2;
 
-      // Geometry, as flat lists: position, colour (8-bit sRGB and a shade), level, kind, whether it's
+      // Geometry, as flat lists: position, colour (as the drawing buffer takes it, and a shade), level, kind, whether it's
       // card (coloured by the page's theme, unless the empty cells are filled: then the cell's own colour,
       // which it carries), when it shows (`only`: ALWAYS; EMPTY, an empty cell, unless they're hidden;
       // ALONE, a wall of Wada's colour next to an empty cell, only when they're hidden or only dots; DOTS,
@@ -3937,7 +4354,7 @@
       const lone = new Map(), spots = new Map(); // an empty cell's id -> its lone dot; one of Wada's colours' -> its dot
       const put = (m, p, rgb, shade, level, kind, card, id, other = only, size = 0) => {
         m.pos.push(p[0], p[1], p[2]);
-        m.col.push(rgb[0], rgb[1], rgb[2], Math.round(shade * 255));
+        m.col.push(rgb[0], rgb[1], rgb[2], shade);
         m.info.push(level, kind, card, other);
         m.id.push(id);
         m.page.push(page);
@@ -3957,11 +4374,7 @@
         const p = (i) => { const t = (i * Math.PI) / 6; return centre.map((c, j) => c + radius * (Math.cos(t) * u[j] + Math.sin(t) * v[j])); };
         for (let i = 0; i < 12; i++) triangle(faces, centre, p(i), p(i + 1), rgb, 1, level, kind, 0, id, DOTS);
       };
-      const encode = (v) => Math.round(255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055));
-      const rgbOf = (c) => {
-        const [L, C, h] = c.oklch;
-        return Array.from(oklabToLinearSRGB(L, C * Math.cos(rad(h)), C * Math.sin(rad(h))), (v) => encode(Math.min(1, Math.max(0, v))));
-      };
+      const rgbOf = (c) => wide.screen(linearOf(c.oklch)); // any colour: the screen clips what it can't show
 
       // What each id is: one of Wada's colours or an empty cell's own colour, with its outline's range.
       const targets = [];
@@ -3977,7 +4390,7 @@
         const D = [[(r - 1) * UR, y], [r * UR, y + UY], [(r + 1) * UR, y], [r * UR, y - UY]];
         const A = D.map(([p, yy]) => at(p, d0, yy)), B = D.map(([p, yy]) => at(p, d1, yy));
         const C = [at((r - 1) * UR, d0, y), at((r + 1) * UR, d0, y), at((r + 1) * UR, d1, y), at((r - 1) * UR, d1, y)]; // the cut
-        const card = rgb ? 0 : 1, col = rgb ?? own.rgb8; // card carries its own colour, for when the empty cells are filled
+        const ownCol = own && wide.screen(own.rgb), card = rgb ? 0 : 1, col = rgb ?? ownCol; // card carries its own colour, for when the empty cells are filled
         // The page's faces (the inner pieces of a shared cell have none), and its edges where the page ends.
         for (const P of [k === 0 && A, k === m - 1 && B]) {
           if (P) quad(faces, P[0], P[1], P[2], P[3], col, 1, s, BODY, card, id);
@@ -4002,7 +4415,7 @@
           const inside = sub(mid, at(r * UR, (d0 + d1) / 2, y)); // from the cell's middle out to the edge
           if (n[0] * inside[0] + n[1] * inside[1] + n[2] * inside[2] < 0) n = n.map((x) => -x);
           const thick = (len(sub(P[3], P[0])) + len(sub(P[2], P[1]))) / 2;
-          dot(mid.map((x, j) => x + 0.0006 * n[j]), u, v, Math.min(0.011, 0.3 * len(sub(P[1], P[0])), 0.3 * thick), own.rgb8, s, BODY, id);
+          dot(mid.map((x, j) => x + 0.0006 * n[j]), u, v, Math.min(0.011, 0.3 * len(sub(P[1], P[0])), 0.3 * thick), ownCol, s, BODY, id);
         }
         quad(faces, C[0], C[1], C[2], C[3], col, 1, s, CAP, card, id);
         for (const mm of rgb ? [outline] : [outline, lines]) {
@@ -4015,14 +4428,14 @@
         }
         if (rgb) return;
         lone.set(id, points.pos.length / 3);
-        put(points, at(r * UR, sector * 15, y), own.rgb8, 1, s, BODY, 0, id, POINTS, pointSize(r * UR));
+        put(points, at(r * UR, sector * 15, y), ownCol, 1, s, BODY, 0, id, POINTS, pointSize(r * UR));
         // The dot: on both faces, in the diamond's middle, just off the page; and on the cut, as on the disc.
         for (const [deg, side] of [[d0, -1], [d1, 1]]) {
           const out = [side * Math.cos(rad(deg)), 0, side * Math.sin(rad(deg))], radial = [Math.sin(rad(deg)), 0, -Math.cos(rad(deg))];
-          dot(at(r * UR, deg, y).map((v, j) => v + 0.0006 * out[j]), radial, [0, 1, 0], 0.011, own.rgb8, s, DOT, id);
+          dot(at(r * UR, deg, y).map((v, j) => v + 0.0006 * out[j]), radial, [0, 1, 0], 0.011, ownCol, s, DOT, id);
         }
         const rc = (r === 1 ? 1.25 : r) * UR;
-        dot(at(rc, sector * 15, y + 0.0006), [1, 0, 0], [0, 0, 1], Math.min(0.022, rc * 0.07), own.rgb8, s, CAP, id);
+        dot(at(rc, sector * 15, y + 0.0006), [1, 0, 0], [0, 0, 1], Math.min(0.022, rc * 0.07), ownCol, s, CAP, id);
       };
       // A grey on the pole (level s), or its piece k of m: a double cone round the axis, as wide as a ring
       // step. An empty one is card with a band of its grey round the middle.
@@ -4030,21 +4443,21 @@
         only = rgb ? ALWAYS : EMPTY;
         page = 24;
         const y = yOf(s), d0 = (k * 360) / m, d1 = ((k + 1) * 360) / m, n = Math.max(6, Math.round(48 / m));
-        const card = rgb ? 0 : 1, col = rgb ?? own.rgb8; // card carries its own colour, for when the empty cells are filled
+        const ownCol = own && wide.screen(own.rgb), card = rgb ? 0 : 1, col = rgb ?? ownCol; // card carries its own colour, for when the empty cells are filled
         const profile = rgb ? [[0, y + UY], [UR, y], [0, y - UY]] : [[0, y + UY], [0.7 * UR, y + 0.3 * UY], [UR, y], [0.7 * UR, y - 0.3 * UY], [0, y - UY]];
         for (let i = 0; i < n; i++) {
           const a0 = d0 + ((d1 - d0) * i) / n, a1 = d0 + ((d1 - d0) * (i + 1)) / n;
           for (let j = 0; j + 1 < profile.length; j++) {
             const band = !rgb && (j === 1 || j === 2), [p0, y0] = profile[j], [p1, y1] = profile[j + 1];
-            quad(faces, at(p0, a0, y0), at(p1, a0, y1), at(p1, a1, y1), at(p0, a1, y0), band ? own.rgb8 : col, 1, s, BODY, band ? 0 : card, id);
+            quad(faces, at(p0, a0, y0), at(p1, a0, y1), at(p1, a1, y1), at(p0, a1, y0), band ? ownCol : col, 1, s, BODY, band ? 0 : card, id);
           }
           triangle(faces, at(0, 0, y), at(UR, a0, y), at(UR, a1, y), col, 1, s, CAP, card, id);
           for (const mm of rgb ? [outline] : [outline, lines]) edge(mm, at(UR, a0, y), at(UR, a1, y), s, BODY, id);
         }
         if (rgb) return;
-        dot(at(0, 0, y + 0.0006), [1, 0, 0], [0, 0, 1], 0.4 * UR, own.rgb8, s, CAP, id);
+        dot(at(0, 0, y + 0.0006), [1, 0, 0], [0, 0, 1], 0.4 * UR, ownCol, s, CAP, id);
         lone.set(id, points.pos.length / 3);
-        put(points, at(0, 0, y), own.rgb8, 1, s, BODY, 0, id, POINTS, pointSize(0));
+        put(points, at(0, 0, y), ownCol, 1, s, BODY, 0, id, POINTS, pointSize(0));
       };
       // Every cell a dot: Wada's colours in a cell (ring r of level s in a sector, or on the pole), as
       // spheres BIG times its empty dot, as big as fits. Several share it side by side through its middle,
@@ -4149,7 +4562,7 @@
       const upload = (m) => {
         const vao = gl.createVertexArray();
         gl.bindVertexArray(vao);
-        for (const [name, data, size, type, normalized] of [["a_pos", new Float32Array(m.pos), 3, gl.FLOAT, false], ["a_col", new Uint8Array(m.col), 4, gl.UNSIGNED_BYTE, true],
+        for (const [name, data, size, type, normalized] of [["a_pos", new Float32Array(m.pos), 3, gl.FLOAT, false], ["a_col", new Float32Array(m.col), 4, gl.FLOAT, false],
           ["a_info", new Uint8Array(m.info), 4, gl.UNSIGNED_BYTE, false], ["a_id", new Float32Array(m.id), 1, gl.FLOAT, false], ["a_page", new Uint8Array(m.page), 1, gl.UNSIGNED_BYTE, false],
           ["a_size", new Float32Array(m.size), 1, gl.FLOAT, false]]) {
           const loc = gl.getAttribLocation(program, name);
@@ -4169,7 +4582,7 @@
       gl.bindVertexArray(null);
 
       // The page's colours: card a little darker than the background, its edges and lines darker still.
-      const BG = cssRGB("--bg"), FG = cssRGB("--fg");
+      const BG = wide.fromEncoded(cssRGB("--bg")), FG = wide.fromEncoded(cssRGB("--fg"));
       const tint = (t) => BG.map((v, i) => v + (FG[i] - v) * t);
       const CARD = tint(0.06), CARD_SIDE = tint(0.11), LINE = tint(0.2);
 
@@ -4411,7 +4824,7 @@
     // OKLCH's solid in 3D, drawn with WebGL 2, built as Ostwald's is (makeSolid): its 36 pages, 10° of hue
     // each as on the 2D view's pages, are walls standing round the axis, PAGE of their slice thick, cut into
     // the pages' cells (per level of lightness, 0.05, rings out to the page's edge at its middle hue: what
-    // the screen can show); the greys are a column on the axis, a piece per level, AXIS round, as in 2D.
+    // the range shown holds, Screen's or Print's); the greys are a column on the axis, a piece per level, AXIS round, as in 2D.
     // Wada's colours fill their cells (when several share one, they split the wall's thickness in hue
     // order; on the axis, the column round it, lightest first). The other cells are pale card, outlined,
     // with a dot of their own colour, their middle's (or filled with it, or hidden, as the cells switch
@@ -4421,14 +4834,16 @@
     // per page (its hue's name, or a dot of its most vivid colour) hides or shows it. Drag (or use the
     // arrow keys) to turn it; hovering and clicking show one of Wada's colours (onColour, onOpen) or an
     // empty cell's own (onCell, onOpenCell: its colour, page, level and ring, or the greys' level).
-    // `walls`: the 2D view's cells and their helpers. Returns null without WebGL 2.
-    function makeOklchSolid({ colors, walls, onColour, onCell, onLeave, onOpen, onOpenCell }) {
+    // `walls`: the 2D view's cells and their helpers; `start`, where to be seen from and the pages hidden
+    // (a solid's state(), to carry over to one of another range). Returns null without WebGL 2.
+    function makeOklchSolid({ colors, walls, start = null, onColour, onCell, onLeave, onOpen, onOpenCell }) {
       const { LEVELS, SLICE, PAGE_Y, AXIS, inner, out, room, steps, lightOf, rowOf, levelOf, isGrey, sliceOf, shareOf, ringOf, midHue, pageEdge, edgeAtL, pageCells, NAMED, vivid, pageName } = walls;
       const canvas = Object.assign(document.createElement("canvas"), { className: "oklch-solid", tabIndex: 0 });
       canvas.setAttribute("role", "img");
       canvas.setAttribute("aria-label", "OKLCH's colour solid in 3D, its pages of hue as walls, cut at the lightness chosen. Drag, or use the arrow keys, to turn it.");
       const gl = canvas.getContext("webgl2", { antialias: true });
       if (!gl) return null;
+      const wide = wideGL(gl); // colours as its drawing buffer takes them, the widest it has
 
       // Units as in 2D: out from the axis, √chroma, the rim at 1; up, lightness, y = (L − 0.5) PAGE_Y. Hue
       // anticlockwise from the east, seen from above, as on the disc.
@@ -4438,8 +4853,6 @@
       const PER = 80; // the walls follow the page's edge per 1/80 of lightness
       const rad = (deg) => (deg * Math.PI) / 180, yOf = (L) => (L - 0.5) * PAGE_Y;
       const at = (r, h, y) => [r * Math.cos(rad(h)), y, -r * Math.sin(rad(h))];
-      const encode = (v) => Math.round(255 * Math.min(1, Math.max(0, v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055)));
-      const rgb8 = (linear) => Array.from(linear, encode);
       // What a piece of geometry is: BODY, always (clipped beyond the cut); CAP, the cut face, only at the
       // cut level. When it shows, as Ostwald's: ALWAYS; EMPTY, an empty cell, unless they're hidden; ALONE,
       // a wall of Wada's colour next to an empty cell, only when they're hidden or only dots; DOTS, an empty
@@ -4475,12 +4888,12 @@
       for (const [key, list] of groups) list.sort(key.startsWith("pole") ? (p, q) => q.oklch[0] - p.oklch[0] : (p, q) => p.oklch[2] - q.oklch[2]);
       const empty = (s, i, b) => !groups.has(`${s} ${i} ${b}`);
 
-      // Geometry, as flat lists, grown as needed: position, colour (8-bit sRGB and a shade), level, kind,
+      // Geometry, as flat lists, grown as needed: position, colour (as the drawing buffer takes it, and a shade), level, kind,
       // whether it's card (coloured by the page's theme, unless the empty cells are filled: then its own
       // colour, which it carries), when it shows, the id of what it belongs to, its page, and `extra`: a
       // lone dot's radius, or the dot an empty cell's card has (its middle, and its radius: negative on a
       // wall's face, as that dot is hidden at the cut level, where the cut face has one).
-      const FIELDS = [["pos", Float32Array, 3], ["col", Uint8Array, 4], ["info", Uint8Array, 4], ["id", Float32Array, 1], ["page", Uint8Array, 1], ["extra", Float32Array, 4]];
+      const FIELDS = [["pos", Float32Array, 3], ["col", Float32Array, 4], ["info", Uint8Array, 4], ["id", Float32Array, 1], ["page", Uint8Array, 1], ["extra", Float32Array, 4]];
       const mesh = () => ({ n: 0, size: 0, ni: 0, idx: new Uint32Array(1 << 16) }); // and the triangles' or lines' vertices, by index
       const faces = mesh(), lines = mesh(), points = mesh();
       const NONE = [0, 0, 0, 0], BLACK = [0, 0, 0];
@@ -4496,7 +4909,7 @@
         }
         const n = m.n++, i = 3 * n, j = 4 * n;
         m.pos[i] = p[0]; m.pos[i + 1] = p[1]; m.pos[i + 2] = p[2];
-        m.col[j] = rgb[0]; m.col[j + 1] = rgb[1]; m.col[j + 2] = rgb[2]; m.col[j + 3] = Math.round(shade * 255);
+        m.col[j] = rgb[0]; m.col[j + 1] = rgb[1]; m.col[j + 2] = rgb[2]; m.col[j + 3] = shade;
         m.info[j] = level; m.info[j + 1] = kind; m.info[j + 2] = card; m.info[j + 3] = other;
         m.id[n] = id;
         m.page[n] = page;
@@ -4552,7 +4965,7 @@
         only = rgb ? ALWAYS : EMPTY;
         page = pg.s;
         const { lights } = pg.levels[i], last = lights.length - 1, w = SLICE * PAGE, da = pg.h - w / 2 + (k * w) / m, db = da + w / m;
-        const card = rgb ? 0 : 1, col = rgb ?? own.rgb8, id = targets.length - 1;
+        const card = rgb ? 0 : 1, col = rgb ?? own.col, id = targets.length - 1;
         // In the page: per lightness, its height and the rings' radii; then where each is on either face.
         const ca = Math.cos(rad(da)), sa = Math.sin(rad(da)), cb = Math.cos(rad(db)), sb = Math.sin(rad(db));
         const onA = (r, y) => [r * ca, y, -r * sa], onB = (r, y) => [r * cb, y, -r * sb];
@@ -4621,7 +5034,7 @@
         };
         if (rgb) return;
         lone.set(id, points.n);
-        put(points, at(rm, pg.h, ym), own.rgb8, 1, i, BODY, 0, id, POINTS, [size, 0, 0, 0]);
+        put(points, at(rm, pg.h, ym), own.col, 1, i, BODY, 0, id, POINTS, [size, 0, 0, 0]);
       };
       // The greys at level i on the axis, or their piece k of m round it: a piece of the column, from
       // lightness q0 to q1, round as far as poleR. An empty one is card with a band of its grey round the
@@ -4632,13 +5045,13 @@
         const [q0, q1] = rowOf(i), qm = (q0 + q1) / 2, band = [qm - 0.15 * (q1 - q0), qm + 0.15 * (q1 - q0)];
         const qs = [...new Set([...steps(q0, q1, PER), ...band])].sort((p, q) => p - q);
         const d0 = (k * 360) / m, d1 = ((k + 1) * 360) / m, segments = Math.max(6, Math.round(48 / m));
-        const card = rgb ? 0 : 1, col = rgb ?? own.rgb8, id = targets.length - 1, L = lightOf(i);
+        const card = rgb ? 0 : 1, col = rgb ?? own.col, id = targets.length - 1, L = lightOf(i);
         const body = [], capLines = [];
         for (let g = 0; g < segments; g++) {
           const a0 = d0 + ((d1 - d0) * g) / segments, a1 = d0 + ((d1 - d0) * (g + 1)) / segments;
           for (let j = 0; j + 1 < qs.length; j++) {
             const [q, p] = [qs[j], qs[j + 1]], inBand = !rgb && q >= band[0] - 1e-12 && p <= band[1] + 1e-12;
-            quad(faces, at(poleR(q), a0, yOf(q)), at(poleR(p), a0, yOf(p)), at(poleR(p), a1, yOf(p)), at(poleR(q), a1, yOf(q)), inBand ? own.rgb8 : col, 1, i, BODY, inBand ? 0 : card, id);
+            quad(faces, at(poleR(q), a0, yOf(q)), at(poleR(p), a0, yOf(p)), at(poleR(p), a1, yOf(p)), at(poleR(q), a1, yOf(q)), inBand ? own.col : col, 1, i, BODY, inBand ? 0 : card, id);
           }
           // Its ends (inside the column but where a neighbour's hidden), and its cut face, with an empty one's dot.
           for (const q of [q0, q1]) {
@@ -4664,7 +5077,7 @@
         t.outline = () => [body, capLines];
         if (rgb) return;
         lone.set(id, points.n);
-        put(points, at(0, 0, yOf(qm)), own.rgb8, 1, i, BODY, 0, id, POINTS, [Math.min(0.011, 0.3 * poleR(qm)), 0, 0, 0]);
+        put(points, at(0, 0, yOf(qm)), own.col, 1, i, BODY, 0, id, POINTS, [Math.min(0.011, 0.3 * poleR(qm)), 0, 0, 0]);
       };
       // Every cell a dot: Wada's colours in a cell, as spheres BIG times its empty dot, as big as fits. Several
       // share it side by side through its middle, out from the axis by chroma (the greys one above another,
@@ -4690,14 +5103,14 @@
       };
 
       // Every cell, the pages' and the column's: Wada's colours' pieces, or the empty cell.
-      const greyOwn = (i) => ({ oklch: [lightOf(i), 0, 0], rgb8: rgb8(oklabToLinearSRGB(lightOf(i), 0, 0)) });
+      const greyOwn = (i) => ({ oklch: [lightOf(i), 0, 0], col: wide.screen(oklabToLinearSRGB(lightOf(i), 0, 0)) });
       const build = (list, made, pg, i, b, n) => {
         const pieces = list ? list.map((colour) => ({ colour })) : [{ cell: made }];
         const dots = list && wadaDots(list, pg, i, b, n);
         pieces.forEach((t, k) => {
           targets.push(t);
           t.level = i;
-          const rgb = t.colour ? rgb8(oklabToLinearSRGB(t.colour.oklch[0], t.colour.oklch[1] * Math.cos(rad(t.colour.oklch[2])), t.colour.oklch[1] * Math.sin(rad(t.colour.oklch[2])))) : null;
+          const rgb = t.colour ? wide.screen(linearOf(t.colour.oklch)) : null; // any colour: the screen clips what it can't show
           if (pg) wallPiece(pg, i, b, n, k, pieces.length, t, rgb, made);
           else polePiece(i, k, pieces.length, t, rgb, made);
           if (dots) {
@@ -4715,7 +5128,7 @@
           if (!here) continue;
           for (let b = 0; b < here.n; b++) {
             const tone = here.tones[b];
-            build(groups.get(`${pg.s} ${i} ${b}`), { oklch: tone.oklch, rgb8: rgb8(tone.rgb), s: pg.s, i, b, n: here.n }, pg, i, b, here.n);
+            build(groups.get(`${pg.s} ${i} ${b}`), { oklch: tone.oklch, col: wide.screen(tone.rgb), s: pg.s, i, b, n: here.n }, pg, i, b, here.n);
           }
         }
       }
@@ -4785,7 +5198,7 @@
           colour = vec4(c, 1.0);
         }`);
       const u = Object.fromEntries(["u_mvp", "u_cut", "u_from", "u_px", "u_dpr", "u_empty", "u_off", "u_card", "u_cardSide", "u_cutY", "u_mode", "u_round", "u_hi", "u_line"].map((n) => [n, gl.getUniformLocation(program, n)]));
-      const ATTRIBUTES = [["a_pos", "pos", 3, gl.FLOAT, false], ["a_col", "col", 4, gl.UNSIGNED_BYTE, true], ["a_info", "info", 4, gl.UNSIGNED_BYTE, false],
+      const ATTRIBUTES = [["a_pos", "pos", 3, gl.FLOAT, false], ["a_col", "col", 4, gl.FLOAT, false], ["a_info", "info", 4, gl.UNSIGNED_BYTE, false],
         ["a_id", "id", 1, gl.FLOAT, false], ["a_page", "page", 1, gl.UNSIGNED_BYTE, false], ["a_extra", "extra", 4, gl.FLOAT, false]];
       const loc = Object.fromEntries(ATTRIBUTES.map(([name]) => [name, gl.getAttribLocation(program, name)]));
       const upload = (m) => {
@@ -4818,7 +5231,7 @@
       gl.bindVertexArray(null);
 
       // The page's colours: card a little darker than the background, its edges and lines darker still.
-      const BG = cssRGB("--bg"), FG = cssRGB("--fg");
+      const BG = wide.fromEncoded(cssRGB("--bg")), FG = wide.fromEncoded(cssRGB("--fg"));
       const tint = (t) => BG.map((v, i) => v + (FG[i] - v) * t);
       const CARD = tint(0.06), CARD_SIDE = tint(0.11), LINE = tint(0.2);
 
@@ -4827,7 +5240,7 @@
       // 1: what's above is hidden) or the bottom (-1); at the end it comes from (white from the top, black
       // from the bottom), nothing is cut: the slice there is the tip.
       const DIST = 4.7, HALF = 13; // (as Ostwald's)
-      let az = 80, el = 25, level = 0, from = 1, hovered = -1, emptyAs = 2, off = new Set(); // off: the pages hidden
+      let az = start?.az ?? 80, el = start?.el ?? 25, level = 0, from = 1, hovered = -1, emptyAs = 2, off = new Set(start?.off); // off: the pages hidden
       const camera = () => orbit(az, el, DIST, HALF, canvas.width / canvas.height);
       const cutLevel = () => (from > 0 ? (level === 0 ? -1 : level) : level === TOP ? TOP + 1 : level);
       const cutY = () => yOf(lightOf(cutLevel()));
@@ -5071,6 +5484,8 @@
         },
         empty: (how) => { emptyAs = ["hidden", "points", "dots", "filled", "all"].indexOf(how); request(); }, // how the cells show
         unhover: () => { if (hovered >= 0) { hovered = -1; request(); } },
+        state: () => ({ az, el, off: [...off] }),
+        dispose: () => gl.getExtension("WEBGL_lose_context")?.loseContext(), // its GPU memory, at once
       };
     }
 
@@ -5148,76 +5563,11 @@
     // OKLCH -> CIE Lab (D50): the inverse of scripts/cmyk_to_oklch.py's maths (CSS Color 4's), with its
     // matrices inverted as scripts/ostwald_cmyk.py does.
     function oklchToLab(L, C, h) {
-      const OKLAB_TO_LMS = [[1.00000000239858, 0.39633777716154006, 0.21580375421218242], [0.999999999290284, -0.1055613457521502, -0.06385417190922567], [0.9999999856456103, -0.08948417624532107, -1.2914855294809227]];
-      const LMS_TO_XYZ = [[1.226879875845924, -0.557814994460217, 0.2813910456659646], [-0.040575745214800875, 1.1122868032803173, -0.07171105806551642], [-0.07637293667466001, -0.4214933324022431, 1.5869240198367816]];
       const D65_TO_D50 = [[1.0479297925449969, 0.02294687060160972, -0.05019226628920526], [0.029627808770055802, 0.99043442675388, -0.017073799063418812], [-0.009243040646204523, 0.015055191490298147, 0.7518742814281371]];
       const D50 = [0.9642956764295677, 1, 0.8251046025104602]; // the white
-      const times = (m, v) => m.map((row) => row[0] * v[0] + row[1] * v[1] + row[2] * v[2]);
-      const rad = h * (Math.PI / 180);
-      const lms = times(OKLAB_TO_LMS, [L, C * Math.cos(rad), C * Math.sin(rad)]).map((v) => v ** 3);
-      const [X, Y, Z] = times(D65_TO_D50, times(LMS_TO_XYZ, lms)).map((v, k) => v / D50[k]);
+      const [X, Y, Z] = Array.from(times3(D65_TO_D50, xyzOf([L, C, h])), (v, k) => v / D50[k]);
       const f = (t) => (t > 216 / 24389 ? t ** (1 / 3) : ((24389 / 27) * t + 16) / 116);
       return [116 * f(Y) - 16, 500 * (f(X) - f(Y)), 200 * (f(Y) - f(Z))];
-    }
-
-    // Linear sRGB 0..1 (in 4096 steps) -> 8-bit sRGB.
-    const SRGB_ENCODE = Uint8ClampedArray.from({ length: 4096 }, (_, i) => {
-      const v = i / 4095;
-      return 255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055);
-    });
-
-    // OKLab -> linear sRGB (Ottosson's matrices), written into `out`.
-    function oklabToLinearSRGB(L, a, b, out = new Float64Array(3)) {
-      const l_ = L + 0.3963377774 * a + 0.2158037573 * b, l = l_ * l_ * l_;
-      const m_ = L - 0.1055613458 * a - 0.0638541728 * b, m = m_ * m_ * m_;
-      const s_ = L - 0.0894841775 * a - 1.291485548 * b, s = s_ * s_ * s_;
-      out[0] = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
-      out[1] = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
-      out[2] = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
-      return out;
-    }
-
-    // Most vivid sRGB colour per hue (the gamut "cusp"): lightness L and chroma C in half-degree steps,
-    // with entry 720 repeating entry 0 so interpolation wraps around. Computed once (into `cusps`, set at
-    // the top, as the wheel can need it before the script gets here).
-    function cuspTable() {
-      if (!cusps) {
-        const L = new Float64Array(721), C = new Float64Array(721);
-        for (let k = 0; k < 720; k++) {
-          L[k] = cuspLightness(k / 2);
-          C[k] = maxChroma(L[k], k / 2);
-        }
-        L[720] = L[0];
-        C[720] = C[0];
-        cusps = { L, C };
-      }
-      return cusps;
-    }
-
-    // Largest chroma sRGB can show at this lightness and hue: within sRGB to within `tolerance` (the OKLCH
-    // layout's slices use a strict one: near black and white, a loose one lets through chroma that isn't
-    // there).
-    function maxChroma(L, h, tolerance = 1e-4) {
-      const rad = (h * Math.PI) / 180, cos = Math.cos(rad), sin = Math.sin(rad), v = new Float64Array(3);
-      let lo = 0, hi = 0.4;
-      for (let i = 0; i < 16; i++) { // to within 0.4 / 2^16
-        const mid = (lo + hi) / 2;
-        oklabToLinearSRGB(L, mid * cos, mid * sin, v);
-        if (v[0] >= -tolerance && v[0] <= 1 + tolerance && v[1] >= -tolerance && v[1] <= 1 + tolerance && v[2] >= -tolerance && v[2] <= 1 + tolerance) lo = mid;
-        else hi = mid;
-      }
-      return lo;
-    }
-
-    // Lightness at which this hue reaches its most vivid sRGB colour (the gamut "cusp").
-    // Max chroma rises then falls with lightness, so a ternary search finds the peak.
-    function cuspLightness(h) {
-      let lo = 0.2, hi = 1;
-      for (let i = 0; i < 24; i++) { // to within 0.8 × (2/3)^24 ≈ 0.00005
-        const m1 = lo + (hi - lo) / 3, m2 = hi - (hi - lo) / 3;
-        if (maxChroma(m1, h) < maxChroma(m2, h)) lo = m1; else hi = m2;
-      }
-      return (lo + hi) / 2;
     }
   </script>
 </body>

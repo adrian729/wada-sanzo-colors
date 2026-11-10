@@ -3653,7 +3653,7 @@
         ["level", "Slice across the axis: one level, seen from above", `${OUTLINE}<ellipse rx="5.5" ry="1.9"/>`],
         ["pages", "Slice through the axis: a hue's page and its complement's, back to back", `${OUTLINE}<path d="M 0 -7 L 2.2 0 L 0 7 L -2.2 0 Z"/>`],
       ];
-      modes.innerHTML = (picker ? "" : `<div class="view-switch" role="group" aria-label="View"><button type="button" data-mode="2d">2D</button><button type="button" data-mode="3d">3D</button></div>`)
+      modes.innerHTML = (picker ? "" : `<div class="view-switch" role="group" aria-label="View"><button type="button" data-mode="2d" title="2D: a slice of the solid, across its axis (one level) or through it (a hue's page and its complement's)">2D</button><button type="button" data-mode="3d" title="3D: the whole solid, its 24 pages round the greys, cut at a level; drag to turn it">3D</button></div>`)
         + optionSwitch("Cells", "empty", EMPTY) + optionSwitch("Slice", "slicing", SLICING) + optionSwitch("Cut", "cut", CUT);
       const cutOption = modes.querySelector('[data-option="cut"]'), slicingOption = modes.querySelector('[data-option="slicing"]');
       layout.append(disc, control, caption, modes);

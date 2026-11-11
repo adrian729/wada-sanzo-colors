@@ -29,6 +29,8 @@ The translations from the Japanese were made for these notes. Before quoting one
 - [analysis.py](analysis.py): the script behind data-analysis.md. Run `python3 notes/analysis.py`; it takes about 40 seconds.
 - [ostwald.md](ostwald.md): Wada's colours placed in Ostwald's colour system as his 1935 supplement draws it, as in the site's Ostwald view, and how well that fits his own data.
 - [ostwald.py](ostwald.py): the script behind ostwald.md. Run `python3 notes/ostwald.py`.
+- [munsell.md](munsell.md): Wada's colours placed in Munsell's system, as in the site's Munsell view, and how they were measured. Its script is `scripts/munsell.py`.
+- [pccs.md](pccs.md): Wada's colours placed in PCCS and its tones, as in the site's PCCS view, and why it's built on Munsell's notation. Its script is `scripts/pccs.py`.
 
 ## Sources
 

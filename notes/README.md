@@ -48,11 +48,9 @@ The translations from the Japanese were made for these notes. Before quoting one
 
 ## Ideas for the site
 
+Wada's rules, his kinds of harmony and his reading of the two January cards are on the site's Guidance page, with Hama's advice; the colour theory of his and Hama's texts is on its Theory page.
+
 - **Add the 12 extra four-colour plates** as #349–#360, marked as missing from the reprint. Plate 116's Grayish Lavender needs checking: A or B.
-- **A page on how Wada worked:**
-  - the rules above;
-  - the four kinds of harmony;
-  - his reading of the two January cards.
 - **In Create:**
   - suggest his complementary pairs;
   - an option to put white, grey or black between colours, with Chevreul's advice on which to use;

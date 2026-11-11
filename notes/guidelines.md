@@ -129,7 +129,7 @@ Wada gives this as the first thing to practise:
 
 ### Neutrals and outlines: Chevreul's rules (pp. 23–26)
 
-Wada presents these as an excerpt from Chevreul, "the first person in the study of colour contrast and harmony". He gives Chevreul's dates as 1786–1879; Chevreul actually died in 1889.
+Wada presents these as an excerpt from Chevreul, "the leading authority (第一人者) on the study of colour contrast and harmony". He gives Chevreul's dates as 1786–1879; Chevreul actually died in 1889.
 
 - **Contrast pairs:** complementary pairs, such as green with red or ultramarine with yellow, give good harmony by contrast.
 - **Primaries:**

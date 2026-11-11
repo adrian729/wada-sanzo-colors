@@ -38,7 +38,12 @@
     /* The site's icon (the book's cover) before its name, as tall as a line of it, level with the first. */
     .brand { display: flex; align-items: flex-start; gap: 0.625rem; line-height: 1.25rem; }
     .brand img { flex: none; width: 1.25rem; height: 1.25rem; }
+    .brand { color: inherit; text-decoration: none; } /* a link to the page about Wada */
+    .brand:is(:hover, :focus-visible) strong { text-decoration: underline; text-underline-offset: 0.25em; }
     nav span { color: var(--muted); }
+    /* Where the five sections would otherwise go to a second row (as wide as four fitted in one: the
+       brand's 481px, four sections' 346px, About's 64px, the gap and the padding), the site's name only. */
+    @media (891px <= width < 955px) { .brand span { display: none; } }
     .views, .subnav { display: flex; gap: 1rem; }
     .views, .subnav { flex-wrap: wrap; row-gap: 0.25rem; } /* narrow screens: on two lines */
     .subnav { justify-content: flex-end; padding: 0 1.5rem 1rem; font-size: 0.875rem; }
@@ -641,20 +646,70 @@
     .copy .done, .copy.copied .idle { display: none; }
     .copy.copied .done { display: block; }
     .error { color: var(--muted); }
+
+    /* The reading pages (Guidance, Theory, About): one column of text, centred, as wide as reads well.
+       Their sections can be linked (#guidance/hama): see showView. */
+    .prose { max-width: 68ch; margin: 0 auto; padding-bottom: 3rem; font-size: 0.9375rem; line-height: 1.65; }
+    .prose h1 { margin-top: 0.5rem; font-size: 1.25rem; font-weight: 500; line-height: 1.3; }
+    .prose h2 { margin-top: 2.75rem; font-size: 1rem; font-weight: 500; line-height: 1.4; }
+    .prose h3 { margin-top: 1.75rem; font-size: 0.9375rem; font-weight: 500; line-height: 1.4; }
+    .prose :is(p, ul, ol, blockquote, figure) { margin-top: 0.75rem; }
+    .prose :is(h2, h3) + :is(p, ul, ol) { margin-top: 0.5rem; }
+    .prose :is(ul, ol) { padding-left: 1.5rem; }
+    .prose li + li, .prose li > :is(ul, ol) { margin-top: 0.375rem; }
+    .prose strong { font-weight: 500; }
+    .prose a { color: inherit; text-underline-offset: 0.2em; text-decoration-color: var(--muted); }
+    .prose a:is(:hover, :focus-visible) { text-decoration-color: currentColor; }
+    .prose blockquote { padding-left: 1rem; border-left: 2px solid var(--line); }
+    .prose .lead { color: var(--muted); }
+    /* Where today's colour science differs from what the 1930s sources teach. */
+    .prose .today { padding-left: 1rem; border-left: 2px solid var(--line); color: var(--muted); font-size: 0.875rem; }
+    .prose .today strong { color: var(--fg); }
+    /* A note on whose words a part is, and the sources at the end: smaller, muted. */
+    .prose .aside { padding: 0.75rem 1rem; border: 1px solid var(--line); color: var(--muted); font-size: 0.875rem; }
+    .prose .sources { color: var(--muted); font-size: 0.8125rem; }
+    .prose .sources h2 { color: var(--fg); }
+    /* The page's sections, under its title. A section linked to takes the focus (see showView), unmarked. */
+    .prose nav { display: block; padding: 0; }
+    .prose [tabindex="-1"]:focus { outline: none; }
+    .prose .contents { padding: 0; list-style: none; font-size: 0.875rem; }
+    .prose .contents li + li { margin-top: 0.125rem; }
+    .prose .contents ul { padding-left: 2ch; list-style: none; }
+    .prose .contents a { color: var(--muted); text-decoration: none; }
+    .prose .contents a:is(:hover, :focus-visible) { color: var(--fg); text-decoration: underline; }
+    /* A colour named in the text: its name, then a square of it (as everywhere on the site); opens its
+       dialog. Kept on one line with its square. */
+    .prose .color-ref {
+      padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; white-space: nowrap;
+      text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 0.2em;
+    }
+    .prose .color-ref:is(:hover, :focus-visible) { text-decoration-color: currentColor; }
+    .prose .ref-keep { white-space: nowrap; }
+    .prose .color-ref .chip { display: inline-block; margin-left: 0.75ch; vertical-align: -0.1em; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1); } /* (White too) */
+    /* Wada's reading of one of his cards: the card (a link to its page), its reading beside it. */
+    .prose .card-reading { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 1.25rem; align-items: start; margin-top: 1.25rem; }
+    .prose .card-reading > :first-child { margin-top: 0.3rem; }
+    .prose .card-reading > div > :first-child { margin-top: 0; }
+    .prose .thumb { color: var(--muted); } /* as in the colour dialog */
+    .prose .thumb:is(:hover, :focus-visible) { color: var(--fg); }
+    @media (width < 30rem) { .prose .card-reading { grid-template-columns: 4.5rem minmax(0, 1fr); gap: 1rem; } }
+    /* Wada's complementary pairs: one to a line. */
+    .prose .pairs { padding: 0; list-style: none; }
   </style>
 </head>
 <body>
   <header>
     <nav>
-      <div class="brand">
+      <a class="brand" href="#about">
         <img src="favicon.svg" alt="" width="20" height="20">
         <div><strong>Wada Sanzo</strong> <span>| A Dictionary of Color Combinations</span></div>
-      </div>
+      </a>
       <div class="views">
         <a href="#colors">Colors</a>
         <a href="#combinations">Combinations</a>
         <a href="#seasons">Seasons</a>
         <a href="#create">Create</a>
+        <a href="#about">About</a>
       </div>
     </nav>
     <div class="subnav" data-view="colors" role="group" aria-label="Colours layout">
@@ -686,6 +741,11 @@
       <button type="button" data-value="12" aria-label="December">Dec</button>
       <button type="button" data-value="all">All</button>
     </div>
+    <nav class="subnav reading-subnav" aria-label="About" hidden>
+      <a href="#about">Wada Sanzo</a>
+      <a href="#guidance">Guidance</a>
+      <a href="#theory">Colour theory</a>
+    </nav>
     <nav class="subnav combo-subnav" aria-label="Combination" hidden>
       <div class="pager"></div>
       <div class="tabs"></div>
@@ -697,12 +757,13 @@
       // again on every change of address; it returns the view to show.
       function showHeader() {
         const route = location.hash.slice(1).split("/")[0];
-        const name = ["colors", "combinations", "combination", "seasons", "season", "create"].includes(route) ? route : "colors";
-        const section = { combination: "combinations", season: "seasons" }[name] ?? name; // highlighted in the nav
-        for (const a of document.querySelectorAll(".views a")) {
-          if (a.hash === `#${section}`) a.setAttribute("aria-current", "page");
+        const name = ["colors", "combinations", "combination", "seasons", "season", "create", "guidance", "theory", "about"].includes(route) ? route : "colors";
+        const section = { combination: "combinations", season: "seasons", guidance: "about", theory: "about" }[name] ?? name; // highlighted in the nav
+        for (const a of document.querySelectorAll(".views a, .reading-subnav a")) { // (and the reading page, under About)
+          if (a.hash === `#${a.closest(".views") ? section : name}`) a.setAttribute("aria-current", "page");
           else a.removeAttribute("aria-current");
         }
+        document.querySelector(".reading-subnav").hidden = section !== "about";
         for (const s of document.querySelectorAll(".subnav[data-view]")) s.hidden = s.dataset.view !== name;
         document.querySelector(".combo-subnav").hidden = name !== "combination" && name !== "season";
         return name;
@@ -734,6 +795,265 @@
         <div class="picker-status" aria-hidden="true"></div>
       </div>
     </section>
+
+    <section id="guidance-view" hidden>
+      <article class="prose">
+        <h1>Guidance</h1>
+        <p class="lead">How to make a combination and how to use one: first in Wada's words, from the booklets he wrote for his combinations, then in Hama Yaohiko's, from the colour atlas they made together.</p>
+        <nav aria-label="On this page"><ul class="contents">
+          <li><a href="#guidance/wada">Wada's advice</a>
+            <ul>
+              <li><a href="#guidance/making">Making a combination</a></li>
+              <li><a href="#guidance/harmony">Four kinds of harmony</a></li>
+              <li><a href="#guidance/pairs">His complementary pairs</a></li>
+              <li><a href="#guidance/neutrals">White, grey or black between colours</a></li>
+              <li><a href="#guidance/using">Using a combination</a></li>
+              <li><a href="#guidance/cards">Wada reads two of his cards</a></li>
+            </ul>
+          </li>
+          <li><a href="#guidance/hama">Hama's advice</a></li>
+          <li><a href="#guidance/sources">Sources</a></li>
+        </ul></nav>
+
+        <h2 id="guidance-wada">Wada's advice</h2>
+        <p>Wada didn't think combining colours could be taught like mathematics, where a formula gives the right answer: a combination always appeals to each person's feelings and taste. Taste in colour, he said, is like a singing voice, partly a gift, but it grows with practice. So he gave advice from what he had learnt as a painter: rules of thumb, not a science.</p>
+
+        <h3 id="guidance-making">Making a combination</h3>
+        <ul>
+          <li><strong>Balance lightness and saturation, not only hue.</strong> Lining up well-chosen hues isn't enough: a combination works through how its colours' lightness and saturation balance one another.
+            <ul>
+              <li>Vivid colours together need a muted one among them or beside them.</li>
+              <li>Pale colours together feel lukewarm: they need a deep one, in a measured amount.</li>
+              <li>Dark colours together are suffocating: some of them must be lighter.</li>
+            </ul>
+            As in cooking, he said: a meal comes together through the balance of hot, sweet and sour.</li>
+          <li><strong>Don't make every colour as strong as the others.</strong> When no colour sets off another, the result is safe, but ordinary (see <a href="#guidance/cards">his first card</a>).</li>
+          <li><strong>Start from one hue,</strong> in its light and dark tones: it can hardly go wrong. Set different hues against each other with care.</li>
+          <li><strong>Where different hues touch,</strong> weigh each colour's lightness and strength, or the result turns coarse.</li>
+          <li><strong>Calm colours for things you live with.</strong> Strong combinations catch the eye, which suits advertising, shop windows and the stage, but they tire quickly. Calm doesn't mean dull: neighbouring hues, their strengths well balanced.</li>
+        </ul>
+
+        <h3 id="guidance-harmony">Four kinds of harmony</h3>
+        <ol>
+          <li><strong>Like colours:</strong> one hue in its light and dark tones, such as orange with its browns and its pale, flesh-like tints. Gentle and safe, but seldom more than ordinary. The place to start.</li>
+          <li><strong>Different hues:</strong> colours of quite different hues, in any tone. Interesting, but it needs care (above).</li>
+          <li><strong>Complementary:</strong> opposite hues, whatever their lightness. Lively, but suited to fewer uses.</li>
+          <li><strong>Graded bands</strong> (<i>ungen</i>, <span lang="ja">暈繝</span>): one hue in steps, from white through the full colour to black, or part of that scale. The calmest of all.</li>
+        </ol>
+        <p>An earlier version has two kinds, same tone and different tone, each light, dark, pale, deep or free: ten in all. He called them a law and a standard, but not one you must obey: those with long experience of colour can merge them or break them. None of his plates says which kind it is.</p>
+
+        <h3 id="guidance-pairs">His complementary pairs</h3>
+        <p>Wada paired colours of his own palette by hue alone, so their lightness and saturation vary. Red's lighter and darker tones pair too: <button class="color-ref">Hermosa Pink</button> and <button class="color-ref">Pale Burnt Lake</button> go with <button class="color-ref">Sea Green</button>, as <button class="color-ref">Spectrum Red</button> does.</p>
+        <ul class="pairs">
+          <li><button class="color-ref">Spectrum Red</button> ↔ <button class="color-ref">Sea Green</button></li>
+          <li><button class="color-ref">Red Orange</button> ↔ <button class="color-ref">Green Blue</button>, or one a little greener</li>
+          <li><button class="color-ref">Orange</button> ↔ <button class="color-ref">Peacock Blue</button></li>
+          <li><button class="color-ref">Yellow Orange</button> ↔ <button class="color-ref">Antwerp Blue</button></li>
+          <li><button class="color-ref">Apricot Yellow</button> ↔ <button class="color-ref">Blue</button></li>
+          <li><button class="color-ref">Yellow</button> ↔ <button class="color-ref">Deep Lyons Blue</button></li>
+          <li><button class="color-ref">Lemon Yellow</button> ↔ <button class="color-ref">Violet Ultramarine</button></li>
+          <li><button class="color-ref">Light Green Yellow</button> ↔ <button class="color-ref">Violet</button></li>
+          <li><button class="color-ref">Yellow Green</button> ↔ <button class="color-ref">Red Violet</button></li>
+          <li><button class="color-ref">Night Green</button> ↔ <button class="color-ref">Rosolane Purple</button></li>
+        </ul>
+        <p>Only one of these pairs is a combination in the book: <a href="#combination/22">022</a>, Yellow with Deep Lyons Blue.</p>
+
+        <h3 id="guidance-neutrals">White, grey or black between colours</h3>
+        <p>Where two colours clash, put white, grey or black between them. Wada passed on the rules of the French chemist Michel-Eugène Chevreul, whom he called the leading authority on colour contrast and harmony, on which to use:</p>
+        <ul>
+          <li>red and yellow: anything but black; red and blue: anything but white; blue and yellow: anything but grey; yellow and orange: anything but black; blue and purple: anything but grey;</li>
+          <li>orange and green: black; purples: grey; purple and green: white;</li>
+          <li>black never clashes with two bright colours, and suits dark purples and blues; grey suits two bright colours, and never clashes with two dull ones;</li>
+          <li>on a pale ground, draw patterns in deep tones, outlined in black, grey or a colour deeper still; a pattern paler than its ground takes a white or grey outline.</li>
+        </ul>
+        <p>But taste moves on, Wada added. By Chevreul's rules red with blue is pleasing, yet few would now agree; brown beside black, long frowned on, is now well liked.</p>
+
+        <h3 id="guidance-using">Using a combination</h3>
+        <ul>
+          <li><strong>Give the colours different areas.</strong> The plates show every colour the same size only for convenience. Equal areas balance only when the colours are equally strong: otherwise, give the weak tones the large areas and the strong ones the small.</li>
+          <li><strong>Try the amounts.</strong> Lay cut white or grey paper over a plate, to change each colour's shape and size. For a kimono, a triangle: its tip is the collar, the middle the kimono, the next part the obi.</li>
+          <li><strong>The main colour can be a small one.</strong> On a card, the largest colour is the main one, holding the rest together; in actual dress, a small one often takes that role: the obi, the collar, a hat, gloves, a handbag. Where is the centre of the combination? That is the question.</li>
+          <li><strong>Large areas look paler.</strong> A combination that works in small swatches looks paler and weaker on a large object: clothes ordered from swatches can come out looking washed out.</li>
+        </ul>
+
+        <h3 id="guidance-cards">Wada reads two of his cards</h3>
+        <p>He explained two of his seasonal cards, both for January. On each, the top colour is the largest.</p>
+        <div class="card-reading">
+          <a data-season="1"></a>
+          <div>
+            <p><button class="color-ref">Seashell Pink</button> with <button class="color-ref">White</button>, <button class="color-ref">Sulphur Yellow</button>, <button class="color-ref">Glaucous Green</button> and <button class="color-ref">Grayish Lavender - A</button>.</p>
+            <p>All are light and, apart from the white, about as strong as one another, with little difference in hue, lightness or saturation: none helps or sets off another, each just asserts itself. Ordinary, he said, though safe: the kind anyone makes.</p>
+          </div>
+        </div>
+        <div class="card-reading">
+          <a data-season="5"></a>
+          <div>
+            <p><button class="color-ref">Black</button> with <button class="color-ref">Spectrum Red</button>, <button class="color-ref">Ivory Buff</button>, <button class="color-ref">Dark Tyrian Blue</button>, <button class="color-ref">Cobalt Green</button> and <button class="color-ref">Warm Gray</button>.</p>
+            <p>Different in every way, and uneven in strength, yet natural, and full of change:</p>
+            <ul>
+              <li>the black, darkest of colours, holds the others together;</li>
+              <li>the red, a pure colour, would look coarse alone: the black's embrace and the Ivory Buff below it soften it;</li>
+              <li>with the weak Cobalt Green below, the Dark Tyrian Blue tightens the whole;</li>
+              <li>the grey, last, changes none of the others.</li>
+            </ul>
+            <p>The black covers the most, but the eye goes first to the red: here, the red is the centre.</p>
+          </div>
+        </div>
+
+        <h2 id="guidance-hama">Hama's advice</h2>
+        <p class="aside">This part is Hama Yaohiko's, not Wada's: from his commentary to the colour atlas they made together. Hama had written an outline of colour theory before it, and the atlas's publisher called him an authority on colour.</p>
+        <p>He treats combining colours only in outline, and sets no absolute laws: what we like depends on custom, age, upbringing and surroundings, and fashion changes it.</p>
+        <ul>
+          <li><strong>Good and poor pairs.</strong> Tests that averaged many people's judgements agree: complementary pairs, or pairs a little off them, are good; a colour with the hue halfway to its complement is poor.
+            <ul>
+              <li>Good: red and blue; red and blue-green; orange and green-blue or blue; yellow and violet; yellow and blue; yellow-green and violet; green and red-purple. (Wada, by contrast, doubted that red with blue still pleased.)</li>
+              <li>Poor: red and orange; red and yellow; orange and yellow; yellow and green or blue-green; yellow-green and orange or green-blue; green and blue.</li>
+            </ul>
+          </li>
+          <li><strong>Three or more colours.</strong> Take hues that divide the hue circle about equally, such as red, yellow and blue, and make one or two of them lighter or darker.</li>
+          <li><strong>Same and similar colours</strong> (one colour, deep and pale, light and dark, or neighbouring hues) are generally liked as mild and pleasant.</li>
+          <li><strong>Variety and unity.</strong> Opposite colours give variety, and look beautiful at first, but tire with long looking: people come to prefer the plainer, milder combinations they first thought dull. So combining colours is balancing variety and unity, for the purpose in hand. Where there is too much variety, change some colours' lightness and saturation to unify them.</li>
+          <li><strong>One dominant colour.</strong> Many colours together easily look scattered: let one of them dominate, to hold the rest together.</li>
+          <li><strong>Tone, like a key in music.</strong> Colours of one tone (equally light, pale or greyed) sit together; different tones, used well, add life and save a design from flatness; used thoughtlessly, they are off-key.</li>
+          <li><strong>Even steps.</strong> Within one series of tints, shades or greyed colours, colours at even steps, every second or every third, go well together.</li>
+          <li><strong>Seen from afar.</strong> In earlier tests he cites, black on yellow read from furthest away, then green, red and blue on white; in a more recent one, lightness contrast decided most of it.</li>
+        </ul>
+
+        <section class="sources">
+          <h2 id="guidance-sources">Sources</h2>
+          <ul>
+            <li>Wada Sanzō, <span lang="ja">配色總鑑概説と其活用</span> (General remarks on the <i>Haishoku Sōkan</i> and how to use it), Hakubisha, 1934: <a href="https://dl.ndl.go.jp/pid/1911912">National Diet Library</a>. The reprint, <i>A Dictionary of Color Combinations</i>, has part of it.</li>
+            <li>Wada Sanzō, <span lang="ja">配色總鑑附說</span> (Supplement to the <i>Haishoku Sōkan</i>), Hakubisha, 1935: <a href="https://dl.ndl.go.jp/pid/1903674">National Diet Library</a>.</li>
+            <li>Hama Yaohiko, the commentary to Wada Sanzō and Hama Yaohiko, <span lang="ja">標準色彩圖集</span> (<i>Hyōjun shikisai zushū</i>, a standard colour atlas), 1935: <a href="https://dl.ndl.go.jp/pid/1014901">National Diet Library</a>.</li>
+          </ul>
+          <p>The translations from the Japanese were made for this site.</p>
+        </section>
+      </article>
+    </section>
+
+    <section id="theory-view" hidden>
+      <article class="prose">
+        <h1>Colour theory</h1>
+        <p class="lead">The ideas behind the book and this site's views: how colour works, how it is described, and what changes it, as Wada and Hama taught them in the 1930s. Where today's colour science says otherwise, a note says so.</p>
+        <nav aria-label="On this page"><ul class="contents">
+          <li><a href="#theory/light">Light and colour</a></li>
+          <li><a href="#theory/attributes">Describing a colour</a></li>
+          <li><a href="#theory/complements">Complementary colours</a></li>
+          <li><a href="#theory/mixing">Mixing colours</a></li>
+          <li><a href="#theory/contrast">Contrast</a></li>
+          <li><a href="#theory/conditions">What changes a colour</a></li>
+          <li><a href="#theory/character">Strong and weak, warm and cool</a></li>
+          <li><a href="#theory/systems">Colour systems</a></li>
+          <li><a href="#theory/names">Colour names</a></li>
+          <li><a href="#theory/sources">Sources</a></li>
+        </ul></nav>
+
+        <h2 id="theory-light">Light and colour</h2>
+        <p>White light is a mix of wavelengths: a prism spreads it into the spectrum, from red to violet. An object has a colour because it absorbs part of the light and sends back the rest: its colour is white light, less what it absorbs, and in the dark it has none. A red paint doesn't send back only red light, Hama pointed out: a pigment absorbs about half the spectrum, and one that sent back only red would look almost black.</p>
+        <p class="today"><strong>Today:</strong> the eye's three kinds of cone, which Hama doubted (none had been found), are established. The brain makes the colour from them, so the same light can look different in different surroundings, and different lights can look the same.</p>
+
+        <h2 id="theory-attributes">Describing a colour</h2>
+        <p>Wada and Hama both describe a colour by three attributes:</p>
+        <ul>
+          <li><strong>Hue:</strong> red, yellow, green, blue and so on, round a circle that closes through the purples, which the spectrum lacks.</li>
+          <li><strong>Lightness:</strong> how light or dark it is, matched against a scale of greys.</li>
+          <li><strong>Saturation:</strong> how strong the colour is, against the pure one. Wada's earlier booklet treats it as depth: red thinned with water is paler, red laid over red deeper. Hama keeps depth apart: a colour laid over itself takes on black, and grows darker.</li>
+        </ul>
+        <p>Adding white to a colour gives tints, adding black gives shades, adding grey gives greyed (broken) tones: from one hue, hundreds of colours. Hama drew them as a triangle, after Ostwald, with the full colour at one corner and white and black at the others; all the hues' triangles together make a solid, white at the top, black at the bottom, the full colours round the middle. He knew this was simplified: yellow's full colour should sit higher, and blue's lower.</p>
+        <p>Full colours aren't equally light. Matched against greys, yellow is lightest, then orange-yellow and yellow-green, then orange and green, red and blue-green, blue and red-purple, and purple darkest.</p>
+        <p>Nor do equal amounts of white look like equal steps: a little white lightens a dark grey far more than a light one. So Hama made his grey scale with its white falling by a constant ratio, not in tenths.</p>
+        <p class="today"><strong>Today:</strong> most colour systems still use these three attributes, now measured so that equal steps look equal (see <a href="#theory/systems">colour systems</a>), and the measured solid is lopsided, yellow's full colour far lighter than blue's. Greys that look evenly spaced follow roughly the cube root of how much light they send back (Munsell's value, CIE L*): a constant ratio crowds the dark steps.</p>
+
+        <h2 id="theory-complements">Complementary colours</h2>
+        <p>Two colours are complementary when, mixed as light or spun together on a disc, they make white or grey. Hama called them twins: the light a colour absorbs is its complement. The eye makes them too: stare at a red paper, take it away, and a blue-green after-image appears in its place. Wada paired colours of his own palette: see <a href="#guidance/pairs">his pairs</a>.</p>
+        <p class="today"><strong>Today:</strong> which colours are complements depends on the model. The painters' pairs (red and green, orange and blue, yellow and purple) differ from those of light (red and cyan, green and magenta, blue and yellow); Wada's and Hama's pairs, such as yellow and blue, or red and blue-green, are close to light's. After-images come from the eye adapting to a colour.</p>
+
+        <h2 id="theory-mixing">Mixing colours</h2>
+        <ul>
+          <li><strong>Paints subtract.</strong> Each absorbs part of the light, so a mix is darker than its colours, with a hue between theirs on the circle: the further apart they are, the duller the mix, and opposite colours make grey or near black. Painters and dyers often dull a colour with its complement rather than with black, for a softer result.</li>
+          <li><strong>Light adds.</strong> Red, green and blue lights make every hue: red and green make yellow, and all three make white. Spun on a disc, as Hama mixed them, or in fine dots, colours average instead: a complementary pair gives grey, not white.</li>
+          <li><strong>Yellow and blue paint make green,</strong> not grey: between them they absorb both ends of the spectrum, and leave its middle.</li>
+        </ul>
+        <p class="today"><strong>Today:</strong> the painters' red, yellow and blue are a tradition, not a law. Printing mixes cyan, magenta and yellow (Hama's advice, to choose a greenish blue and a purplish red, already leads that way), and screens mix red, green and blue. Rules of proportion such as George Field's, 3 of yellow to 5 of red and 8 of blue, depend on the paints.</p>
+
+        <h2 id="theory-contrast">Contrast</h2>
+        <ul>
+          <li><strong>Side by side,</strong> colours push each other apart: each looks tinged with the other's complement. Close hues shift most, and complements keep their hue. Larger, more saturated and lighter areas push hardest.</li>
+          <li><strong>Lightness:</strong> a colour looks lighter beside a darker one, and darker beside a lighter one. White looks whitest on black.</li>
+          <li><strong>Saturation:</strong> a pale colour beside a vivid one looks paler still.</li>
+          <li><strong>One after another:</strong> a colour seen just after its complement looks more vivid.</li>
+          <li><strong>A grey on a coloured ground</strong> looks tinged with the ground's complement.</li>
+          <li><strong>A line stops it:</strong> a black outline, a gap or an overlap between two colours removes the effect, which may be one reason <a href="#guidance/neutrals">white, grey or black between colours</a> works.</li>
+          <li><strong>From afar, small colours mix:</strong> fine stripes or dots blend into their average. Japanese textiles use it, in <i>komon</i>, <i>kasuri</i> and stripes: separate colours near, a mixture far, and in between a beauty of its own.</li>
+        </ul>
+
+        <h2 id="theory-conditions">What changes a colour</h2>
+        <ul>
+          <li><strong>The light.</strong> Lamplight is rich in orange and poor in blue: reds and oranges glow, yellow fades, blues darken. Hama found colour hard to judge by lamplight. Strong sun favours reds and yellows, dull weather pale, cool colours.</li>
+          <li><strong>Dim light.</strong> At dusk, red goes dark first, while greens and blues still show their colour.</li>
+          <li><strong>The material.</strong> The same colour differs as oil paint, watercolour or dye, and on silk, cotton or linen: oils look dark and deep, pastels light, watercolours between. A wet surface looks more saturated than a dry one.</li>
+          <li><strong>The area.</strong> Large areas look paler and weaker than small swatches, as <a href="#guidance/using">Wada warned</a>.</li>
+        </ul>
+        <p class="today"><strong>Today:</strong> the eye also adapts to the light, which hides much of its shift; and two colours that match in one light can differ in another.</p>
+
+        <h2 id="theory-character">Strong and weak, warm and cool</h2>
+        <ul>
+          <li><strong>Strength.</strong> Wada ranked colours by how much they excite the eye: red most, then orange, yellow, green, blue and indigo, violet least. That is why danger signals are red. People differ, he said, but this order is generally accepted.</li>
+          <li><strong>Warm and cool.</strong> Red, orange and yellow are warm, blue and green cool: Hama traced it to fire and to deep, clear water. But every hue has warmer and cooler kinds: for Wada, celadon is a warm green and evergreen a cool one, and canary a cooler yellow than turmeric.</li>
+          <li><strong>What colours stand for,</strong> in Hama's list, "a kind of code": white and black, purity and seriousness; red, power and passion; yellow, light and joy; green, peace and health; blue, calm and depth; purple, grace and nobility.</li>
+        </ul>
+        <p class="today"><strong>Today:</strong> no fixed order of strength by hue is established: how much a colour stands out depends on its saturation, lightness and surroundings, and red for danger is partly convention.</p>
+
+        <h2 id="theory-systems">Colour systems</h2>
+        <p>A colour system orders colours by their attributes, so that any colour can be found and written down. This site places Wada's colours in four, each a view under <a href="#colors">Colors</a>:</p>
+        <ul>
+          <li><a href="#colors" data-layout="ostwald"><strong>Ostwald</strong></a>: every colour a mix of full colour, white and black, on a circle of 100 hues, each hue a triangle, as Hama drew it. Wada wrote colours in it: his orange is 16PA, his dark brown 17PK.</li>
+          <li><a href="#colors" data-layout="oklch"><strong>OKLCH</strong></a>: a modern colour space, of lightness, chroma and hue, made so that equal steps look equal. The site computes every colour in it, from the book's CMYK, and uses it to show them on screen.</li>
+          <li><a href="#colors" data-layout="munsell"><strong>Munsell</strong></a>: hue, value (lightness) and chroma, spaced to look even, chroma reaching as far as colours go. Japan's colour standards write colours in it.</li>
+          <li><a href="#colors" data-layout="pccs"><strong>PCCS</strong></a>: made by the Japan Color Research Institute, which grew out of the association Wada founded. Built on Munsell's notation, it adds tones (colours of like lightness and saturation across the hues), for colour harmony.</li>
+        </ul>
+
+        <h2 id="theory-names">Colour names</h2>
+        <p>Wada gathered colour names into books, and gave every colour of his combinations a Japanese name and an English one. The English names come from Robert Ridgway's <i>Color Standards and Color Nomenclature</i>, a few misspelled. Plate 8 of the atlas shows 12 hues, each as tint, full colour and shade, with Wada's names: 35 of them are colours here, and those colours' dialogs say so.</p>
+        <p>Hama adds notes on Japanese names: <i>ao</i> long meant both green and blue; the browns (<i>cha</i>) and the mouse greys (<i>nezumi</i>) were the two great families of colour names in the Edo period; and Kyoto's purple was redder than Edo's.</p>
+
+        <section class="sources">
+          <h2 id="theory-sources">Sources</h2>
+          <ul>
+            <li>Hama Yaohiko, the commentary to Wada Sanzō and Hama Yaohiko, <span lang="ja">標準色彩圖集</span> (<i>Hyōjun shikisai zushū</i>, a standard colour atlas), 1935: <a href="https://dl.ndl.go.jp/pid/1014901">National Diet Library</a>; its plates, <a href="https://dl.ndl.go.jp/pid/1014903">part 2</a>.</li>
+            <li>Wada Sanzō, <span lang="ja">配色總鑑概説と其活用</span> (General remarks on the <i>Haishoku Sōkan</i> and how to use it), Hakubisha, 1934: <a href="https://dl.ndl.go.jp/pid/1911912">National Diet Library</a>.</li>
+            <li>Wada Sanzō, <span lang="ja">配色總鑑附說</span> (Supplement to the <i>Haishoku Sōkan</i>), Hakubisha, 1935: <a href="https://dl.ndl.go.jp/pid/1903674">National Diet Library</a>.</li>
+            <li>How this site places the colours in each system: the notes linked from the project's <a href="https://github.com/adrian729/wada-sanzo-colors">README</a>.</li>
+          </ul>
+          <p>The translations from the Japanese were made for this site. The notes marked Today are ours.</p>
+        </section>
+      </article>
+    </section>
+
+    <section id="about-view" hidden>
+      <article class="prose">
+        <h1>Wada Sanzo</h1>
+        <p>Wada Sanzō (<span lang="ja">和田三造</span>, 1883–1967) was a Japanese painter who spent much of his life on one problem: how people can agree on a colour, and use colours well.</p>
+        <p>He trained in Western-style painting under Kuroda Seiki, then studied in Europe, mainly in France, where he also studied craft design, and Eastern art in India and Burma. Painting from nature taught him, he wrote, to take apart its complex tones and put them together again: his sense of colour comes from that, not from science. He drew on European colour work as well: Ostwald's system to write colours down, Chevreul's rules for harmony, Ridgway's colour names. Later he taught design at the Tokyo School of Fine Arts.</p>
+        <p>He worked on the problem in three ways:</p>
+        <ul>
+          <li><strong>Standard colours.</strong> On his way home, in India, a trader told him how hard it was to agree on a colour without standard samples. He collected scraps of colour in every material, and from them made Japan's first systematic colour samples: 500 colours in dyed silk, each in three weaves, from glossy to matte. He founded the Japan Standard Color Association, later the Japan Color Research Institute, which made Japan's first colour system with steps that look even, the first chips anywhere of Munsell's revised system, and later PCCS, one of this site's views; it also helped draft Japan's standard for specifying colours.</li>
+          <li><strong>Colour names.</strong> With experts in art, literature and science, his association gathered some 600 colour names onto 171 colour samples, each with its Japanese, Chinese and English names and its code in Ostwald's notation, so that a name points to one colour. A pocket edition sold widely.</li>
+          <li><strong>Combinations.</strong> Without the actual colours, he wrote, names alone can't call up a combination, and the books on it were of use only to specialists. So he showed them: his <i>Haishoku Sōkan</i> (<span lang="ja">配色總鑑</span>) sets out 348 combinations of two, three and four colours in hand-painted samples, for anyone choosing colours, for clothes, interiors, crafts or advertising, with advice on how to use them (see <a href="#guidance">Guidance</a>). It is a painter's guide, from his own eye, not a theory, and the first of the many books of colour combinations since.</li>
+        </ul>
+        <h2>This site</h2>
+        <p>The <i>Haishoku Sōkan</i> is in print again as <i>A Dictionary of Color Combinations</i> (Seigensha). A second volume adds Wada's seasonal combinations: six for each month of the year, each a strip of one large colour above smaller bands. This site shows the colours and combinations of both.</p>
+        <ul>
+          <li><a href="#colors"><strong>Colors</strong></a>: all of Wada's colours, 171, grouped by colour family as in the book, or placed in four colour systems (see <a href="#theory/systems">Colour theory</a>).</li>
+          <li><a href="#combinations"><strong>Combinations</strong></a>: the 348 combinations of the first volume, laid out as in the book.</li>
+          <li><a href="#seasons"><strong>Seasons</strong></a>: the 72 seasonal combinations of the second volume, month by month.</li>
+          <li><a href="#create"><strong>Create</strong></a>: put together your own combinations, from Wada's colours or any colour of the four systems, and keep them in your browser.</li>
+          <li><a href="#guidance"><strong>Guidance</strong></a>: Wada's advice on making and using combinations, and Hama Yaohiko's.</li>
+          <li><a href="#theory"><strong>Colour theory</strong></a>: the theory behind them, as Wada and Hama taught it.</li>
+        </ul>
+        <p>Where the data comes from, and how it was checked, is in the project's <a href="https://github.com/adrian729/wada-sanzo-colors">README</a>.</p>
+      </article>
+    </section>
   </main>
 
   <dialog id="detail">
@@ -761,7 +1081,12 @@
       seasons: document.getElementById("seasons-view"),
       season: document.getElementById("season-view"),
       create: document.getElementById("create-view"),
+      guidance: document.getElementById("guidance-view"),
+      theory: document.getElementById("theory-view"),
+      about: document.getElementById("about-view"),
     };
+    // The reading pages, and their titles.
+    const READING = { guidance: "Guidance", theory: "Colour theory", about: "About" };
     const detail = document.getElementById("detail");
     const subnavs = document.querySelectorAll(".subnav[data-view]"); // each list view's options
     const comboSubnav = document.querySelector(".combo-subnav");
@@ -775,7 +1100,8 @@
 
     // Routes: #colors, #combinations, #seasons, #combination/<number> and #season/<number> for one
     // combination (Volume 1's, numbered 1-348, or a seasonal one, 1-72), followed by /<tab> for its
-    // other pages (see TABS), and #create/<colours> for a combination being composed.
+    // other pages (see TABS), and #create/<colours> for a combination being composed. The reading pages:
+    // #guidance, #theory and #about, each followed by /<section> for one of its sections (id <page>-<section>).
     let data = null; // set once the JSON has loaded
     const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     // Volume 1's three sections: size, name, and the book's name (2色の配色帖, "album of 2-colour combinations").
@@ -1023,7 +1349,7 @@
       return [L, Math.hypot(A, B), (((Math.atan2(B, A) * 180) / Math.PI) % 360 + 360) % 360];
     }
 
-    function showView() {
+    function showView(afterLoad = false) {
       const [, arg, tab] = location.hash.slice(1).split("/");
       const name = showHeader(); // the header's script (in the page, so as to show the header right from the start)
       for (const [key, el] of Object.entries(views)) el.hidden = key !== name;
@@ -1034,6 +1360,23 @@
       } else if (name === "create" && data) {
         openCreate(arg);
         document.title = "Create | Wada Sanzo";
+      } else if (READING[name]) {
+        // Back where the reader was (back, forward and reload: kept in the history entry, see below), else at
+        // the section the address names (#guidance/hama), else at the top. Once the data is in (afterLoad),
+        // only to a section again (the cards above it have taken their room), not to the top under a reader
+        // already scrolling.
+        document.title = `${READING[name]} | Wada Sanzo`;
+        const target = arg && views[name].querySelector(`[id="${name}-${arg}"]`);
+        if (history.state?.y != null) scrollTo(0, history.state.y);
+        else if (target) {
+          // By the header's height now (its subnav may have just been hidden, before --header-height
+          // follows), and 1rem of space. The keyboard's next Tab goes on from the section.
+          scrollTo(0, target.getBoundingClientRect().top + scrollY - document.querySelector("header").offsetHeight - 16);
+          if (!afterLoad) {
+            target.tabIndex = -1;
+            target.focus({ preventScroll: true });
+          }
+        } else if (!afterLoad) scrollTo(0, 0);
       } else {
         document.title = "Wada Sanzo | A Dictionary of Color Combinations";
       }
@@ -1054,7 +1397,25 @@
       choose(buttons.find((b) => b.getAttribute("aria-pressed") === "true").dataset.value);
     }
 
-    addEventListener("hashchange", showView);
+    addEventListener("hashchange", () => showView());
+    // A reading page's link to the section the address already names (clicked again, after scrolling
+    // away) changes no address: go there again, not back to where the reader was.
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest('.prose a[href^="#"]');
+      if (link && link.hash === location.hash && !(e.metaKey || e.ctrlKey || e.shiftKey)) {
+        history.replaceState(null, "");
+        showView();
+      }
+    });
+    // Where the reader is on a reading page, kept in its history entry once the scrolling stops, for
+    // showView to come back to.
+    let keepTimer = null;
+    addEventListener("scroll", () => {
+      clearTimeout(keepTimer);
+      keepTimer = setTimeout(() => {
+        if (READING[location.hash.slice(1).split("/")[0]]) history.replaceState({ y: scrollY }, "");
+      }, 200);
+    }, { passive: true });
     showView();
 
     // Fills a block that has .detail-swatch, h2 and data-field elements (the dialog and the wheel panel).
@@ -1219,10 +1580,13 @@
       views.colors.append(makeWheel(colors, { views: true }).box, makeOstwald(colors), makeNotation(colors, munsellShared()), makeNotation(colors, pccsShared()));
       // Prepare the wheel background's hue table while the page is idle, so opening the wheel is quick.
       (window.requestIdleCallback ?? setTimeout)(() => gamut("screen").cusp());
-      showView(); // a #combination/<number> (or #season, #create) link opened directly needs the data
+      fillReading(colors, seasons);
+      showView(true); // a #combination/<number> (or #season, #create) link opened directly needs the data
     } catch (error) {
       console.error(error);
-      document.querySelector("main").innerHTML = `<p class="error">Couldn't load the colour data. Serve this folder over HTTP, e.g. <code>python3 -m http.server</code>.</p>`;
+      for (const [key, view] of Object.entries(views)) { // (the reading pages are still there to read)
+        if (!READING[key]) view.innerHTML = `<p class="error">Couldn't load the colour data. Serve this folder over HTTP, e.g. <code>python3 -m http.server</code>.</p>`;
+      }
     }
 
     // A colour block: shows its text on hover, opens the details on click (or does onClick).
@@ -1312,6 +1676,50 @@
       chip.className = "chip";
       chip.style.setProperty("--color", c.css);
       return chip;
+    }
+
+    // The reading pages, once the data is in: each colour named in their text (a .color-ref, by its name
+    // in colors.json, or its data-color) gets its square and opens its dialog; each card they show
+    // (data-season) is drawn, a link to its page; a link to one of the Colors layouts (data-layout)
+    // chooses it there.
+    function fillReading(colors, seasons) {
+      const byName = new Map(colors.map((c) => [c.name, c]));
+      for (const ref of document.querySelectorAll(".prose .color-ref")) {
+        const c = byName.get(ref.dataset.color ?? ref.textContent.trim());
+        if (!c) {
+          console.error(`No colour named "${ref.dataset.color ?? ref.textContent.trim()}"`);
+          continue;
+        }
+        ref.type = "button";
+        ref.setAttribute("aria-haspopup", "dialog");
+        ref.append(chipOf(c));
+        ref.addEventListener("click", () => showDetail(c));
+        // With the punctuation right after it, so that no line starts with that (as .hue-name does).
+        const next = ref.nextSibling, mark = next?.nodeType === Node.TEXT_NODE && next.data.match(/^[,.;:)]+/);
+        if (mark) {
+          next.data = next.data.slice(mark[0].length);
+          const keep = Object.assign(document.createElement("span"), { className: "ref-keep" });
+          ref.replaceWith(keep);
+          keep.append(ref, mark[0]);
+        }
+      }
+      for (const slot of document.querySelectorAll(".prose a[data-season]")) {
+        const combo = seasons[slot.dataset.season - 1];
+        if (!combo) {
+          console.error(`No seasonal combination ${slot.dataset.season}`);
+          continue;
+        }
+        slot.className = "thumb";
+        slot.href = comboHref(combo);
+        slot.setAttribute("aria-label", `Seasonal combination ${combo.number}`);
+        slot.textContent = comboLabel(combo);
+        const blocks = blocksFor(combo, () => document.createElement("div"));
+        blocks.setAttribute("aria-hidden", "true");
+        slot.append(blocks);
+      }
+      for (const link of document.querySelectorAll(".prose a[data-layout]")) {
+        link.addEventListener("click", () => document.querySelector(`.subnav[data-view="colors"] button[data-value="${link.dataset.layout}"]`).click());
+      }
     }
 
     function infoFor(colors, row = false, size = colors.length) {

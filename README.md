@@ -1,6 +1,6 @@
 # Wada Sanzo: A Dictionary of Color Combinations
 
-A static site for browsing Sanzo Wada's *A Dictionary of Color Combinations*: its 159 colours in the book's six families, its 348 combinations of 2, 3 and 4 colours, the 72 seasonal combinations of Volume 2 (with its 12 extra colours), the colours laid out in Ostwald's colour solid (Wada's own notation), in OKLCH, in Munsell's solid and in PCCS's (with its tones), and a page to compose your own combinations and save them in your browser (they're listed first in Combinations, as yours).
+A static site for browsing Sanzo Wada's *A Dictionary of Color Combinations*: its 159 colours in the book's six families, its 348 combinations of 2, 3 and 4 colours, the 72 seasonal combinations of Volume 2 (with its 12 extra colours), the colours laid out in Ostwald's colour solid (Wada's own notation), in OKLCH, in Munsell's solid and in PCCS's (with its tones), a page to compose your own combinations and save them in your browser (they're listed first in Combinations, as yours), and three pages to read: Wada's guidance on making and using combinations (with Hama Yaohiko's), the colour theory behind them, and about Wada.
 
 Live: https://adrian729.github.io/wada-sanzo-colors/
 

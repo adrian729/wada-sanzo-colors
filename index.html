@@ -1462,8 +1462,9 @@
       for (const [key, el] of Object.entries(views)) el.hidden = key !== name;
       if (detail.open) detail.close();
       // Every view goes back where it was left (back, forward and reload: kept in the history entry, see
-      // keepPlace), once it's there to scroll (its data in, and shown); a combination's page newly visited
-      // starts at the top, the other views where the page was.
+      // keepPlace), once it's there to scroll (its data in, and shown); a view newly visited (a link
+      // followed) starts at the top, not where the page it came from was. Once the data is in (afterLoad),
+      // not again, under a reader already scrolling (a combination's page excepted: it's only there then).
       const y = history.state?.y;
       if ((name === "combination" || name === "season") && data) {
         renderCombination(name, Number(arg), tab);
@@ -1472,6 +1473,7 @@
         openCreate(arg);
         document.title = "Create | Wada Sanzō";
         if (y != null) scrollTo(0, y);
+        else if (!afterLoad) scrollTo(0, 0);
       } else if (READING[name]) {
         // Back where the reader was, else at the section the address names (#guidance/hama), else at the
         // top. Once the data is in (afterLoad), only to a section again (the cards above it have taken their
@@ -1492,6 +1494,7 @@
         document.title = "Wada Sanzō | A Dictionary of Color Combinations";
         if (name === "colors") showLayout();
         if (y != null) scrollTo(0, y);
+        else if (!afterLoad) scrollTo(0, 0);
       }
       if (unsettled) unsettled.at = scrollY; // (where the page has put itself, for settle to tell if it's been scrolled since)
       if (y == null && data && !READING[name]) keepPlace(); // (newly visited, it may not be scrolled before it's left)

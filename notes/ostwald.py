@@ -11,10 +11,14 @@ measured against what the press prints, Japan Color 2011 Coated, as Wada's colou
 import bisect
 import json
 import math
+import sys
 from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+# OKLCH <-> CIE XYZ (D65), CSS Color 4's maths and white, as the scripts and the page have them.
+from oklab import WHITE, oklab_of, oklch_of, xyz_of  # noqa: E402
 colors = json.loads((ROOT / "colors.json").read_text())
 index = {c["name"]: i for i, c in enumerate(colors)}
 PRESS = json.loads((ROOT / "print-gamut.json").read_text())["ostwald"]
@@ -26,46 +30,9 @@ RAYS, ANGLES, STEPS = PRESS["rays"], PRESS["angles"], PRESS["steps"]
 LETTERS = "abcdefghijklmnop"
 GREYS = [0.891 * (0.0355 / 0.891) ** (k / 15) for k in range(16)]
 
-# OKLCH <-> CIE XYZ (D65), CSS Color 4's matrices (as scripts/cmyk_to_oklch.py, and inverted); the white
-# is CSS's D65 (Y = 1), the white print-gamut.json measures the press against.
-LMS_TO_OKLAB = [[0.2104542683093140, 0.7936177747023054, -0.0040720430116193],
-                [1.9779985324311684, -2.4285922420485799, 0.4505937096174110],
-                [0.0259040424655478, 0.7827717124575296, -0.8086757660377118]]
-XYZ_TO_LMS = [[0.8190224379967030, 0.3619062600528904, -0.1288737815209879],
-              [0.0329836539323885, 0.9292868615863434, 0.0361446663506424],
-              [0.0481771893596242, 0.2642395317527308, 0.6335478284694309]]
-OKLAB_TO_LMS = [[1.00000000239858, 0.39633777716154006, 0.21580375421218242],
-                [0.999999999290284, -0.1055613457521502, -0.06385417190922567],
-                [0.9999999856456103, -0.08948417624532107, -1.2914855294809227]]
-LMS_TO_XYZ = [[1.226879875845924, -0.557814994460217, 0.2813910456659646],
-              [-0.040575745214800875, 1.1122868032803173, -0.07171105806551642],
-              [-0.07637293667466001, -0.4214933324022431, 1.5869240198367816]]
-WHITE = [0.9504559270516716, 1.0, 1.0890577507598784]
+# The white is CSS's D65 (Y = 1), the white print-gamut.json measures the press against.
 SW = sum(WHITE)
 XW, YW = WHITE[0] / SW, WHITE[1] / SW
-
-
-def mul(m, v):
-    return [m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2], m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2],
-            m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2]]
-
-
-def xyz_of(L, C, h):
-    """OKLCH -> XYZ (D65), as it is: nothing clipped."""
-    lms = mul(OKLAB_TO_LMS, [L, C * math.cos(math.radians(h)), C * math.sin(math.radians(h))])
-    return mul(LMS_TO_XYZ, [v ** 3 for v in lms])
-
-
-def oklab_of(xyz):
-    return mul(LMS_TO_OKLAB, [math.copysign(abs(v) ** (1 / 3), v) for v in mul(XYZ_TO_LMS, xyz)])
-
-
-def oklch_of(xyz):
-    """Rounded as colors.json is."""
-    L, a, b = oklab_of(xyz)
-    C = round(math.hypot(a, b), 4)
-    h = round(math.degrees(math.atan2(b, a)) % 360, 2)
-    return [round(L, 4), C, 0 if C == 0 or h == 360 else h]
 
 
 def between(theta):
@@ -119,6 +86,8 @@ def measure(xyz):
     what the press prints, purer than its full colour or brighter than its tint edge, it is measured at
     the edge (`outside` says by how much: the share past 1, and the black below 0)."""
     s = sum(xyz)
+    if s < 1e-9:  # black: no chromaticity, all black
+        return dict(theta=None, r=0.0, white=0.0, black=1.0, colour=0.0, outside=(0.0, 0.0))
     dx, dy = xyz[0] / s - XW, xyz[1] / s - YW
     d = math.hypot(dx, dy)
     if d < 1e-6:

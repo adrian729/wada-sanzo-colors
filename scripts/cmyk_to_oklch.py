@@ -19,15 +19,19 @@ Pipeline (standard library only):
 
 2. Lab (D50) -> XYZ (D50) -> XYZ (D65) -> OKLab -> OKLCH.
    Exact maths, using the constants and matrices from CSS Color 4
-   (https://www.w3.org/TR/css-color-4/#color-conversion-code), so the result matches what a
-   browser computes for the same colour given as lab().
+   (https://www.w3.org/TR/css-color-4/#color-conversion-code; OKLab's in oklab.py, which every
+   script shares), so the result matches what a browser computes for the same colour given as lab().
 
 No RGB step: sRGB would clip the print colours outside its gamut and quantise to 8 bits.
 """
 import json
 import math
 import struct
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from oklab import mul, oklab_of  # noqa: E402  CSS Color 4's OKLab maths, shared by the scripts
 
 ROOT = Path(__file__).resolve().parent.parent
 PROFILE = ROOT / "profiles" / "JapanColor2011Coated.icc"
@@ -139,20 +143,6 @@ D50_TO_D65 = [  # Bradford chromatic adaptation
     [-0.0283697093338637, 1.0099953980813041, 0.021041441191917323],
     [0.012314014864481998, -0.020507649298898964, 1.330365926242124],
 ]
-XYZ_TO_LMS = [
-    [0.8190224379967030, 0.3619062600528904, -0.1288737815209879],
-    [0.0329836539323885, 0.9292868615863434, 0.0361446663506424],
-    [0.0481771893596242, 0.2642395317527308, 0.6335478284694309],
-]
-LMS_TO_OKLAB = [
-    [0.2104542683093140, 0.7936177747023054, -0.0040720430116193],
-    [1.9779985324311684, -2.4285922420485799, 0.4505937096174110],
-    [0.0259040424655478, 0.7827717124575296, -0.8086757660377118],
-]
-
-
-def mul(m, v):
-    return [sum(a * b for a, b in zip(row, v)) for row in m]
 
 
 def lab_to_xyz_d50(L, a, b):
@@ -167,11 +157,11 @@ def lab_to_xyz_d50(L, a, b):
 
 
 def lab_to_oklch(lab):
-    lms = mul(XYZ_TO_LMS, mul(D50_TO_D65, lab_to_xyz_d50(*lab)))
-    L, a, b = mul(LMS_TO_OKLAB, [math.copysign(abs(c) ** (1 / 3), c) for c in lms])
+    L, a, b = oklab_of(mul(D50_TO_D65, lab_to_xyz_d50(*lab)))
     C = math.hypot(a, b)
-    h = math.degrees(math.atan2(b, a)) % 360 if C > 1e-4 else 0.0  # hue is meaningless for neutrals
-    return [round(L, 4), round(C, 4), round(h, 2)]
+    # Rounded, then wrapped: a hue just under 360 is 0, never 360. Hue is meaningless for neutrals.
+    h = round(round(math.degrees(math.atan2(b, a)), 2) % 360, 2) if C > 1e-4 else 0.0
+    return [round(L, 4), round(C, 4), h]
 
 
 # --- Lab (D50) -> CMYK through the profile's B2A1 table, the inverse of A2B1 (for ostwald_cmyk.py) --

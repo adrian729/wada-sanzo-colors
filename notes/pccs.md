@@ -1,6 +1,6 @@
 # Wada's colours in PCCS
 
-PCCS, the Practical Color Co-ordinate System (日本色研配色体系), was made in 1964 by the Japan Color Research Institute, which grew out of the association Wada founded in 1927. It was made for colour harmony: besides hue, lightness and saturation, it groups colours into tones, and describes combinations by hue and tone. Nothing here is Wada's: he wrote colours in Ostwald's notation (see [ostwald.md](ostwald.md)), and PCCS came after him. The site's Colors › PCCS view shows it. [scripts/pccs.py](../scripts/pccs.py) computes it into `pccs.json`, from `munsell.json` (see [munsell.md](munsell.md)); the counts below are from the page.
+PCCS, the Practical Color Co-ordinate System (日本色研配色体系), was made in 1964 by the Japan Color Research Institute, which grew out of the association Wada founded in 1927. It was made for colour harmony: besides hue, lightness and saturation, it groups colours into tones, and describes combinations by hue and tone. Nothing here is Wada's: he wrote colours in Ostwald's notation (see [ostwald.md](ostwald.md)), and PCCS came after him. The site's Colors › PCCS view shows it. [scripts/pccs.py](../scripts/pccs.py) computes it into `pccs.json`, from the Munsell notation [scripts/munsell.py](../scripts/munsell.py) computes (see [munsell.md](munsell.md)); the counts below are from the page.
 
 ## Why it's built on Munsell's notation
 
@@ -25,11 +25,11 @@ PCCS, the Practical Color Co-ordinate System (日本色研配色体系), was mad
 
 ## Placing Wada's colours
 
-- **From their Munsell notation** (munsell.json: against the ideal white, under Illuminant C), by the precise algorithm:
+- **From their Munsell notation** (as munsell.py computes it, unrounded: against the ideal white, under Illuminant C), by the precise algorithm:
   - l = V;
   - h from Munsell's hue, between the 24 hues' (linearly);
   - s from a cubic in s per hue, its coefficients the paper's for the even hues, linear between, solved by Newton's method.
-- **A colour's cell:** h and s rounded to whole numbers, l to 0.5. If s rounds to 0, it's a grey: n and its lightness. The cell's code is what the view calls it, e.g. PCCS ≈ 2:R-3.5-8s; the exact notation is given too, e.g. 1.6:R-3.5-7.7s for Red.
+- **A colour's cell:** h and s rounded to whole numbers, l to 0.5. If s rounds to 0, it's a grey: n and its lightness. The cell's code is what the view calls it, e.g. PCCS ≈ 2:R-3.5-8s; the exact notation is given too, e.g. 1.6:R-3.6-7.7s for Red.
 - **A colour's tone:** from its own values, not its cell's.
   - In Kobayasi and Yosiki's tone coordinates: s, and a relative lightness t = l − m(h) s, which makes each tone's representatives about the same for every hue. The tone is the nearest representative's. 201-L's pale+ and light+ count as pale and light.
   - Under s 1, where the paper's figure draws the edge of the greys, the tone is a grey's, by lightness rounded to 0.5: W 9.5; ltGy 7.5 to 9; mGy 4 to 7; dkGy 2 to 3.5; Bk 1.5. These are 201-L's greys, with those between them going to the middle ones.
@@ -45,10 +45,10 @@ PCCS, the Practical Color Co-ordinate System (日本色研配色体系), was mad
 - **The greys** n-1.5 to n-9.5, from ASTM D1535's value scale.
 - **Each tone's representative per hue:** 201-L's for the even hues; for the odd ones, from the tone coordinates, rounded to 0.5 as 201-L's are. All are in the grid.
 - **Ranges,** as in the OKLCH and Munsell views:
-  - Screen: 3,573 of the 4,086, out to s 18;
-  - Print: 2,147, out to s 11 (PCCS's 9 was the pigments of 1964);
+  - Screen: 3,526 of the 4,086, out to s 18;
+  - Print: 2,116, out to s 11 (PCCS's 9 was the pigments of 1964);
   - all 17 greys in both.
-- **Beyond the range:** as in the Munsell view, a page's rings go out to one of Wada's colours if it's further than the range. In Screen, none; in Print, 23 cells, which hold 21 of Wada's colours. Every cell has its colour in the grid.
+- **Beyond the range:** as in the Munsell view, a page's rings go out to one of Wada's colours if it's further than the range. In Screen, 1 cell, which holds 1 of Wada's colours; in Print, 29 cells, which hold 24. Every cell has its colour in the grid.
 - **Their CMYK** is estimated through the print profile, as the other views' own colours are.
 
 ## The view
@@ -69,15 +69,15 @@ PCCS, the Practical Color Co-ordinate System (日本色研配色体系), was mad
 
 ## How Wada's colours spread
 
-- **Lightness 1.5 to 9.5:** per lightness, 9.5 to 1.5: 1, 4, 8, 6, 15, 16, 12, 9, 16, 19, 16, 12, 12, 11, 11, 1, 2.
+- **Lightness 1.5 to 9.5:** per lightness, 9.5 to 1.5: 1, 4, 8, 6, 15, 16, 12, 9, 15, 20, 16, 12, 12, 11, 11, 1, 2.
 - **Saturation:** up to 9.8, just over vivid's 9.
 - **Cells:** the 171 colours fill 162 cells; 8 are shared, by at most 3.
-- **Tones:** lt 19, d 19, s 18, p 17, g 17, dp 15, v 13, dk 13, sf 10, b 9, ltg 8, dkg 5; the greys' 8. On the tone map they fill 121 sectors, 32 of them shared, by at most 3.
+- **Tones:** lt 19, d 19, s 18, p 17, g 17, dp 15, v 13, dk 13, sf 10, b 9, ltg 8, dkg 5; the greys' 8. On the tone map they fill 122 sectors, 31 of them shared, by at most 3.
 - **Greys:** only White is grey in its cell (n-9.5). Wada's other near-greys have s just under 1, in cells of s 1, with a grey's tone:
-  - ltGy: Neutral Gray (15.6:gB-7.4-0.6s), Pale Ecru-Drab (5.4:O-7.3-0.9s), Pale King's Blue - B (10.6:yG-9.1-0.7s);
-  - mGy: Mineral Gray (13.8:BG-6.9-0.8s), Warm Gray (10.3:YG-6.5-0.6s);
+  - ltGy: Neutral Gray (15.7:gB-7.4-0.6s), Pale Ecru-Drab (5.4:O-7.3-0.9s), Pale King's Blue - B (10.6:yG-9.1-0.7s);
+  - mGy: Mineral Gray (13.9:BG-6.9-0.7s), Warm Gray (10.3:YG-6.5-0.6s);
   - dkGy: Dull Purplish Black (7.3:rY-2.6-0.7s);
-  - Bk: Black (7.6:Y-1.6-0.6s).
+  - Bk: Black (7.6:Y-1.5-0.6s).
 
 ## Limits
 

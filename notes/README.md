@@ -1,4 +1,4 @@
-# How Wada Sanzo combined colours
+# How Wada Sanzō combined colours
 
 Research notes on how Wada built the combinations in *A Dictionary of Color Combinations*, and on what he advised about using them. They draw on:
 

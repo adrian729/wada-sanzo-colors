@@ -25,13 +25,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "notes"))
-import cmyk_to_oklch as cx  # noqa: E402  the profile's tables and the Lab <-> OKLab maths
+import cmyk_to_oklch as cx  # noqa: E402  the profile's tables and the Lab maths
+import oklab  # noqa: E402  the OKLab maths
 import ostwald  # noqa: E402  the Ostwald system: its greys, letters and calibration
 
 OUT = ROOT / "ostwald-cmyk.json"
 
 
-# --- OKLab / XYZ (D65) -> Lab (D50), the inverse of cmyk_to_oklch.py's maths --------------------
+# --- OKLCH / XYZ (D65) -> Lab (D50), the inverse of cmyk_to_oklch.py's maths --------------------
 
 def inverse(m):
     (a, b, c), (d, e, f), (g, h, i) = m
@@ -41,21 +42,17 @@ def inverse(m):
             [(d * h - e * g) / det, (b * g - a * h) / det, (a * e - b * d) / det]]
 
 
-OKLAB_TO_LMS, LMS_TO_XYZ, D65_TO_D50 = inverse(cx.LMS_TO_OKLAB), inverse(cx.XYZ_TO_LMS), inverse(cx.D50_TO_D65)
+D65_TO_D50 = inverse(cx.D50_TO_D65)
 
 
 def xyz_to_lab(xyz):
-    X, Y, Z = (v / w for v, w in zip(cx.mul(D65_TO_D50, xyz), cx.D50))
+    X, Y, Z = (v / w for v, w in zip(oklab.mul(D65_TO_D50, xyz), cx.D50))
     f = lambda t: t ** (1 / 3) if t > cx.EPSILON else (cx.KAPPA * t + 16) / 116  # noqa: E731
     return [116 * f(Y) - 16, 500 * (f(X) - f(Y)), 200 * (f(Y) - f(Z))]
 
 
-def oklab_to_lab(oklab):
-    return xyz_to_lab(cx.mul(LMS_TO_XYZ, [v ** 3 for v in cx.mul(OKLAB_TO_LMS, oklab)]))
-
-
 def oklch_to_lab(L, C, h):
-    return oklab_to_lab([L, C * math.cos(math.radians(h)), C * math.sin(math.radians(h))])
+    return xyz_to_lab(oklab.xyz_of(L, C, h))
 
 
 def delta_e_2000(lab1, lab2):

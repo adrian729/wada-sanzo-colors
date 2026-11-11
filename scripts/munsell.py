@@ -16,7 +16,7 @@ munsell.json holds:
 
 - `paper`: the paper's Y against the ideal white.
 - `colours`: per colour of colors.json, in its order, its Munsell hue (ASTM's hue number: 5R is 5, 5YR
-  15, ... 10RP 100), value and chroma, to 0.01.
+  15, ... 10RP 100), value and chroma, to 0.0001.
 - `chips`: the system's own colours: the 1943 renotation's real colours (Newhall, Nickerson and Judd,
   2,734 of them, within the MacAdam limits of what a surface can reflect), as [hue, value, chroma] and
   OKLCH, in our space (relative to the paper, D65), rounded as colors.json is. Their Y is the
@@ -43,38 +43,22 @@ from colour.notation.datasets.munsell import MUNSELL_COLOURS_REAL
 from colour.notation.munsell import hue_to_ASTM_hue
 
 import cmyk_to_oklch as cx
+import oklab
+from oklab import oklab_of, oklch_of
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "munsell.json"
 MGO = 0.975  # magnesium oxide's reflectance factor against the ideal white
 
 OBSERVER = colour.CCS_ILLUMINANTS["CIE 1931 2 Degree Standard Observer"]
-D65, C = colour.xy_to_XYZ(OBSERVER["D65"]), colour.xy_to_XYZ(OBSERVER["C"])
-# OKLab (Ottosson), from XYZ (D65); and back.
-M1 = np.array([[0.8189330101, 0.3618667424, -0.1288597137], [0.0329845436, 0.9293118715, 0.0361456387],
-               [0.0482003018, 0.2643662691, 0.6338517070]])
-M2 = np.array([[0.2104542553, 0.7936177850, -0.0040720468], [1.9779984951, -2.4285922050, 0.4505937099],
-               [0.0259040371, 0.7827717662, -0.8086757660]])
+# Our white, CSS's D65 (oklab.py, with the OKLab maths), and Illuminant C.
+D65, C = np.array(oklab.WHITE), colour.xy_to_XYZ(OBSERVER["C"])
 
 
 def paper_y():
     """The paper's Y against the ideal white: the profile's media white point (wtpt, XYZ)."""
     data = cx.load_tag(b"wtpt")
     return struct.unpack(">i", data[12:16])[0] / 65536
-
-
-def xyz_of(oklch):
-    L, Cc, h = oklch
-    lab = np.array([L, Cc * math.cos(math.radians(h)), Cc * math.sin(math.radians(h))])
-    return np.linalg.inv(M1) @ (np.linalg.inv(M2) @ lab) ** 3
-
-
-def oklch_of(xyz):
-    """Rounded as colors.json is."""
-    L, a, b = M2 @ np.cbrt(M1 @ xyz)
-    Cc = round(math.hypot(a, b), 4)
-    h = round(math.degrees(math.atan2(b, a)) % 360, 2)
-    return [round(float(L), 4), Cc, 0 if Cc == 0 or h == 360 else h]
 
 
 def to_c(xyz):
@@ -85,22 +69,36 @@ def to_d65(xyz):
     return colour.adaptation.chromatic_adaptation_VonKries(xyz, C, D65, transform="Bradford")
 
 
+def notation(oklch, paper):
+    """A colour's Munsell notation, unrounded: its hue number (None for an exact grey), value and chroma; and
+    how far (in OKLab) the notation, converted back, is from the colour."""
+    xyY = colour.XYZ_to_xyY(to_c(np.array(oklab.xyz_of(*oklch)) * paper))
+    spec = colour.notation.munsell.xyY_to_munsell_specification(xyY)
+    hue, value, chroma, code = spec
+    back = colour.notation.munsell.munsell_specification_to_xyY(spec)
+    off = math.dist(oklab_of(to_d65(colour.xyY_to_XYZ(back))), oklab_of(to_d65(colour.xyY_to_XYZ(xyY))))
+    if np.isnan(hue):  # exactly grey
+        return None, float(value), 0.0, off
+    return float(hue_to_ASTM_hue([hue, code])), float(value), float(chroma), off
+
+
+def cell(H, V, C):
+    """The cell the page puts a notation in (index.html's munsellSystem, rounding halves up as Math.round
+    does): its page (None for a grey), value and ring."""
+    v, j = min(9, max(1, math.floor(V + 0.5))), 0 if H is None else math.floor(C / 2 + 0.5)
+    return (math.floor(H / 2.5 + 0.5) % 40 if j else None), v, j
+
+
 def main():
     paper = paper_y()
-    worst = 0.0
     colors = json.loads((ROOT / "colors.json").read_text())
-    out = []
-    for c in colors:
-        xyY = colour.XYZ_to_xyY(to_c(xyz_of(c["oklch"]) * paper))
-        spec = colour.notation.munsell.xyY_to_munsell_specification(xyY)
-        hue, value, chroma, code = spec
-        back = colour.notation.munsell.munsell_specification_to_xyY(spec)
-        worst = max(worst, float(np.linalg.norm(M2 @ np.cbrt(M1 @ to_d65(colour.xyY_to_XYZ(back)))
-                                                - M2 @ np.cbrt(M1 @ to_d65(colour.xyY_to_XYZ(xyY))))))
-        if np.isnan(hue):  # exactly grey
-            out.append([None, round(float(value), 2), 0])
-        else:
-            out.append([round(float(hue_to_ASTM_hue([hue, code])), 2), round(float(value), 2), round(float(chroma), 2)])
+    full = [notation(c["oklch"], paper) for c in colors]
+    worst = max(f[3] for f in full)
+    # Stored to 0.0001, enough that rounding them again, as the page does to find the cell, finds the
+    # cell of the unrounded notation (to 0.01, a colour just either side of a step could land on it).
+    out = [[None, round(V, 4), 0] if H is None else [round(H, 4), round(V, 4), round(Cc, 4)] for H, V, Cc, _ in full]
+    for c, f, o in zip(colors, full, out):
+        assert cell(*o) == cell(*f[:3]), f"{c['name']}: stored {o} is in cell {cell(*o)}, its notation {f[:3]} in {cell(*f[:3])}"
     chips = []
     for (name, value, chroma), (x, y, Y) in MUNSELL_COLOURS_REAL:
         hue, code = colour.notation.munsell.parse_munsell_colour(f"{name} {value}/{chroma}")[[0, 3]]

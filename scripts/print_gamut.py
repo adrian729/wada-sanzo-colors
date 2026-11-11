@@ -46,6 +46,7 @@ import math
 from pathlib import Path
 
 import cmyk_to_oklch as cx
+from oklab import WHITE, mul, oklab_of as xyz_to_oklab
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "print-gamut.json"
@@ -56,22 +57,12 @@ SCALE = 100000  # the edge's points are stored as whole numbers: lightness and c
 BLEND_TOLERANCE = 0.001  # chroma: how far blending two neighbouring hues may be from the edge between
 R_STEPS = 32  # the tint edge, per 1/32 of share of full colour
 
-# CIE 1931 XYZ (D65) of linear sRGB, CSS Color 4's: its white, (1, 1, 1), is the white measured against
-# (Y = 1, the paper's white, as Lab is media-relative). It is only the white: no colour goes through sRGB.
-SRGB_TO_XYZ = [[0.41239079926595934, 0.357584339383878, 0.1804807884018343],
-               [0.21263900587151027, 0.715168678767756, 0.07219231536073371],
-               [0.01933081871559182, 0.11919477979462598, 0.9505321522496607]]
-WHITE = [sum(row) for row in SRGB_TO_XYZ]
+# The white measured against is CSS's D65 (Y = 1, the paper's white, as Lab is media-relative).
 XW, YW = WHITE[0] / sum(WHITE), WHITE[1] / sum(WHITE)
 
 
 def lab_to_xyz_d65(lab):
-    return cx.mul(cx.D50_TO_D65, cx.lab_to_xyz_d50(*lab))
-
-
-def xyz_to_oklab(xyz):
-    lms = cx.mul(cx.XYZ_TO_LMS, xyz)
-    return cx.mul(cx.LMS_TO_OKLAB, [math.copysign(abs(v) ** (1 / 3), v) for v in lms])
+    return mul(cx.D50_TO_D65, cx.lab_to_xyz_d50(*lab))
 
 
 class Press:

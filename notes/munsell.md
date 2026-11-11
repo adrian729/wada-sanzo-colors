@@ -14,15 +14,15 @@ Munsell's notation is how Japan's colour standards write a colour (JIS Z 8721), 
 
 - **Against the ideal white:** a chip's notation is measured against the perfect white, and Wada's colours are printed on paper, which reflects less. Our values (colors.json) are relative to the paper, as the CMYK was printed on it, so each colour's Y is multiplied by the paper's own: 0.8561, the media white point of the Japan Color 2011 Coated profile. Wada's white paper comes out N9.4.
 - **Under Illuminant C:** each colour is adapted from D65 (CSS's white, our values') to C with Bradford's transform.
-- **The conversion:** colour-science's (Centore's method, from the renotation data), with the value scale of ASTM D1535. Each colour's notation, converted back, is within 0.00012 of it in OKLab.
+- **The conversion:** colour-science's (Centore's method, from the renotation data), with the value scale of ASTM D1535. Each colour's notation, converted back, is within 0.00008 of it in OKLab.
 - **A colour's cell:** its nearest hue page, its value rounded (1 to 9), and its chroma rounded to the nearest even step, its ring. Under chroma 1 it is a grey: N and its value. The cell's code is what the view calls it, e.g. Munsell ≈ 5R 5/10; the exact notation is given too, e.g. 5.8R 5.4/10.2 for Eugenia Red - A.
 
 ## The system's own colours
 
 - **Each empty cell** shows the renotation's colour for it, in our space: its Y scaled by 0.975 (magnesium oxide against the ideal white, as ASTM D1535 does), adapted from C to D65, and made relative to the paper. The greys N1 to N9 come from ASTM D1535's value scale.
 - **Ranges,** as in the OKLCH view:
-  - Screen: the chips Rec. 2020 holds, 2,096 of the 2,734;
-  - Print: the chips the press prints (Japan Color 2011 Coated, at most 350% ink), 955;
+  - Screen: the chips Rec. 2020 holds, 2,097 of the 2,734;
+  - Print: the chips the press prints (Japan Color 2011 Coated, at most 350% ink), 956;
   - all 9 greys in both.
 - **A page's rings** at a value go out to its last chip in the range, or to one of Wada's colours, if that's further. A cell between the two has the renotation's colour, beyond the range, and says so: 2 cells in Screen, 33 in Print. Every cell has a chip in the renotation.
 - **Their CMYK** is estimated through the print profile, as the OKLCH view's own colours are.
@@ -50,11 +50,11 @@ Munsell's notation is how Japan's colour standards write a colour (JIS Z 8721), 
 - **Chroma:** up to 15.5 (8 rings).
 - **Cells:** the 171 colours fill 159 cells; 11 are shared, by at most 3.
 - **Greys** (under chroma 1), with their exact notation:
-  - N9: White (N9.4), Pale King's Blue - B (5.8GY 9.1/0.7);
-  - N7: Neutral Gray (3.2B 7.4/0.6), Mineral Gray (4BG 6.9/0.8), Pale Ecru-Drab (5.6YR 7.3/1.0);
-  - N6: Warm Gray (4.4GY 6.5/0.6);
+  - N9: White (N9.4), Pale King's Blue - B (5.9GY 9.1/0.7);
+  - N7: Neutral Gray (3.4B 7.4/0.6), Mineral Gray (4.2BG 6.9/0.8), Pale Ecru-Drab (5.6YR 7.3/1.0);
+  - N6: Warm Gray (4.5GY 6.5/0.6);
   - N3: Dull Purplish Black (3Y 2.6/0.6);
-  - N2: Black (3.9Y 1.6/0.3).
+  - N2: Black (3.9Y 1.5/0.3).
 - **Beyond the range:** one of Wada's colours is in a cell whose chip Rec. 2020 doesn't hold, and 25 in cells whose chip the press can't print. The colours themselves are within both; the chips, at the cell's rounded chroma, are further out.
 
 ## Limits

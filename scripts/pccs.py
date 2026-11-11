@@ -3,8 +3,9 @@
 
     uv run -q --python 3.12 --with colour-science --with scipy python scripts/pccs.py
 
-Run scripts/munsell.py first: this reads munsell.json. It needs colour-science (and scipy) for the
-Munsell renotation's colours, as munsell.py does; uv fetches them for the run. Takes about half a minute.
+It places Wada's colours from their Munsell notation as scripts/munsell.py finds it (unrounded: this runs
+its conversion again). It needs colour-science (and scipy) for that and for the Munsell renotation's colours,
+as munsell.py does; uv fetches them for the run. Takes a few minutes.
 
 PCCS (the Practical Color Co-ordinate System, the Japan Color Research Institute's, 1964) is defined
 through Munsell's notation: its lightness l is Munsell's value; its 24 hues h are points on Munsell's hue
@@ -35,12 +36,14 @@ them rounded (h and s whole, l to 0.5): a colour just under s 1 is in a cell of 
 pccs.json holds:
 
 - `colours`: per colour of colors.json, in its order, its PCCS hue h (1 to 25, 25 being 1 again; null
-  for a grey), lightness l and saturation s, to 0.01; its tone.
+  for a grey), lightness l and saturation s, to 0.0001; its tone.
 - `chips`: the system's own colours: the PCCS grid (h 1 to 24, l in steps of 0.5, s whole) as far as
   the Munsell renotation's real colours go (within the MacAdam limits of what a surface can reflect:
   its chroma under the real chips' most at its hue and value, between the pages and values round it,
   none at value 10, the ideal white; and where the renotation's data, which colour-science interpolates,
   has that chroma at the values round it), as [h, l, s, tone] and OKLCH, in our space (relative to the paper, D65) as munsell.json's chips are.
+  colour-science gives a notation's Y against the ideal white (ASTM D1535's), so a chip is the Munsell
+  chip of the same notation.
 - `greys`: n-1.5 to n-9.5, as [l, its tone, OKLCH lightness].
 - `tones`: per tone, its code and name, its coordinates (s, t) and its representative's l per hue.
 """
@@ -58,7 +61,9 @@ from colour.notation.datasets.munsell import MUNSELL_COLOURS_REAL
 
 sys.dont_write_bytecode = True  # (no __pycache__ beside the scripts)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from munsell import MGO, OBSERVER, oklch_of, to_d65  # noqa: E402
+import munsell as ms  # noqa: E402
+from munsell import OBSERVER, to_d65  # noqa: E402
+from oklab import oklch_of  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "pccs.json"
@@ -133,12 +138,23 @@ def to_pccs(H, V, C):
     big = 12 + 1.7 * math.sin((h + 2.2) * math.pi / 12)  # equation 4, for the start (equation 13)
     s = (-0.077 + math.sqrt(0.077**2 + 4 * 0.0040 * target / big)) / (2 * 0.0040)
     a1, a2, a3 = coeffs(h)
+    if a3 < 0:  # the cubic has a top: a chroma past it has no saturation (and Newton's method would run off)
+        top = (-a2 - math.sqrt(a2 * a2 - 3 * a1 * a3)) / (3 * a3)
+        if target > a3 * top**3 + a2 * top**2 + a1 * top:
+            raise ValueError(f"Munsell {H} {V}/{C}: beyond the conversion's most saturation at its hue, s {top:.1f}")
     for _ in range(50):
         step = (a3 * s**3 + a2 * s**2 + a1 * s - target) / (3 * a3 * s**2 + 2 * a2 * s + a1)
         s -= step
         if abs(step) < 1e-12:
             break
     return h, V, s
+
+
+def cell(h, l, s):
+    """The cell the page puts a colour in (index.html's pccsSystem, rounding halves up as Math.round does): its
+    page (None for a grey), level (0 is l 9.5) and ring."""
+    j = 0 if h is None else math.floor(s + 0.5)
+    return ((math.floor(h + 0.5) - 2) % 24 if j else None), min(16, max(0, 19 - math.floor(2 * l + 0.5))), j
 
 
 def m_of(h):
@@ -154,6 +170,8 @@ def tone_of(h, l, s):
 
 
 def grey_tone(l):
+    """A grey's tone, by its lightness rounded to 0.5 (halves up, as cell() rounds them)."""
+    l = math.floor(2 * l + 0.5) / 2
     return next(name for top, name in GREY_TONES if l >= top)
 
 
@@ -175,8 +193,7 @@ def spec_of(H, V, C):
 
 
 def main():
-    munsell = json.loads((ROOT / "munsell.json").read_text())
-    paper = munsell["paper"]
+    paper = ms.paper_y()
     # The real chips' most chroma at each page (ASTM hue 2.5 k) and value; nothing at value 10, the ideal white.
     most = {}
     for (name, value, chroma), _ in MUNSELL_COLOURS_REAL:
@@ -197,21 +214,24 @@ def main():
 
     def colour_of(H, V, C):
         xyY = colour.notation.munsell.munsell_specification_to_xyY(spec_of(H, V, C))
-        xyz = colour.xyY_to_XYZ(xyY) * MGO
-        return oklch_of(to_d65(xyz) / paper)
+        return oklch_of(to_d65(colour.xyY_to_XYZ(xyY)) / paper)
 
     # The paper's checks: 201-L's chroma for colours its simple algorithm had a whole step off (table 7).
     for h, l, s, c in [(18, 5.0, 8, 10.0), (18, 3.5, 8, 10.0), (18, 2.5, 8, 9.5), (18, 3.5, 9, 11.5), (19, 3.5, 9, 11.5), (23, 5.0, 8, 10.0), (23, 3.5, 9, 11.5)]:
         print(f"  check {h}:{l}-{s}s: C {to_munsell(h, l, s)[2]:.2f} (201-L {c}); back, s {to_pccs(*to_munsell(h, l, s))[2]:.4f}")
-    # Wada's colours, from their Munsell notation.
+    # Wada's colours, from their Munsell notation, unrounded; stored to 0.0001, enough that rounding them
+    # again, as the page does to find the cell, finds the cell of the unrounded values.
+    names = [c["name"] for c in json.loads((ROOT / "colors.json").read_text())]
     colours = []
-    for H, V, C in munsell["colours"]:
+    for name, c in zip(names, json.loads((ROOT / "colors.json").read_text())):
+        H, V, C, _ = ms.notation(c["oklch"], paper)
         if H is None or C == 0:
-            colours.append([None, V, 0, grey_tone(round(2 * V) / 2)])
+            colours.append([None, round(V, 4), 0, grey_tone(V)])
             continue
         h, l, s = to_pccs(H, V, C)
-        tone = tone_of(h, l, s) if s >= 1 else grey_tone(round(2 * l) / 2)
-        colours.append([round(h, 2), round(l, 2), round(s, 2), tone])
+        tone = tone_of(h, l, s) if s >= 1 else grey_tone(l)
+        colours.append([round(h, 4), round(l, 4), round(s, 4), tone])
+        assert cell(*colours[-1][:3]) == cell(h, l, s), f"{name}: stored {colours[-1]} is in cell {cell(*colours[-1][:3])}, its values {[h, l, s]} in {cell(h, l, s)}"
     # The grid, as far as the real colours go; and each tone's representatives, which are on it.
     reps = {(h, representative(T, h), T[2]) for T in TONES for h in range(1, 25)}
     chips, unreal = [], []
@@ -243,7 +263,6 @@ def main():
         + '"tones":[\n' + ",\n".join(json.dumps(v, separators=(",", ":")) for v in tones) + "]}\n")
     print(f"{len(colours)} colours, {len(chips)} chips (s up to {max(c[2] for c in chips)}); wrote {OUT.relative_to(ROOT)} ({OUT.stat().st_size // 1024} KB)")
     print(f"representatives beyond the real colours, kept: {unreal}")
-    names = [c["name"] for c in json.loads((ROOT / "colors.json").read_text())]
     for name in ("White", "Black", "Orange", "Red", "Blue"):
         print(f"  {name}: {colours[names.index(name)]}")
 

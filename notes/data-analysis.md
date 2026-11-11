@@ -80,7 +80,7 @@ The book leans the right way on the first two rules, but within chance. The samp
   - it takes a median 65% of the coloured strip, from 49% to 89%;
   - it is the largest band on all 72 cards.
 - **It isn't chosen by chroma or lightness.** Chance would give each of these on 16.6 cards:
-  - it has the lowest chroma on 16 cards, and the highest on 17;
+  - it has the lowest chroma on 15 cards, and the highest on 17;
   - it is the darkest on 13 cards, and the lightest on 16.
 - **His own examples** show both kinds: a light main colour (card 1) and black (card 5).
 

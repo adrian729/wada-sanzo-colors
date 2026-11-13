@@ -1954,7 +1954,15 @@
       0.4246,
       0.0613,
       275.75
-    ]
+    ],
+    "atlas": {
+      "hue": "purple-blue",
+      "tone": "shade",
+      "ja": "花色",
+      "reading": "hana-iro",
+      "plateName": "Coolie Blue",
+      "inferred": true
+    }
   },
   {
     "name": "Vanderpoel's Blue",

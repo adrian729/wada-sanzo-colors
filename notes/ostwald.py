@@ -202,7 +202,7 @@ if __name__ == "__main__":
         here = [o for o in row if o]
         ns = [o["n"] for o in here]
         spread = max((b - a) % 100 for a in ns for b in ns if (b - a) % 100 <= 50)
-        tint, full = tones["tint"], tones["full colour"]  # every hue has both; purple-blue has no shade
+        tint, full = tones["tint"], tones["full colour"]  # every hue has all three (purple-blue's shade inferred: see the main README)
         at_rim += full["code"].endswith("PA")
         tint_fuller += tint["colour"] > full["colour"]
         tint_a += tint["code"].endswith("A")

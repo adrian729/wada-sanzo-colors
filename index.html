@@ -660,7 +660,7 @@
     .prose { max-width: 38.25rem; margin: 0 auto; padding-bottom: 3rem; font-family: var(--serif); font-size: 1rem; line-height: 1.65; }
     /* Captions: at most three quarters of a paragraph's width (longer ones wrap), centred, lines filled to
        that width but no word left alone on the last one (pretty, not balance, which would narrow them). */
-    .prose figcaption { max-width: calc(38.25rem * 3 / 4); margin-inline: auto; text-wrap: pretty; }
+    .prose figcaption { width: fit-content; max-width: calc(38.25rem * 3 / 4); margin-inline: auto; text-wrap: pretty; }
     .prose :is(h1, h2, h3, nav) { font-family: var(--mono); }
     .prose h1 { margin-top: 0.5rem; font-size: 1.5rem; font-weight: 500; line-height: 1.3; }
     /* A section: a rule above it, and room. Its parts (h3), smaller, without. */
@@ -702,9 +702,12 @@
       .prose:has(> nav) > * { grid-column: 2; }
       .prose > nav {
         grid-column: 1; grid-row: 1 / span 400; justify-self: start; width: min(100%, 14rem);
-        position: sticky; top: calc(var(--header-height, 3.375rem) + 1.5rem);
-        display: flex; flex-direction: column; height: calc(100dvh - var(--header-height, 3.375rem) - 3rem); overflow-y: auto;
-        margin-top: 0.5rem; padding: 0; border: 0;
+        /* Sticks where it starts (main's padding and its own margin below the header), so it doesn't move at
+           first; its negative bottom margin lets it reach into the text's bottom padding, which is outside its
+           grid area, so it doesn't move at the end either. */
+        position: sticky; top: calc(var(--header-height, 3.375rem) + 2rem);
+        display: flex; flex-direction: column; height: calc(100dvh - var(--header-height, 3.375rem) - 3.5rem); overflow-y: auto;
+        margin-top: 0.5rem; margin-bottom: -3rem; padding: 0; border: 0;
       }
       .prose > nav > .contents { margin-block: auto; }
     }
@@ -743,7 +746,7 @@
     .prose :is(.saturation-steps, .tone-rows, .grey-scales) div { display: flex; }
     .prose :is(.saturation-steps, .tone-rows, .grey-scales) span { width: 2.5rem; height: 2.5rem; background: var(--c); }
     .prose :is(.saturation-steps, .tone-rows, .grey-scales) figure { display: flex; flex-direction: column; align-items: center; margin: 0; }
-    .prose :is(.saturation-steps, .tone-rows, .grey-scales) figcaption { margin-top: 0.375rem; color: var(--muted); font-size: 0.8125rem; text-align: center; }
+    .prose :is(.saturation-steps, .tone-rows, .grey-scales) figcaption { margin-top: 0.375rem; color: var(--muted); font-size: 0.8125rem; text-align: left; }
     /* One hue's triangle (Ostwald's): the red of the examples above, every third letter of Wada's scale
        (a d g j m p, notes/ostwald.py cell_xyz), each cell a rhombus, white at the top, black at the bottom,
        the full colour at the right corner. */
@@ -764,7 +767,7 @@
     .prose .twins .band { position: relative; width: min(15rem, 60vw); height: 1.75rem; background: var(--spectrum); }
     .prose .twins .band[style]::after { content: ""; position: absolute; inset: 0 calc(100% - var(--to)) 0 var(--from); background: var(--bg) repeating-linear-gradient(-45deg, var(--line) 0 1px, transparent 1px 6px); }
     .prose .twins span { width: 1.75rem; height: 1.75rem; background: var(--c); box-shadow: inset 0 0 0 1px var(--line); }
-    .prose .twins figcaption { margin-block: 0.375rem 0.875rem; color: var(--muted); font-size: 0.8125rem; text-align: center; }
+    .prose .twins figcaption { margin-block: 0.375rem 0.875rem; color: var(--muted); font-size: 0.8125rem; text-align: left; }
     .prose .twins figcaption:last-child { margin-bottom: 0; }
     /* Spinning discs: four pairs of opposite full colours (Ostwald's, sectors 0, 4, 6 and 8 and their
        opposites), each pair's shares set so that, averaged as light, they give a neutral grey, which is shown
@@ -781,7 +784,7 @@
     .prose .discs .disc { width: 4rem; height: 4rem; padding: 0; border: 0; border-radius: 50%; background: conic-gradient(var(--a) 0 var(--w), var(--b) 0); cursor: pointer; }
     .prose .discs .disc:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
     .prose .discs span { width: 2rem; height: 2rem; background: var(--c); }
-    .prose .discs figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: center; }
+    .prose .discs figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: left; }
     /* The note under both rows of discs: set apart from their captions, as wide as a paragraph. */
     .prose .screen-note { margin: 1.25rem 0; color: var(--muted); font-size: 0.75rem; }
     /* Mixing colours. Paint mixes: a simple model (each paint a smooth reflectance spectrum, as Hama drew
@@ -794,7 +797,7 @@
        beside it, each as tall as its share of the dots. Three ways: that
        yellow and blue as paint (the model), as light (white) and averaged (the grey). */
     .prose :is(.paint-mixes, .lights, .dots, .three-ways) { margin: 1rem 0 1.25rem; }
-    .prose :is(.paint-mixes, .lights, .dots, .three-ways) figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: center; }
+    .prose :is(.paint-mixes, .lights, .dots, .three-ways) figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: left; }
     .prose .paint-mixes > div { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
     .prose .paint-mixes > div > div { display: flex; }
     .prose .paint-mixes span { width: 2rem; height: 2rem; background: var(--c); }
@@ -818,6 +821,62 @@
     .prose .three-ways span { width: 2.5rem; height: 2.5rem; background: var(--c); }
     .prose .three-ways .light { box-shadow: inset 0 0 0 1px var(--line); }
     .prose .three-ways small { color: var(--muted); font-size: 0.75rem; }
+    .prose .tone-rows > figcaption { margin-top: 0; }
+    .prose .surfaces { margin: 1rem 0 1.25rem; }
+    .prose .surfaces > div { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+    .prose .surfaces > div > div { display: flex; gap: 1rem; }
+    .prose .surfaces > div > div > div { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+    .prose .surfaces span { width: 3rem; height: 3rem; background: var(--c); }
+    .prose .surfaces small { color: var(--muted); font-size: 0.75rem; }
+    .prose .surfaces figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: left; }
+    .prose .warm-cool { margin: 1rem 0 1.25rem; }
+    /* Two columns, warm and cool, each row a hue: every name as wide as the others (long ones wrap), so the squares are evenly spaced. */
+    .prose .warm-cool > div { display: grid; grid-template-columns: repeat(2, auto); justify-content: center; gap: 1.5rem 3rem; }
+    .prose .warm-cool .row { display: contents; }
+    .prose .warm-cool .group { justify-self: center; display: flex; flex-direction: column; align-items: center; gap: 0.375rem; }
+    .prose .warm-cool .items { display: flex; align-items: flex-start; gap: 0.5rem; }
+    .prose .warm-cool .group > small { font-size: 0.75rem; }
+    /* Each a named colour: its square over its name, which opens its dialog, as a .color-ref in the text. */
+    .prose .warm-cool .color-ref { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; width: 5.5rem; white-space: normal; text-align: center; line-height: 1.3; text-decoration: none; color: var(--muted); font-size: 0.75rem; }
+    @media (max-width: 30rem) { .prose .warm-cool > div { column-gap: 1rem; } .prose .warm-cool .color-ref { width: 4.375rem; font-size: 0.6875rem; } }
+    .prose .warm-cool .color-ref:is(:hover, :focus-visible) { text-decoration: underline; color: var(--fg); }
+    .prose .warm-cool .color-ref .chip { order: -1; width: 3rem; height: 3rem; margin: 0; box-shadow: none; }
+    .prose .warm-cool figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: left; }
+    /* Plate 8: a column per hue, tint over full colour over shade, each a named colour that opens its dialog; six hues a row where twelve don't fit. */
+    .prose .plate8 { margin: 1rem 0 1.25rem; }
+    .prose .plate8 > div { display: grid; grid-template-columns: repeat(12, 2.5rem); justify-content: center; gap: 1rem 0.25rem; }
+    @media (max-width: 40rem) { .prose .plate8 > div { grid-template-columns: repeat(6, 2.5rem); } }
+    .prose .plate8 > div > div { display: flex; flex-direction: column; gap: 0.25rem; }
+    .prose .plate8 .color-ref { display: block; text-decoration: none; }
+    .prose .plate8 .color-ref .name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .prose .plate8 .color-ref .chip { display: block; width: 2.5rem; height: 2.5rem; margin: 0; box-shadow: none; }
+    .prose .plate8 .color-ref:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+    .prose .plate8 figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: left; }
+    .prose .plate8 figcaption .note { display: block; margin-top: 0.375rem; }
+    .prose .area-sizes { margin: 1rem 0 1.25rem; }
+    .prose .area-sizes > div { display: flex; justify-content: center; align-items: center; gap: 2.5rem; }
+    .prose .area-sizes .backdrop { display: flex; padding: 1.5rem; background: oklch(0.5 0 0); }
+    .prose .area-sizes .wide { flex: 0 1 21rem; }
+    .prose .area-sizes .backdrop span { flex: none; width: 1.5rem; height: 1.5rem; background: var(--c); }
+    .prose .area-sizes .backdrop .large { flex: 1 1 auto; width: auto; height: 10rem; }
+    .prose .area-sizes figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: left; }
+    .prose :is(.grounds, .steps) { margin: 1rem 0 1.25rem; }
+    .prose :is(.grounds, .steps) figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: left; }
+    .prose .grounds button { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin: 0 auto; padding: 0; border: 0; background: none; cursor: pointer; }
+    .prose .grounds button:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+    .prose .grounds button > span { display: flex; gap: 2.5rem; }
+    .prose .grounds .ground { display: grid; place-items: center; width: 4.5rem; height: 4.5rem; background: var(--g); }
+    .prose .grounds .ground.light { box-shadow: inset 0 0 0 1px var(--line); }
+    .prose .grounds .ground span { width: 1.5rem; height: 1.5rem; background: var(--c); transition: width 0.3s, height 0.3s; }
+    .prose .grounds button:is(:hover, [aria-pressed="true"]) .ground span { width: 100%; height: 100%; }
+    @media (max-width: 30rem) { .prose .grounds .ground { width: 3.75rem; height: 3.75rem; } .prose .grounds .ground span { width: 1.25rem; height: 1.25rem; } }
+    @media (prefers-reduced-motion: reduce) { .prose .grounds .ground span { transition: none; } }
+    .prose .steps :is(button, .lined) { display: flex; justify-content: center; }
+    .prose .steps button { margin: 0 auto; padding: 0; border: 0; background: none; cursor: pointer; }
+    .prose .steps button:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+    .prose .steps .lined { margin-top: 1.5rem; }
+    .prose .steps span { width: 2.5rem; height: 4rem; background: var(--c); }
+    .prose .steps :is(button:is(:hover, [aria-pressed="true"]), .lined) span + span { box-shadow: inset 3px 0 #000; }
     /* Wada's reading of one of his cards: the card (a link to its page), its reading beside it. */
     .prose .card-reading { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 1.25rem; align-items: start; margin-top: 1.25rem; }
     .prose .card-reading > :first-child { margin-top: 0.3rem; }
@@ -1264,7 +1323,7 @@
           <li><strong>Light adds.</strong> Lights shone together add up, so a mix is lighter than either. Red and green light make yellow. The further apart two lights are on the circle, the paler the mix, and opposite colours make white.
             <figure class="lights"><svg viewBox="0 0 100 88" role="img" aria-label="Red, green and blue lights overlapping on black: red and green make yellow, green and blue cyan, blue and red magenta, and all three white"><rect width="100" height="88" rx="4"/><g><circle cx="39" cy="34" r="22" fill="#f00"/><circle cx="61" cy="34" r="22" fill="#0f0"/><circle cx="50" cy="53" r="22" fill="#00f"/></g></svg><figcaption>Red, green and blue lights. Two make yellow, cyan or magenta, and all three white.</figcaption></figure>
           </li>
-          <li><strong>Spinning and dots average.</strong> On a spinning disc, or in dots too small to see apart, colours neither subtract nor add but average. The mix is as light as the two averaged, so a complementary pair gives grey, not white.
+          <li><strong>Spinning and dots average.</strong> On a spinning disc, or in dots too small to see apart, colours neither subtract nor add but average. The mix is as light as the two averaged, so a complementary pair gives grey, not white. Japanese textiles have long used this, in <i>komon</i>, <i>kasuri</i> and stripes. Up close they show separate colours, from afar a mixture, and in between a beauty of their own.
             <figure class="dots"><div><div class="pair"><span style="--c: oklch(0.9145 0.1732 99.80); --s: 0.3359"></span><span style="--c: oklch(0.5146 0.1498 257.66); --s: 0.6641"></span></div><button type="button" class="dot-patch" aria-pressed="false" aria-label="Enlarge the dots"><svg width="96" height="64" viewBox="0 0 96 64" shape-rendering="crispEdges" aria-hidden="true"><defs><pattern id="dots-yb" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="oklch(0.5146 0.1498 257.66)"/><g fill="oklch(0.9145 0.1732 99.80)"><rect x="0" y="0" width="1" height="1"/><rect x="2" y="0" width="1" height="1"/><rect x="4" y="0" width="1" height="1"/><rect x="6" y="0" width="1" height="1"/><rect x="8" y="0" width="1" height="1"/><rect x="10" y="0" width="1" height="1"/><rect x="12" y="0" width="1" height="1"/><rect x="14" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="5" y="1" width="1" height="1"/><rect x="9" y="1" width="1" height="1"/><rect x="13" y="1" width="1" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="8" y="2" width="1" height="1"/><rect x="10" y="2" width="1" height="1"/><rect x="12" y="2" width="1" height="1"/><rect x="14" y="2" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="11" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="6" y="4" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="12" y="4" width="1" height="1"/><rect x="14" y="4" width="1" height="1"/><rect x="1" y="5" width="1" height="1"/><rect x="5" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="13" y="5" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/><rect x="8" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="12" y="6" width="1" height="1"/><rect x="14" y="6" width="1" height="1"/><rect x="7" y="7" width="1" height="1"/><rect x="0" y="8" width="1" height="1"/><rect x="2" y="8" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="6" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="10" y="8" width="1" height="1"/><rect x="12" y="8" width="1" height="1"/><rect x="14" y="8" width="1" height="1"/><rect x="1" y="9" width="1" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="9" y="9" width="1" height="1"/><rect x="13" y="9" width="1" height="1"/><rect x="0" y="10" width="1" height="1"/><rect x="2" y="10" width="1" height="1"/><rect x="4" y="10" width="1" height="1"/><rect x="6" y="10" width="1" height="1"/><rect x="8" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/><rect x="12" y="10" width="1" height="1"/><rect x="14" y="10" width="1" height="1"/><rect x="3" y="11" width="1" height="1"/><rect x="11" y="11" width="1" height="1"/><rect x="0" y="12" width="1" height="1"/><rect x="2" y="12" width="1" height="1"/><rect x="4" y="12" width="1" height="1"/><rect x="6" y="12" width="1" height="1"/><rect x="8" y="12" width="1" height="1"/><rect x="10" y="12" width="1" height="1"/><rect x="12" y="12" width="1" height="1"/><rect x="14" y="12" width="1" height="1"/><rect x="1" y="13" width="1" height="1"/><rect x="5" y="13" width="1" height="1"/><rect x="9" y="13" width="1" height="1"/><rect x="13" y="13" width="1" height="1"/><rect x="0" y="14" width="1" height="1"/><rect x="2" y="14" width="1" height="1"/><rect x="4" y="14" width="1" height="1"/><rect x="6" y="14" width="1" height="1"/><rect x="8" y="14" width="1" height="1"/><rect x="10" y="14" width="1" height="1"/><rect x="12" y="14" width="1" height="1"/><rect x="14" y="14" width="1" height="1"/><rect x="15" y="15" width="1" height="1"/></g></pattern></defs><rect width="96" height="64" fill="url(#dots-yb)"/></svg></button><span style="--c: oklch(0.7033 0 0)"></span></div><div><div class="pair"><span style="--c: #f00; --s: 0.5"></span><span style="--c: #0f0; --s: 0.5"></span></div><button type="button" class="dot-patch" aria-pressed="false" aria-label="Enlarge the dots"><svg width="96" height="64" viewBox="0 0 96 64" shape-rendering="crispEdges" aria-hidden="true"><defs><pattern id="dots-rg" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#0f0"/><rect width="1" height="1" fill="#f00"/><rect x="1" y="1" width="1" height="1" fill="#f00"/></pattern></defs><rect width="96" height="64" fill="url(#dots-rg)"/></svg></button><span style="--c: oklch(0.7683 0.1675 109.77)"></span></div><figcaption>Dots of two colours, in the shares shown on their left. Seen from further away, each patch blends into the colour on its right. Point at the dots, or tap them, to enlarge them.</figcaption></figure>
           </li>
         </ul>
@@ -1274,45 +1333,64 @@
         <p class="remark"><strong>Since then:</strong> the primaries for paints and inks are taken to be cyan, magenta and yellow, close to the greenish blue and purplish red above, and red, yellow and blue are seen as a painters' tradition. No three primaries, of paint or of light, mix every colour either. They give every hue, but not every hue at its strongest.</p>
 
         <h2 id="theory-contrast">Contrast</h2>
+        <p>A colour doesn't look the same everywhere. What lies beside it, and what was seen just before, changes how it looks. This is contrast.</p>
+        <p>Side by side, two colours push each other apart, in three ways that often appear together.</p>
         <ul>
-          <li><strong>Side by side,</strong> colours push each other apart: each looks tinged with the other's complement. Close hues shift most, and complements keep their hue. Larger, more saturated and lighter areas push hardest.</li>
-          <li><strong>Lightness:</strong> a colour looks lighter beside a darker one, and darker beside a lighter one. White looks whitest on black.</li>
-          <li><strong>Saturation:</strong> a pale colour beside a vivid one looks paler still.</li>
-          <li><strong>One after another:</strong> a colour seen just after its complement looks more vivid.</li>
-          <li><strong>A grey on a coloured ground</strong> looks tinged with the ground's complement.</li>
-          <li><strong>A line stops it:</strong> a black outline, a gap or an overlap between two colours removes the effect, which may be one reason <a href="#guidance/neutrals">white, grey or black between colours</a> works.</li>
-          <li><strong>From afar, small colours mix:</strong> fine stripes or dots blend into their average. Japanese textiles use it, in <i>komon</i>, <i>kasuri</i> and stripes: separate colours near, a mixture far, and in between a beauty of its own.</li>
+          <li><p><strong>Hue.</strong> Each colour looks tinged with the other's complement, so the two seem further apart on the hue circle than they are. The closer the two hues, the bigger the shift. Complements don't shift at all, and each shows its own hue at its fullest. A grey on a coloured ground takes on a tinge of the ground's complement.</p>
+            <figure class="grounds"><button type="button" aria-pressed="false" aria-label="The same orange square on red, yellow and blue grounds. Press to enlarge the centres"><span><span class="ground" style="--g: oklch(0.6 0.2 27)"><span style="--c: oklch(0.72 0.16 55)"></span></span><span class="ground" style="--g: oklch(0.85 0.17 95)"><span style="--c: oklch(0.72 0.16 55)"></span></span><span class="ground" style="--g: oklch(0.6 0.14 255)"><span style="--c: oklch(0.72 0.16 55)"></span></span></span></button><figcaption>The same orange on red, yellow and blue. On red it looks yellower, on yellow redder, and on blue, its complement, it keeps its hue. Point at the squares, or tap them, to enlarge the centres.</figcaption></figure></li>
+          <li><p><strong>Lightness.</strong> A colour looks lighter beside a darker one, and darker beside a lighter one. White looks whitest on black.</p>
+            <figure class="grounds"><button type="button" aria-pressed="false" aria-label="The same grey square, and the same orange square, on white and black grounds. Press to enlarge the centres"><span><span class="ground light" style="--g: oklch(1 0 0)"><span style="--c: oklch(0.65 0 0)"></span></span><span class="ground" style="--g: oklch(0.15 0 0)"><span style="--c: oklch(0.65 0 0)"></span></span></span><span><span class="ground light" style="--g: oklch(1 0 0)"><span style="--c: oklch(0.72 0.16 55)"></span></span><span class="ground" style="--g: oklch(0.15 0 0)"><span style="--c: oklch(0.72 0.16 55)"></span></span></span></button><figcaption>The same grey, and the same orange, on white and black. Each looks lighter on black. Point at the squares, or tap them, to enlarge the centres.</figcaption></figure></li>
+          <li><p><strong>Saturation.</strong> A pale colour beside a vivid one looks paler still.</p>
+            <figure class="grounds"><button type="button" aria-pressed="false" aria-label="The same pale purple square on a vivid purple ground and on a grey ground of the same lightness. Press to enlarge the centres"><span><span class="ground" style="--g: oklch(0.6 0.17 320)"><span style="--c: oklch(0.6 0.05 320)"></span></span><span class="ground" style="--g: oklch(0.6 0 0)"><span style="--c: oklch(0.6 0.05 320)"></span></span></span></button><figcaption>The same pale purple on a vivid purple and on a grey, both as light as it. Beside the vivid purple it looks paler. Point at the squares, or tap them, to enlarge the centres.</figcaption></figure></li>
         </ul>
+        <p>The larger, more saturated or lighter colour pushes harder, and two equal ones push each other alike. It happens where two colours meet on one surface with nothing marking the edge. An outline, a gap or an overlap between them stops it, which may be one reason <a href="#guidance/neutrals">white, grey or black between colours</a> works.</p>
+        <figure class="steps"><button type="button" aria-pressed="false" aria-label="Draw lines between the grey steps"><span style="--c: oklch(0.30 0 0)"></span><span style="--c: oklch(0.38 0 0)"></span><span style="--c: oklch(0.46 0 0)"></span><span style="--c: oklch(0.54 0 0)"></span><span style="--c: oklch(0.62 0 0)"></span><span style="--c: oklch(0.70 0 0)"></span><span style="--c: oklch(0.78 0 0)"></span><span style="--c: oklch(0.86 0 0)"></span></button><div class="lined" role="img" aria-label="The same steps with black lines between them"><span style="--c: oklch(0.30 0 0)"></span><span style="--c: oklch(0.38 0 0)"></span><span style="--c: oklch(0.46 0 0)"></span><span style="--c: oklch(0.54 0 0)"></span><span style="--c: oklch(0.62 0 0)"></span><span style="--c: oklch(0.70 0 0)"></span><span style="--c: oklch(0.78 0 0)"></span><span style="--c: oklch(0.86 0 0)"></span></div><figcaption>Eight steps of grey, each one flat. Where two meet, the lighter looks lighter and the darker darker, so each step seems shaded. Below, with lines between them, the same steps look flat. Point at the top steps, or tap them, to draw the lines there too.</figcaption></figure>
+        <p>One after another, colours change too, because the after-image of the first, its complement, mixes into the next. A colour seen just after its complement looks more vivid. Seen after the same or a close hue, it looks duller, and a close hue also pushes it away, so orange seen after red looks yellower.</p>
 
         <h2 id="theory-conditions">What changes a colour</h2>
+        <p>A colour isn't fixed in the thing that carries it. The same paint looks different in another light, on another material, at another size, and as it ages.</p>
         <ul>
-          <li><strong>The light.</strong> Lamplight is rich in orange and poor in blue: reds and oranges glow, yellow fades, blues darken. Hama found colour hard to judge by lamplight. Strong sun favours reds and yellows, dull weather pale, cool colours.</li>
-          <li><strong>Dim light.</strong> At dusk, red goes dark first, while greens and blues still show their colour.</li>
-          <li><strong>The material.</strong> The same colour differs as oil paint, watercolour or dye, and on silk, cotton or linen: oils look dark and deep, pastels light, watercolours between. A wet surface looks more saturated than a dry one.</li>
-          <li><strong>The area.</strong> Large areas look paler and weaker than small swatches, as <a href="#guidance/using">Wada warned</a>.</li>
+          <li><p><strong>The light.</strong> Daylight comes from two places, the sun and the sky. On its way through the air, sunlight loses some of its blue, which the air scatters across the sky. So direct sun is orange-yellow, the sky is blue, and together they make white. Strong sun favours reds, oranges and yellows and dulls blues and purples. Quince, pomegranate and marigold blaze at noon, while wisteria, iris and hydrangea are at their best in rain, haze and the soft light of morning and evening.</p>
+            <p>Lamplight depends on the lamp, but it's usually richer in orange and poorer in blue than daylight. Under it, reds and oranges glow, yellow turns whitish, green leans to yellow-green, blues darken and purple turns redder, so colour is hard to judge. A coloured light goes further. Colours of its own hue look white, and its complement grey or black.</p>
+            <figure class="tone-rows"><figure><div role="img" aria-label="Seven colours in daylight: white, red, orange, yellow, green, blue and purple"><span style="--c: oklch(0.9583 0 0)"></span><span style="--c: oklch(0.6207 0.2087 31.06)"></span><span style="--c: oklch(0.7381 0.1713 46.99)"></span><span style="--c: oklch(0.9145 0.1759 99.80)"></span><span style="--c: oklch(0.7391 0.1890 153.10)"></span><span style="--c: oklch(0.5249 0.1494 250.37)"></span><span style="--c: oklch(0.5438 0.2083 331.75)"></span></div><figcaption>Daylight</figcaption></figure><figure><div role="img" aria-label="The same under lamplight: a little warmer, the reds stronger, the blue darker and duller, the purple redder"><span style="--c: oklch(0.8599 0.0517 58.08)"></span><span style="--c: oklch(0.5921 0.2208 30.44)"></span><span style="--c: oklch(0.6944 0.1957 45.59)"></span><span style="--c: oklch(0.8294 0.1687 90.56)"></span><span style="--c: oklch(0.6398 0.1658 152.49)"></span><span style="--c: oklch(0.4551 0.1060 245.87)"></span><span style="--c: oklch(0.5089 0.1852 350.07)"></span></div><figcaption>Lamplight</figcaption></figure><figure><div role="img" aria-label="The same under red light: white, red, orange and yellow all the same red, green and blue nearly black"><span style="--c: oklch(0.6028 0.2455 28.30)"></span><span style="--c: oklch(0.5688 0.2305 26.68)"></span><span style="--c: oklch(0.5976 0.2431 27.92)"></span><span style="--c: oklch(0.6028 0.2455 28.30)"></span><span style="--c: oklch(0.2574 0.0907 34.99)"></span><span style="--c: oklch(0.2251 0.0913 29.89)"></span><span style="--c: oklch(0.4675 0.1894 26.40)"></span></div><figcaption>Red light</figcaption></figure><figcaption>The same colours in daylight, under lamplight and under red light (modelled). Under red light, the white, orange and yellow look the same as the red.</figcaption></figure>
+            <p class="remark"><strong>Since then:</strong> the eye adapts to the light more than these lists suggest. After a few minutes under lamplight it discounts much of the light's colour, so the shifts show most at first, or beside daylight. Two colours that match in one light can still differ in another.</p></li>
+          <li><p><strong>Dim light.</strong> At dusk, red goes dark first and yellow loses its colour, while greens and blues still show theirs. In faint light the eye's cones, which see colour, gradually stop working, and its rods take over. Rods see only light and dark, and they respond most to blue-green, so blues and greens keep their lightness, while reds go almost black.</p>
+            <figure class="tone-rows"><figure><div role="img" aria-label="Seven colours in daylight: white, red, orange, yellow, green, blue and purple"><span style="--c: oklch(0.9583 0 0)"></span><span style="--c: oklch(0.6207 0.2087 31.06)"></span><span style="--c: oklch(0.7381 0.1713 46.99)"></span><span style="--c: oklch(0.9145 0.1759 99.80)"></span><span style="--c: oklch(0.7391 0.1890 153.10)"></span><span style="--c: oklch(0.5249 0.1494 250.37)"></span><span style="--c: oklch(0.5438 0.2083 331.75)"></span></div><figcaption>Daylight</figcaption></figure><figure><div role="img" aria-label="The same in near darkness, all grey: the red darkest, the green and yellow lightest after the white, the blue lighter than the red"><span style="--c: oklch(0.6415 0 0)"></span><span style="--c: oklch(0.2457 0 0)"></span><span style="--c: oklch(0.2892 0 0)"></span><span style="--c: oklch(0.4946 0 0)"></span><span style="--c: oklch(0.5233 0 0)"></span><span style="--c: oklch(0.4428 0 0)"></span><span style="--c: oklch(0.3502 0 0)"></span></div><figcaption>Near darkness</figcaption></figure><figcaption>The same colours by day and in near darkness, where only the rods see (modelled). Every colour turns grey. Red goes darkest, and blue, darker than red by day, is now lighter.</figcaption></figure></li>
+          <li><p><strong>The material.</strong> Part of the light bounces off a surface as white before it reaches the colour, and the more it does, the whiter the colour looks. Water fills a rough surface and cuts this down, so a colour looks deeper wet than dry. For the same reason, pastels look light, oils dark and deep, and watercolours in between.</p>
+            <figure class="surfaces"><div role="img" aria-label="The same blue wet and dry, and as oil, watercolour and pastel, lighter and greyer as more white light bounces off its surface"><div><div><span style="--c: oklch(0.5249 0.1494 250.37)"></span><small>Wet</small></div><div><span style="--c: oklch(0.5811 0.1336 255.57)"></span><small>Dry</small></div></div><div><div><span style="--c: oklch(0.5249 0.1494 250.37)"></span><small>Oil</small></div><div><span style="--c: oklch(0.5636 0.1423 254.14)"></span><small>Watercolour</small></div><div><span style="--c: oklch(0.6280 0.1123 258.75)"></span><small>Pastel</small></div></div></div><figcaption>The same blue with less or more white light bouncing off its surface (modelled).</figcaption></figure>
+            <p>What the colour sits on matters too. The same dye looks different on silk, cotton or hemp, because their fibres reflect light differently. A colour thinned with water is transparent and lets the ground show through, while one thinned with white is opaque and hides it.</p></li>
+          <li><p><strong>The area.</strong> <a href="#guidance/using">Wada warned</a> that large areas look paler and weaker than small swatches.</p>
+            <figure class="area-sizes"><div role="img" aria-label="The same blue-green as a small chip and as a large area"><span class="backdrop"><span style="--c: oklch(0.62 0.1 195)"></span></span><span class="backdrop wide"><span class="large" style="--c: oklch(0.62 0.1 195)"></span></span></div><figcaption>The same colour as a small chip and as a large area.</figcaption></figure>
+            <p class="remark"><strong>Since then:</strong> measurements mostly find that a large area looks lighter, as Wada said, but more vivid, not weaker. Decorators often choose a wall paint a step greyer than its sample for this reason.</p></li>
+          <li><p><strong>Time.</strong> Colours fade. Mineral pigments last, while plant dyes and coal-tar dyes change and fade far sooner, and white paper yellows in sunlight and air. Wada used only pigments that had passed a fading test.</p>
+            <p class="remark"><strong>Since then:</strong> many synthetic pigments last as well as mineral ones, and paints now carry a lightfastness rating, pigment by pigment.</p></li>
         </ul>
-        <p class="remark"><strong>Since then:</strong> the eye also adapts to the light, which hides much of its shift, and two colours that match in one light can differ in another.</p>
 
         <h2 id="theory-character">Strong and weak, warm and cool</h2>
+        <p>Colours also carry feelings. Some excite more than others, some feel warm or cool, and many carry meanings.</p>
         <ul>
-          <li><strong>Strength.</strong> Wada ranked colours by how much they excite the eye: red most, then orange, yellow, green, blue and indigo, violet least. That is why danger signals are red. People differ, he said, but this order is generally accepted.</li>
-          <li><strong>Warm and cool.</strong> Red, orange and yellow are warm, blue and green cool: Hama traced it to fire and to deep, clear water. But every hue has warmer and cooler kinds: for Wada, celadon is a warm green and evergreen a cool one, and canary a cooler yellow than turmeric.</li>
-          <li><strong>What colours stand for,</strong> in Hama's list, "a kind of code": white and black for purity and seriousness, red for power and passion, yellow for light and joy, green for peace and health, blue for calm and depth, purple for grace and nobility.</li>
+          <li><p><strong>Strength.</strong> Some colours excite the eye more than others. Wada put this down mostly to how strong a colour is, and partly to its hue. By hue, red excites most, then orange, yellow, green, blue and indigo, and violet least. People differ, he said, but this order is generally accepted, and red catches the eye so easily that it's used for danger signals. Strong combinations look splendid at first sight but tend to vulgarity and tire quickly, so they suit advertising, shop fronts and the stage better than the home (see <a href="#guidance/making">Making a combination</a>).</p>
+            <p class="remark"><strong>Since then:</strong> studies find that how strong a colour is, its saturation and lightness, matters far more than its hue, as Wada's first point says, and no fixed order by hue holds. Red for danger is partly convention.</p></li>
+          <li><p><strong>Warm and cool.</strong> Red, orange and yellow are warm, and blue and green cool. Hama traced it to the flames of a fire and the clear water of a deep pool. Every hue has warmer and cooler kinds, though. For Wada, celadon (<button class="color-ref">Cobalt Green</button>) is a warm green and green bamboo (<button class="color-ref">Green Blue</button>) a cool one. Warm colours suggest warmth and intimacy. Cool ones, to Hama, suggest coolness, purity and quiet, where Europeans and Americans call them cold and chilly.</p>
+            <figure class="warm-cool"><div><div class="row"><div class="group"><small>Warm</small><div class="items"><button class="color-ref" data-color="Night Green">Siskin yellow‑green</button><button class="color-ref" data-color="Cobalt Green">Celadon</button></div></div><div class="group"><small>Cool</small><div class="items"><button class="color-ref" data-color="Green Blue">Green bamboo</button><button class="color-ref" data-color="Diamine Green">Evergreen</button></div></div></div><div class="row"><div class="group"><small>Warmer</small><div class="items"><button class="color-ref" data-color="Apricot Yellow">Turmeric</button><button class="color-ref" data-color="Orange Yellow">Kerria</button></div></div><div class="group"><small>Cooler</small><div class="items"><button class="color-ref" data-color="Lemon Yellow">Canary</button></div></div></div></div><figcaption>Wada's own examples of warmer and cooler greens and yellows.</figcaption></figure></li>
+          <li><p><strong>What colours stand for.</strong> Hama listed meanings that colours carry, "a kind of code". White and black stand for sanctity, purity and seriousness, red for power and passion, yellow for light and joy, green for peace and health, blue for calm and depth, and purple for grace and nobility. But which colours people like depends on custom, age, education and surroundings, he added, so no absolute law can be laid down.</p>
+            <p class="remark"><strong>Since then:</strong> some associations are widely shared, such as red with anger and with love, but many vary by culture. In Japan, white was long the colour of mourning.</p></li>
         </ul>
-        <p class="remark"><strong>Since then:</strong> no fixed order of strength by hue is established: how much a colour stands out depends on its saturation, lightness and surroundings, and red for danger is partly convention.</p>
 
         <h2 id="theory-systems">Colour systems</h2>
-        <p>A colour system orders colours by their attributes, so that any colour can be found and written down. This site places Wada's colours in four, each a view under <a href="#colors">Colors</a>:</p>
+        <p>A colour system orders colours by their attributes, so that any colour can be found and written down. This site places Wada's colours in four, each a view under <a href="#colors">Colors</a>.</p>
         <ul>
-          <li><a href="#colors" data-layout="ostwald"><strong>Ostwald</strong></a>: every colour a mix of full colour, white and black, on a circle of 100 hues, each hue a triangle, as Hama drew it. Wada wrote colours in it: his orange is 16PA, his dark brown 17PK.</li>
-          <li><a href="#colors" data-layout="oklch"><strong>OKLCH</strong></a>: a modern colour space, of lightness, chroma and hue, made so that equal steps look equal. The site computes every colour in it, from the book's CMYK, and uses it to show them on screen.</li>
-          <li><a href="#colors" data-layout="munsell"><strong>Munsell</strong></a>: hue, value (lightness) and chroma, spaced to look even, chroma reaching as far as colours go. Japan's colour standards write colours in it.</li>
-          <li><a href="#colors" data-layout="pccs"><strong>PCCS</strong></a>: made by the Japan Color Research Institute, which grew out of the association Wada founded. Built on Munsell's notation, it adds tones (colours of like lightness and saturation across the hues), for colour harmony.</li>
+          <li><p><strong><a href="#colors" data-layout="ostwald">Ostwald</a>.</strong> Every colour is a mix of full colour, white and black, so each hue is a triangle running from its full colour to white and to black, on a circle of 100 hues. Wada held Ostwald's theory to be "far above all others" and wrote colours in it, with 16 greys from white to black, lettered A to P, which this view follows. Hama drew the triangle with amounts of white and black of his own.</p>
+            <p class="remark"><strong>Since then:</strong> Ostwald's system has fallen out of use, and Munsell's has become the standard. The Swedish NCS still describes colours much as Ostwald did, by how much white, black and full colour they seem to hold.</p></li>
+          <li><strong><a href="#colors" data-layout="oklch">OKLCH</a>.</strong> A modern colour space, of lightness, chroma and hue, made so that equal steps look roughly equal. The site computes every colour in it from the book's CMYK, and uses it to show them on screen.</li>
+          <li><strong><a href="#colors" data-layout="munsell">Munsell</a>.</strong> Hue, value (lightness) and chroma, spaced to look even, with chroma reaching as far as colours go. Japan's colour standards write colours in it.</li>
+          <li><strong><a href="#colors" data-layout="pccs">PCCS</a>.</strong> Made by the Japan Color Research Institute, which grew out of the association Wada founded. Its lightness follows Munsell's value, and it adds tones (colours of like lightness and saturation across the hues), for colour harmony.</li>
         </ul>
 
         <h2 id="theory-names">Colour names</h2>
-        <p>Wada gathered colour names into books, and gave every colour of his combinations a Japanese name and an English one. The English names come from Robert Ridgway's <i>Color Standards and Color Nomenclature</i>, a few misspelled. Plate 8 of the atlas shows 12 hues, each as tint, full colour and shade, with Wada's names: 35 of them are colours here, and those colours' dialogs say so.</p>
-        <p>Hama adds notes on Japanese names. <i>Ao</i> long meant both green and blue. The browns (<i>cha</i>) and the mouse greys (<i>nezumi</i>) were the two great families of colour names in the Edo period. Kyoto's purple was redder than Edo's.</p>
+        <p>Wada gathered colour names into books, the <i>Shikimei Sōkan</i> and the <i>Shikimei-chō</i>, published by the Japan Standard Colour Association he founded, and gave every colour of his combinations a Japanese name and an English one. The English names come from Robert Ridgway's <i>Color Standards and Color Nomenclature</i>, a few misspelled, such as Antwarp Blue. Plate 8 of the 1935 atlas Wada made with Hama, <i>Hyōjun shikisai zushū</i>, shows 12 hues, each as tint, full colour and shade, with Wada's names. All 36 are colours here, 35 matched by name and one by our own reading of the plate, and their dialogs say so.</p>
+        <figure class="plate8"><div><div><button class="color-ref" data-color="Hermosa Pink" title="鴾色, Hermosa Pink"><span class="name">鴾色</span></button><button class="color-ref" data-color="Red" title="赤色, Red"><span class="name">赤色</span></button><button class="color-ref" data-color="Pale Burnt Lake" title="海老茶色, Pale Burnt Lake"><span class="name">海老茶色</span></button></div><div><button class="color-ref" data-color="Ochraceous Salmon" title="欵冬色, Ochraceous Salmon"><span class="name">欵冬色</span></button><button class="color-ref" data-color="Orange" title="橙色, Orange"><span class="name">橙色</span></button><button class="color-ref" data-color="Sudan Brown" title="丁字茶, Sudan Brown"><span class="name">丁字茶</span></button></div><div><button class="color-ref" data-color="Cream Yellow" title="卵色, Cream Yellow"><span class="name">卵色</span></button><button class="color-ref" data-color="Yellow Orange" title="柑子色, Yellow Orange"><span class="name">柑子色</span></button><button class="color-ref" data-color="Raw Sienna" title="檜皮色, Raw Sienna"><span class="name">檜皮色</span></button></div><div><button class="color-ref" data-color="Pale Lemon Yellow" title="淡卵色, Pale Lemon Yellow"><span class="name">淡卵色</span></button><button class="color-ref" data-color="Yellow" title="黃色, Yellow"><span class="name">黃色</span></button><button class="color-ref" data-color="Citrine" title="靑朽葉, Citrine"><span class="name">靑朽葉</span></button></div><div><button class="color-ref" data-color="Light Green Yellow" title="鶸色, Light Green Yellow"><span class="name">鶸色</span></button><button class="color-ref" data-color="Yellow Green" title="若草色, Yellow Green"><span class="name">若草色</span></button><button class="color-ref" data-color="Chromium Green" title="老綠, Chromium Green"><span class="name">老綠</span></button></div><div><button class="color-ref" data-color="Cobalt Green" title="靑磁色, Cobalt Green"><span class="name">靑磁色</span></button><button class="color-ref" data-color="Green" title="綠色, Green"><span class="name">綠色</span></button><button class="color-ref" data-color="Cossack Green" title="萠木色, Cossack Green"><span class="name">萠木色</span></button></div><div><button class="color-ref" data-color="Calamine Blue" title="淡淺葱, Calamine Blue"><span class="name">淡淺葱</span></button><button class="color-ref" data-color="Green Blue" title="靑竹色, Green Blue"><span class="name">靑竹色</span></button><button class="color-ref" data-color="Antwerp Blue" title="納戶色, Antwerp Blue"><span class="name">納戶色</span></button></div><div><button class="color-ref" data-color="Salvia Blue" title="空色, Salvia Blue"><span class="name">空色</span></button><button class="color-ref" data-color="Blue" title="靑色, Blue"><span class="name">靑色</span></button><button class="color-ref" data-color="Deep Lyons Blue" title="紺靑, Deep Lyons Blue"><span class="name">紺靑</span></button></div><div><button class="color-ref" data-color="Grayish Lavender - A" title="藤色, Grayish Lavender - A"><span class="name">藤色</span></button><button class="color-ref" data-color="Violet Ultramarine" title="濃桔梗色, Violet Ultramarine"><span class="name">濃桔梗色</span></button><button class="color-ref" data-color="Violet Blue" title="花色, Violet Blue (Coolie Blue on the plate), our own match*"><span class="name">花色</span></button></div><div><button class="color-ref" data-color="Light Mauve" title="淺紫, Light Mauve"><span class="name">淺紫</span></button><button class="color-ref" data-color="Violet" title="紫色, Violet"><span class="name">紫色</span></button><button class="color-ref" data-color="Dusky Madder Violet" title="黑紫, Dusky Madder Violet"><span class="name">黑紫</span></button></div><div><button class="color-ref" data-color="Lilac" title="鳩羽紫, Lilac"><span class="name">鳩羽紫</span></button><button class="color-ref" data-color="Red Violet" title="菖蒲色, Red Violet"><span class="name">菖蒲色</span></button><button class="color-ref" data-color="Cotinga Purple" title="杜若色, Cotinga Purple"><span class="name">杜若色</span></button></div><div><button class="color-ref" data-color="Spinel Red" title="紅梅色, Spinel Red"><span class="name">紅梅色</span></button><button class="color-ref" data-color="Rosolane Purple" title="牡丹色, Rosolane Purple"><span class="name">牡丹色</span></button><button class="color-ref" data-color="Violet Red" title="京紫, Violet Red"><span class="name">京紫</span></button></div></div><figcaption>Plate 8*, from red round to purple-red, each column a hue, with its tint above, full colour in the middle and shade below. Select a colour to see its names.<span class="note">* Our only copy of the plate is a black-and-white scan, so these colours are our own match, mostly by name, and may be wrong. Its Coolie Blue (<span lang="ja">花色</span>) is shown as Violet Blue, which Wada also named <span lang="ja">花色</span>.</span></figcaption></figure>
+        <p>Hama adds notes on Japanese names. <i>Ao</i> long meant both green and blue. The browns (<i>cha</i>) and the mouse greys (<i>nezumi</i>) were the two great families of colour names in the Edo period, and both spread far. <i>Cha</i>, at first the colour of coarse tea, came to take in reds and even greens, such as bush-warbler brown, and <i>nezumi</i> took in blues and purples, such as wisteria grey. Kyoto's purple was redder than Edo's.</p>
 
         <section class="sources">
           <h2 id="theory-sources">Sources</h2>
@@ -1979,6 +2057,8 @@
       if (atlas) {
         note.append(`${parts.length ? ". " : ""}Colour atlas (1935), Plate 8: ${atlas.tone} of ${atlas.hue}, `,
           Object.assign(document.createElement("span"), { lang: "ja", textContent: atlas.ja }), ` (${atlas.reading})`);
+        // Matched by us, not by name: the plate's own English name, and that the match may be wrong.
+        if (atlas.inferred) note.append(`, where it is called ${atlas.plateName}. Our own match, by its Japanese name and its place on the plate, so it may be wrong`);
       }
       note.hidden = !note.textContent;
       // The colour's combinations, small, Volume 1's then the seasonal ones; each opens its page.
@@ -2393,9 +2473,25 @@
         link.addEventListener("click", () => document.querySelector(`.subnav[data-view="colors"] button[data-value="${link.dataset.layout}"]`).click());
       }
       spinDiscs();
-      for (const patch of document.querySelectorAll(".prose .dot-patch")) {
+      for (const patch of document.querySelectorAll(".prose :is(.dot-patch, .steps button, .grounds button)")) {
         patch.addEventListener("click", () => patch.setAttribute("aria-pressed", String(patch.getAttribute("aria-pressed") !== "true")));
       }
+      // A wrapped caption keeps the full width its box may take, so its lines, often shorter, sit left of centre:
+      // narrow each box to its longest line, so a caption of any length sits centred under its figure. Again
+      // whenever its figure changes size (shown, resized, fonts loaded).
+      const fitCaption = (caption) => {
+        caption.style.width = "";
+        const range = document.createRange();
+        range.selectNodeContents(caption);
+        const rects = [...range.getClientRects()];
+        if (!rects.length) return;
+        const width = Math.max(...rects.map((r) => r.right)) - Math.min(...rects.map((r) => r.left));
+        if (width < caption.getBoundingClientRect().width - 1) caption.style.width = `${Math.ceil(width) + 1}px`;
+      };
+      const captions = new ResizeObserver((entries) => {
+        for (const entry of entries) for (const caption of entry.target.querySelectorAll(":scope > figcaption")) fitCaption(caption);
+      });
+      for (const caption of document.querySelectorAll(".prose figure > figcaption")) captions.observe(caption.parentElement);
     }
 
     // Complementary colours' discs: pointing at one (a mouse), or pressing it (a tap, a key), spins it up, as a

@@ -654,7 +654,7 @@
     .error { color: var(--muted); }
 
     /* The reading pages (Guidance, Theory, About): one column of text, centred, as wide as reads well.
-       Their sections can be linked (#guidance/hama): see showView. */
+       Their sections can be linked (#guidance/pairs): see showView. */
     /* The text in Source Serif, the headings and contents in DM Mono, as the rest of the site. 1rem of it
        has about the x-height of 0.9375rem of DM Mono; the column is as wide as 68ch of that DM Mono. */
     .prose { max-width: 38.25rem; margin: 0 auto; padding-bottom: 3rem; font-family: var(--serif); font-size: 1rem; line-height: 1.65; }
@@ -686,7 +686,7 @@
     /* A note on whose words a part is, and the sources at the end: smaller, muted. */
     .prose .aside { padding: 0.75rem 1rem; border: 1px solid var(--line); color: var(--muted); font-size: 0.9375rem; }
     .prose .sources { color: var(--muted); font-size: 0.875rem; }
-    .prose .sources h2 { color: var(--fg); }
+    .prose .sources :is(h2, h3) { color: var(--fg); }
     /* The page's sections, under its title. A section linked to takes the focus (see showView), unmarked. */
     .prose nav { display: block; margin-top: 1.75rem; padding: 1rem 1.25rem 1.125rem; border: 1px solid var(--line); }
     .prose [tabindex="-1"]:focus { outline: none; }
@@ -802,7 +802,9 @@
     .prose .screen-note { margin: 1.25rem 0; color: var(--muted); font-size: 0.75rem; }
     /* Mixing colours. Paint mixes: a simple model (each paint a smooth reflectance spectrum, as Hama drew
        them, mixed by Kubelka-Munk, a third red), red with orange, yellow, green and blue-green, each pair then
-       its mix. Lights: red, green and blue added by the screen (plus-lighter) on black. Dots: the model's
+       its mix. Lights: red, green and blue added by the screen (plus-lighter) on black. Inks: cyan, magenta and
+       yellow at 100%, alone, in pairs and all three, each through the Japan Color 2011 Coated profile as
+       scripts/cmyk_to_oklch.py does (so Yellow is the palette's own), on white. Dots: the model's
        yellow and blue in a 16 by 16 ordered dither (86 of 256 yellow), the blue then set so that the two as
        shown (the model's are trimmed to the screen's colours) average to an exactly neutral grey,
        one CSS pixel each, then red and green (the screen's own) in a checkerboard over the yellow they
@@ -818,7 +820,9 @@
     .prose .lights svg { display: block; width: min(100%, 12rem); height: auto; margin: 0 auto; }
     .prose .lights rect { fill: #000; }
     .prose .lights g { isolation: isolate; }
-    .prose .lights circle { mix-blend-mode: plus-lighter; }
+    .prose .lights:not(.inks) circle { mix-blend-mode: plus-lighter; }
+    /* The inks: each overlap filled with its own printed colour (clipped to the circles), on paper white. */
+    .prose .inks rect { fill: #fff; stroke: var(--line); stroke-width: 0.5; }
     .prose .dots > div { display: flex; justify-content: center; gap: 2.5rem; }
     .prose .dots > div + div { margin-top: 1.5rem; }
     .prose .dot-patch { display: block; width: 96px; height: 64px; padding: 0; border: 0; overflow: hidden; background: none; cursor: zoom-in; }
@@ -843,7 +847,7 @@
     .prose .surfaces small { color: var(--muted); font-size: 0.75rem; }
     .prose .surfaces figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: left; }
     .prose .warm-cool { margin: 1rem 0 1.25rem; }
-    /* Two columns, warm and cool, each row a hue: every name as wide as the others (long ones wrap), so the squares are evenly spaced. */
+    /* Two columns of opposites (warm and cool, or Guidance's lively and calm, light and heavy), each row a hue: every name as wide as the others (long ones wrap), so the squares are evenly spaced. */
     .prose .warm-cool > div { display: grid; grid-template-columns: repeat(2, auto); justify-content: center; gap: 1.5rem 3rem; }
     .prose .warm-cool .row { display: contents; }
     .prose .warm-cool .group { justify-self: center; display: flex; flex-direction: column; align-items: center; gap: 0.375rem; }
@@ -884,6 +888,15 @@
     .prose .grounds button:is(:hover, [aria-pressed="true"]) .ground span { width: 100%; height: 100%; }
     @media (max-width: 30rem) { .prose .grounds .ground { width: 3.75rem; height: 3.75rem; } .prose .grounds .ground span { width: 1.25rem; height: 1.25rem; } }
     @media (prefers-reduced-motion: reduce) { .prose .grounds .ground span { transition: none; } }
+    /* Guidance's text on grounds: each pair of Wada's colours (data-fg on data-bg) as text on a ground, with their L below. */
+    .prose .legibility .samples { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    @media (max-width: 30rem) { .prose .legibility .samples { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; } }
+    .prose .legibility .samples > div { display: flex; flex-direction: column; gap: 0.375rem; }
+    .prose .legibility .text { display: grid; place-items: center; min-height: 4.5rem; padding: 0.5rem; background: var(--bg); color: var(--fg); font-size: 1.0625rem; font-weight: 600; line-height: 1.25; text-align: center; }
+    .prose .legibility .text.light { box-shadow: inset 0 0 0 1px var(--line); }
+    .prose .legibility small { color: var(--muted); font-size: 0.75rem; text-align: center; }
+    .prose .legibility { margin: 1rem 0 1.25rem; }
+    .prose .legibility figcaption { margin-top: 0.75rem; color: var(--muted); font-size: 0.8125rem; text-align: left; }
     .prose .steps :is(button, .lined) { display: flex; justify-content: center; }
     .prose .steps button { margin: 0 auto; padding: 0; border: 0; background: none; cursor: pointer; }
     .prose .steps button:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
@@ -896,6 +909,7 @@
     .prose .card-reading > div > :first-child { margin-top: 0; }
     .prose .thumb { color: var(--muted); font-family: var(--mono); } /* as in the colour dialog */
     .prose .thumb:is(:hover, :focus-visible) { color: var(--fg); }
+    .prose .thumb.made { color: var(--muted); } /* not a link: no hover */
     @media (width < 30rem) { .prose .card-reading { grid-template-columns: 4.5rem minmax(0, 1fr); gap: 1rem; } }
     /* Wada's complementary pairs: each two squares side by side, as a two-colour combination, each colour's
        name under its square. */
@@ -907,9 +921,18 @@
     .prose .pairs .color-ref .chip { order: -1; width: 100%; height: 3.5rem; margin: 0 0 0.375rem; box-shadow: none; }
     .prose .pairs .color-ref:first-child .chip { width: calc(100% + 0.75rem); }
     .prose .pairs .note { grid-column: 1 / -1; margin-top: 0.25rem; color: var(--muted); }
-    /* Combinations shown as examples: each drawn as in the book (a link to its page), its caption under it. */
-    .prose .examples { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1.25rem; margin-top: 1rem; padding: 0; list-style: none; }
-    .prose li > .examples { margin-bottom: 1.25rem; }
+    /* Combinations shown as examples: each drawn as in the book (a link to its page), its caption under it,
+       centred as the figures are, their captions styled as figures' captions. Each example spans two rows of
+       the list's grid (subgrid), so in a row of them the captions start level whatever each drawing's height. */
+    .prose .examples { display: grid; grid-template-columns: repeat(auto-fit, 10.5rem); grid-auto-rows: auto; justify-content: center; gap: 1.5rem; margin: 1rem 0 1.25rem; padding: 0; list-style: none; }
+    .prose .examples:not(.stacked):has(> li:nth-child(4):last-child) { grid-template-columns: repeat(2, 10.5rem); } /* four: two by two, none alone */
+    .prose .examples:has(> li:only-child), .prose .examples.stacked { grid-template-columns: minmax(0, calc(38.25rem * 3 / 4)); } /* one alone, or one to a row: its caption as wide as a figure's may be */
+    .prose .examples > li:only-child p, .prose .examples.stacked p { width: fit-content; max-width: 100%; }
+    @media (max-width: 30rem) {
+      .prose .examples, .prose .examples:not(.stacked):has(> li:nth-child(4):last-child) { grid-template-columns: repeat(auto-fit, 9rem); column-gap: 1rem; }
+      .prose .examples > li:last-child:nth-child(odd):not(:first-child) { grid-column: 1 / -1; } /* two to a row: the odd one out, centred */
+    }
+    .prose .examples > li { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0.5rem; justify-items: center; align-items: end; }
     /* An item of more than one paragraph: the first flush with the item's start, the rest spaced as text. */
     .prose li > p:first-child { margin-top: 0; }
     .prose li > p + p { margin-top: 0.5rem; }
@@ -918,7 +941,8 @@
     .prose .examples .blocks[data-size="3"] { width: 9rem; }
     .prose .examples .blocks[data-size="4"] { width: 6rem; }
     .prose .examples .blocks.stack { width: 4.5rem; }
-    .prose .examples p { margin-top: 0.375rem; color: var(--muted); font-size: 0.875rem; line-height: 1.45; }
+    .prose .thumb .blocks.card { aspect-ratio: 9 / 16; } /* a seasonal card, its bands as printed (see fillReading): tall enough for the small ones to show */
+    .prose .examples p { align-self: start; max-width: 10.5rem; margin: 0; color: var(--muted); font-size: 0.8125rem; line-height: 1.45; text-align: left; text-wrap: pretty; } /* as figure captions: the block centred, the text left */
   </style>
 </head>
 <body>
@@ -1023,72 +1047,126 @@
     <section id="guidance-view" hidden>
       <article class="prose">
         <h1>Guidance</h1>
-        <p class="lead">How to make a colour combination and how to use one, in the words of Wada Sanzō, who made the combinations on this site, and of Hama Yaohiko, who made a colour atlas with him.</p>
+        <p class="lead">How to choose colours, how to put them together and how to use a combination, from the advice of Wada Sanzō, who made the combinations on this site, and of <a href="#about/hama">Hama Yaohiko</a>, who made a colour atlas with him. Advice not marked otherwise is Wada's, and notes marked <i>Since then</i> add what colour research has found since.</p>
+        <p class="lead">Wada didn't say which of his combinations show which point. The examples here are chosen for this site by their colours' lightness, saturation and hue, and each opens its page. The ideas behind the advice are explained in <a href="#theory">Colour theory</a>.</p>
         <nav aria-label="On this page"><ul class="contents">
           <li><a href="#guidance">Introduction</a></li>
-          <li><a href="#guidance/origin">Where the advice comes from</a></li>
-          <li><a href="#guidance/wada">Wada's advice</a>
+          <li><a href="#guidance/outlook">How Wada saw it</a></li>
+          <li><a href="#guidance/colour">Choosing a colour</a></li>
+          <li><a href="#guidance/together">What makes colours go together</a>
             <ul>
-              <li><a href="#guidance/making">Making a combination</a></li>
-              <li><a href="#guidance/harmony">Four kinds of harmony</a></li>
-              <li><a href="#guidance/pairs">His complementary pairs</a></li>
+              <li><a href="#guidance/harmony">Kinds of harmony</a></li>
+              <li><a href="#guidance/pairs">Opposite hues</a></li>
+            </ul>
+          </li>
+          <li><a href="#guidance/using">Using a combination</a></li>
+          <li><a href="#guidance/making">Making your own</a>
+            <ul>
               <li><a href="#guidance/neutrals">White, grey or black between colours</a></li>
-              <li><a href="#guidance/using">Using a combination</a></li>
               <li><a href="#guidance/cards">Wada reads two of his cards</a></li>
             </ul>
           </li>
-          <li><a href="#guidance/hama">Hama's advice</a></li>
           <li><a href="#guidance/sources">Sources</a></li>
         </ul></nav>
 
-        <h2 id="guidance-origin">Where the advice comes from</h2>
-        <p>Wada's book, the <i>Haishoku Sōkan</i> (1933–34), shows 348 <a href="#combinations">combinations</a> of two, three and four colours, every colour at the same size. Wada also made 72 <a href="#seasons">seasonal combinations</a> (1934–35), six for each month, as cards: on each, one large colour on top and smaller bands below.</p>
-        <p>He wrote two booklets on how to use them: one in 1934, sent out with the book (today's reprint, <i>A Dictionary of Color Combinations</i>, has part of it), and a longer supplement in 1935. Wada's advice below comes from them. In 1935 he also published a colour atlas with Hama Yaohiko, and Hama's advice, at the end, comes from his commentary to it.</p>
-        <p>Wada didn't say which of his combinations show which advice. The examples here are combinations from the book that show each point, chosen for this site by their colours' lightness, saturation and hue. Each opens its page.</p>
-        <p>The ideas the advice builds on, such as hue, lightness, saturation and complementary colours, are explained in <a href="#theory">Colour theory</a>.</p>
-
-        <h2 id="guidance-wada">Wada's advice</h2>
-        <p>Wada didn't think combining colours could be taught like mathematics, where a formula gives the right answer: a combination always appeals to each person's feelings and taste. Taste in colour, he said, is like a singing voice, partly a gift, but it grows with practice. So he gave advice from what he had learnt as a painter: rules of thumb, not a science.</p>
-
-        <h3 id="guidance-making">Making a combination</h3>
+        <h2 id="guidance-outlook">How Wada saw it</h2>
         <ul>
-          <li><strong>Balance lightness and saturation, not only hue.</strong> Lining up well-chosen hues isn't enough: a combination works through how its colours' lightness and saturation balance one another.
+          <li><p><strong>What the combinations are for.</strong> Wada made his book for everyone, not only for artists. By then everyone chose the colours of their own clothes and rooms, yet books on combining colours were written for specialists, and gave colours as names, which can't pin a colour down. So he showed the colours themselves, as "a handy colour adviser for everyday use", for art and crafts, dress, architecture and interiors, furniture, shop windows and advertising.</p>
+            <p>He didn't think the book complete. Tastes keep changing, and he meant to improve it with readers' help.</p></li>
+          <li><p><strong>Taste, not a formula.</strong> Combining colours can't be taught like mathematics, where a formula gives the right answer. Each person judges by their own feeling, and taste in colour is like a singing voice, partly a gift but improved by practice. So Wada gave rules of thumb from a painter's experience, not laws. Hama didn't set laws either, since what people like depends on custom, age, upbringing and surroundings.</p>
+            <p class="remark"><strong>Since then:</strong> tests bear this out for liking, but find other judgements widely shared. In eight countries, people judged pairs of colours much alike as warm or cool, heavy or light, and lively or calm, but whether they liked a pair varied with culture, sex, age and training in design, much as Hama said. In tests in the United States, most people also found pairs of similar hue more harmonious than pairs of very different hue. No one has found a formula.</p></li>
+          <li><p><strong>Taste changes.</strong> It differs from nation to nation. Wada found the shop windows of Paris more refined than those of Berlin or London, and put it down to a taste the whole nation shared. It changes over time too. Under Louis XIV, French silks had large, rich patterns, and less than a century later, under Louis XVI, they were cream or pale pink with small flowers. Japan's textiles from the Heian to the Edo period show the same.</p>
+            <p>So old rules go out of date. By the rules of the French chemist Michel-Eugène Chevreul, red with blue is pleasing, yet few in Wada's day agreed, and brown beside black, long frowned on, had become well liked.</p>
+            <p class="remark"><strong>Since then:</strong> one explanation of why taste differs, from tests in the United States, is that people like colours they link with things they like, such as the blue of clear skies and clean water, and dislike those they link with things they dislike, such as the browns of rotten food. Students at Berkeley and Stanford each liked their own university's colours more than their rival's, the more so the more school spirit they had.</p></li>
+        </ul>
+
+        <h2 id="guidance-colour">Choosing a colour</h2>
+        <p>Wada and Hama describe how colours feel, but seldom how to get the feeling you want. So the advice here comes from colour research since their time, with their own points added, and marked as theirs, where they fit.</p>
+        <ul>
+          <li><p><strong>Start from the feeling.</strong> Decide what the colour should do, whether it should look warm or cool, lively or calm, light or heavy. Each feeling depends mostly on one of a colour's three <a href="#theory/attributes">attributes</a>, so you can set them one at a time. In tests in Britain and China, warm or cool depended mostly on hue, lively or calm on saturation, and light or heavy on lightness.</p></li>
+          <li><p><strong>Warmer or cooler.</strong> Move the hue. The warmest colours are orange-reds and the coolest blues, so a red leaning towards orange is warm and one leaning towards purple cooler. The stronger the colour, the stronger the feeling, and lightness makes little difference. Wada's own warmer and cooler greens and yellows lean the same way (see <a href="#theory/character">Strong and weak, warm and cool</a>).</p>
+            <figure class="warm-cool"><div><div class="row"><div class="group"><small>Warm</small><div class="items"><button class="color-ref">Red Orange</button></div></div><div class="group"><small>Cool</small><div class="items"><button class="color-ref">Indian Lake</button></div></div></div><div class="row"><div class="group"><small>Warm</small><div class="items"><button class="color-ref">Oil Green</button></div></div><div class="group"><small>Cool</small><div class="items"><button class="color-ref">Sea Green</button></div></div></div></div><figcaption>Two reds and two greens, each pair about as light and as strong. The warm one of each is nearer orange in hue.</figcaption></figure>
+            <p>Warmth is also relative. Beside an orange a red looks cooler, and beside a purple warmer (see <a href="#theory/contrast">Contrast</a>).</p></li>
+          <li><p><strong>Livelier or calmer.</strong> Change the saturation. A strong colour looks lively, as Wada also found, and a muted one of middle lightness looks calmest.</p>
+            <p>Most colours in use are muted. Sorting tens of thousands of samples for Wada's standard colours of 1930, the technician at his studio found few pure colours among them.</p>
+            <figure class="warm-cool"><div><div class="row"><div class="group"><small>Lively</small><div class="items"><button class="color-ref">Pompeian Red</button></div></div><div class="group"><small>Calm</small><div class="items"><button class="color-ref">Vistoris Lake</button></div></div></div><div class="row"><div class="group"><small>Lively</small><div class="items"><button class="color-ref">Dull Viridian Green</button></div></div><div class="group"><small>Calm</small><div class="items"><button class="color-ref">Andover Green</button></div></div></div></div><figcaption>Two reds and two greens, each pair about as light and of about the same hue.</figcaption></figure></li>
+          <li><p><strong>Lighter or heavier.</strong> Change the lightness. Dark colours look heavy, and pale ones light, almost whatever their hue. Wada found a combination of dark colours alone suffocating (see <a href="#guidance/together">What makes colours go together</a>).</p>
+            <figure class="warm-cool"><div><div class="row"><div class="group"><small>Light</small><div class="items"><button class="color-ref">Coral Red</button></div></div><div class="group"><small>Heavy</small><div class="items"><button class="color-ref">Vandyke Red</button></div></div></div><div class="row"><div class="group"><small>Light</small><div class="items"><button class="color-ref">Salvia Blue</button></div></div><div class="group"><small>Heavy</small><div class="items"><button class="color-ref">Deep Indigo</button></div></div></div></div><figcaption>Two reds and two blues, each pair of about the same hue and saturation.</figcaption></figure></li>
+          <li><p><strong>Readable from afar.</strong> Text and signs read best when they differ strongly in lightness from their ground. A difference in hue adds little, so a red on a green just as light is hard to read, however opposite the two hues (see <a href="#theory/contrast">Contrast</a>).</p>
+            <p>Hama's commentary gives two tests. In the first, black on yellow could be read from furthest away, then green, red and blue on white, and red on green came last. In the second, with small cards seen from about 22 metres, white stood out best on green, red and blue grounds, and black on white. Lightness contrast, Hama concluded, decided the order.</p>
+            <p><a href="#theory/systems">OKLCH</a> gives lightness as L, its first number, from 0 for black to 1 for white. The further apart the L of text and ground, the better the text reads. Guidelines for text on screens, such as WCAG, also go by lightness alone, measured as luminance. They ask for a contrast of at least 4.5 to 1 for ordinary text, which means L values roughly 0.4 apart, or up to about 0.55 when the darker colour is near black.</p>
+            <figure class="legibility"><div class="samples"><div data-fg="Black" data-bg="Yellow"></div><div data-fg="Benzol Green" data-bg="White"></div><div data-fg="Spectrum Red" data-bg="White"></div><div data-fg="Blue" data-bg="White"></div><div data-fg="Spectrum Red" data-bg="Benzol Green"></div><div data-fg="Yellow" data-bg="White"></div></div><figcaption>Text on a ground, with each colour's L. The first five follow Hama's first test, best first. The last two barely differ in L, so they're hard to read.</figcaption></figure></li>
+          <li><p><strong>Judge it where it will be used.</strong> A colour changes with the light, the material and its size (see <a href="#theory/conditions">What changes a colour</a>), so look at a sample in the place and the light it's for.</p>
+            <ul>
+              <li><strong>Material.</strong> The same dye comes out differently on silk, cotton and hemp (Wada), so judge a colour on the material it will be made in.</li>
+              <li><strong>Size.</strong> Colours look paler and weaker on a large object than in a small swatch (Wada). Measurements since find large areas lighter, but more vivid, so for a wall, choose a paint a step greyer than its sample.</li>
+            </ul></li>
+          <li><p><strong>Lasting colour.</strong> Colours fade, some far sooner than others. Choose paints and inks by their lightfastness rating, and keep colours out of strong sun (see <a href="#theory/conditions">What changes a colour</a>). Even Wada's cards, painted only in pigments that had passed a fading test, were to be kept out of direct sunlight, in a dry, dark place.</p></li>
+        </ul>
+
+        <h2 id="guidance-together">What makes colours go together</h2>
+        <ul>
+          <li><p><strong>Balance lightness and saturation, not only hue.</strong> Lining up well-chosen hues isn't enough. A combination works through how its colours' lightness and saturation balance one another.</p>
             <ul>
               <li>Vivid colours together need a muted one among them or beside them.</li>
-              <li>Pale colours together feel lukewarm: they need a deep one, in a measured amount.</li>
-              <li>Dark colours together are suffocating: some of them must be lighter.</li>
+              <li>Pale colours together feel lukewarm, and need a deep one, in a measured amount.</li>
+              <li>Dark colours together are suffocating, and some of them must be lighter.</li>
             </ul>
-            As in cooking, he said: a meal comes together through the balance of hot, sweet and sour.
-            <ul class="examples">
+            <p>It's like cooking, where a meal comes together through the balance of hot, sweet and sour.</p>
+            <ul class="examples stacked">
               <li><a data-combination="155"></a> <p>Vivid Benzol Green and Jasper Red, with a muted Deep Indigo.</p></li>
               <li><a data-combination="246"></a> <p>Three pale colours, with a deep Brick Red.</p></li>
               <li><a data-combination="145"></a> <p>Two dark colours, Dull Violet Black and Brown, with a lighter Citron Yellow.</p></li>
             </ul></li>
-          <li><strong>Don't make every colour as strong as the others.</strong> When no colour sets off another, the result is safe, but ordinary (see <a href="#guidance/cards">his first card</a>).
+          <li><p><strong>Equal strength is safe, but ordinary.</strong> When every colour is about as strong as the others, none sets off another. The result is safe but commonplace, the kind anyone makes.</p>
             <ul class="examples">
               <li><a data-combination="176"></a> <p>Three pale colours, about as strong as one another.</p></li>
+            </ul>
+            <p>For something livelier, make some colours stronger than others, so that they set one another off.</p>
+            <ul class="examples">
+              <li><a data-combination="150"></a> <p>Two pale colours, Seashell Pink and Glaucous Green, set off by a stronger Citron Yellow.</p></li>
             </ul></li>
-          <li><strong>Start from one hue,</strong> in its light and dark tones: it can hardly go wrong. Set different hues against each other with care.</li>
-          <li><strong>Where different hues touch,</strong> weigh each colour's lightness and strength, or the result turns coarse.</li>
-          <li><strong>Calm colours for things you live with.</strong> Strong combinations catch the eye, which suits advertising, shop windows and the stage, but they tire quickly. Calm doesn't mean dull: neighbouring hues, their strengths well balanced.</li>
+          <li><p><strong>Tone</strong> (Hama). Colours of one tone, about equally light and strong, sit together. Colours of different tones, used well, add life and save a design from flatness, but used thoughtlessly they're off-key, as in music.</p>
+            <ul class="examples stacked">
+              <li><a data-combination="153"></a> <p>One tone, Eosine Pink, Orange Yellow and Citron Yellow, about equally light and strong.</p></li>
+              <li><div data-colors="Hermosa Pink|Yellow"></div> <p>Two unrelated tones, a pale Hermosa Pink and a vivid Yellow, close to the baby pink and bright yellow that design guides list as a clash.</p></li>
+            </ul></li>
+          <li><p><strong>Variety and unity</strong> (Hama). Opposite colours give variety and look beautiful at first, but they tire with long looking, and people come to prefer the milder combinations they first thought dull. So balance variety and unity, for the purpose in hand.</p>
+            <ul class="examples">
+              <li><a data-combination="17"></a> <p>Clear opposites, a strong red, Eugenia Red, and a blue-green about as light, Sea Green.</p></li>
+            </ul>
+            <ul>
+              <li>Where there is too much variety, change some colours' lightness and saturation.
+                <ul class="examples">
+                  <li><a data-combination="25"></a> <p>The same opposite hues, the blue-green now pale and greyish, Nile Blue beside Etruscan Red.</p></li>
+                </ul></li>
+              <li>Where there are many colours, let one of them dominate, to hold the rest together.
+                <ul class="examples">
+                  <li><a data-season="6"></a> <p>Five colours, from a strong Apricot Yellow to a deep Violet Blue, held together by a large, soft Grayish Lavender.</p></li>
+                  <li><a data-season="18"></a> <p>A blue, a green, a red, a yellow and an olive, held together by a large Olive Ocher.</p></li>
+                </ul></li>
+            </ul></li>
         </ul>
 
-        <h3 id="guidance-harmony">Four kinds of harmony</h3>
+        <h3 id="guidance-harmony">Kinds of harmony</h3>
+        <p>Wada sorts harmony into four kinds.</p>
         <ol>
-          <li><strong>Like colours.</strong> One hue in its light and dark tones, such as orange with its browns and its pale, flesh-like tints. Gentle and safe, but seldom more than ordinary. The place to start.</li>
-          <li><strong>Different hues.</strong> Colours of quite different hues, in any tone. Interesting, but it needs care (above).</li>
-          <li><strong>Complementary.</strong> Opposite hues, whatever their lightness. Lively, but suited to fewer uses.</li>
-          <li><strong>Graded bands</strong> (<i>ungen</i>, <span lang="ja">暈繝</span>): one hue in steps, from white through the full colour to black, or part of that scale. The calmest of all.</li>
+          <li><strong>Like colours.</strong> One hue in its light and dark tones, such as orange with its browns and its pale, flesh-like tints. Gentle, and hard to get badly wrong, but seldom more than ordinary. The place for a beginner to start, and widely liked as mild and pleasant (Hama).</li>
+          <li><strong>Different hues.</strong> Colours of quite different hues, in any tone. More interesting, but where the hues touch, weigh each colour's lightness and strength, or the result turns coarse.</li>
+          <li><strong>Complementary.</strong> Opposite hues, whatever their lightness. Each sets the other off, and used well they give lively, excellent combinations.</li>
+          <li><strong>Graded bands</strong> (<i>ungen</i>, <span lang="ja">暈繝</span>). One hue in steps, from white through the full colour to black, as in the banded colouring of temple ornament, and a combination takes part of that scale. Calmer still than the others. The steps can also move gradually through neighbouring hues (Hama).</li>
         </ol>
         <ul class="examples">
-          <li><a data-combination="165"></a> <p>Like colours, one red from the deep Vistoris Lake to the pale Cameo Pink.</p></li>
+          <li><a data-combination="120"></a> <p>Like colours, one red, strong and pale, Pompeian Red and Cameo Pink.</p></li>
           <li><a data-combination="172"></a> <p>Different hues, Antwerp Blue, Red Violet and Cinnamon Rufous.</p></li>
-          <li><a data-combination="17"></a> <p>Complementary, Eugenia Red and Sea Green, close to his own pair of red and Sea Green (below).</p></li>
+          <li><a data-combination="17"></a> <p>Complementary, Eugenia Red and Sea Green, near his own pair of red and Sea Green (below).</p></li>
+          <li><a data-combination="165"></a> <p>Graded bands, one red in three steps, from the dark Vistoris Lake through Spinel Red to the pale Cameo Pink.</p></li>
         </ul>
-        <p>His 1934 booklet sorts them differently, into two kinds, same tone and different tone, each light, dark, pale, deep or free: ten in all. He called them a law and a standard, but not one you must obey: those with long experience of colour can merge them or break them. None of the book's combinations says which kind it is.</p>
+        <p>His 1934 booklet sorts them differently, into same tone and different tone, each light, dark, pale, deep or free, ten kinds in all. For clothes, interiors and furniture, colours of one family in free tones are the safe choice, and different tones the hardest but the most rewarding.</p>
+        <p>The kinds are a standard, not rules to obey, and those with long experience of colour can merge them or break them. None of the book's combinations says which kind it is.</p>
 
-        <h3 id="guidance-pairs">His complementary pairs</h3>
-        <p>Wada drew up a table of complementary pairs from his own palette. He paired them by hue alone, so their lightness and saturation vary. Red's lighter and darker tones pair too: <button class="color-ref">Hermosa Pink</button> and <button class="color-ref">Pale Burnt Lake</button> go with <button class="color-ref">Sea Green</button>, as <button class="color-ref">Spectrum Red</button> does.</p>
+        <h3 id="guidance-pairs">Opposite hues</h3>
+        <p>Wada drew up a table of complementary pairs from his own palette. He paired them by hue alone, so their lightness and saturation vary. A colour's lighter and darker tones pair too. <button class="color-ref">Hermosa Pink</button> and <button class="color-ref">Pale Burnt Lake</button> go with <button class="color-ref">Sea Green</button>, as <button class="color-ref">Spectrum Red</button> does.</p>
         <ul class="pairs">
           <li><button class="color-ref">Spectrum Red</button> <button class="color-ref">Sea Green</button></li>
           <li><button class="color-ref">Red Orange</button> <button class="color-ref">Green Blue</button> <span class="note">or one a little greener</span></li>
@@ -1101,13 +1179,51 @@
           <li><button class="color-ref">Yellow Green</button> <button class="color-ref">Red Violet</button></li>
           <li><button class="color-ref">Night Green</button> <button class="color-ref">Rosolane Purple</button></li>
         </ul>
-        <p>Only one of these pairs is a combination in the book:</p>
+        <p>Only one of these pairs is a combination in the book, about as many as chance would give.</p>
         <ul class="examples">
           <li><a data-combination="22"></a> <p>Deep Lyons Blue and Yellow.</p></li>
         </ul>
+        <p>In tests that averaged many people's judgements, cited by Hama, complementary pairs, or pairs a little off them, were good, and a colour with the hue halfway to its complement was poor.</p>
+        <ul>
+          <li><strong>Good.</strong> Red and blue, red and blue-green, orange and green-blue (or blue), yellow and violet, yellow and blue, yellow-green and violet, green and red-purple. Wada had his doubts about red with blue (see <a href="#guidance/outlook">Taste changes</a>).</li>
+          <li><strong>Poor.</strong> Red and orange, red and yellow, orange and yellow, yellow and green (or blue-green), yellow-green and orange (or green-blue), green and blue.</li>
+        </ul>
+        <p class="remark"><strong>Since then:</strong> recent tests disagree. Pairs of very different hue are usually judged neither harmonious nor pleasing, and pairs of similar hue more of both. But people liked a small colour on a ground better the more its hue differed from the ground's, so contrasting hues suit a figure set on a background.</p>
+
+        <h2 id="guidance-using">Using a combination</h2>
+        <ul>
+          <li><p><strong>Choose for the purpose and place.</strong> Strong combinations catch the eye, which suits advertising, shop windows and the stage, but many find them vulgar, and they tire quickly. For things you live with, choose calm ones. Calm doesn't mean dull, but neighbouring hues, their strengths well balanced.</p>
+            <ul class="examples">
+              <li><a data-combination="154"></a> <p>Strong, Carmine, Yellow and Blue, each near full strength.</p></li>
+              <li><a data-combination="132"></a> <p>Calm but not dull, three neighbouring yellows, Citrine, Golden Yellow and Sulphur Yellow.</p></li>
+            </ul></li>
+          <li><p><strong>Give the colours different areas.</strong> The book shows every colour the same size only for convenience. Equal areas balance only when the colours are equally strong, so give the weak tones the large areas and the strong ones the small.</p>
+            <ul class="examples">
+              <li><a data-season="7"></a> <p>A weak Light Glaucous Blue on the large area, a strong Red on a small one.</p></li>
+            </ul></li>
+          <li><p><strong>Try the amounts.</strong> Lay cut white or grey paper over a combination, to change each colour's shape and size. The book came with a sheet of cut-out papers of several shapes for this.</p>
+            <p>For a kimono, lay a triangle over three colours, so that its tip gives the collar, the middle colour the kimono and the last the obi. For more colours, cut papers of your own, and count the white of the mount as one more colour.</p></li>
+          <li><p><strong>Find the main colour.</strong> On the seasonal cards, the largest colour, on top, is the main one, holding the rest together. In actual dress a small one often takes that role, such as the obi, the collar, a hat, gloves or a handbag. Where is the centre of the combination? That is the question (see <a href="#guidance/cards">his second card</a>).</p></li>
+          <li><p><strong>Glossy materials help</strong> (Chevreul). Colours go together better on glossy materials, such as silk or glass, than on matt ones, such as cotton or wool. Two bright colours, too, go together better than duller ones.</p></li>
+        </ul>
+
+        <h2 id="guidance-making">Making your own</h2>
+        <p>Wada also meant his readers to make combinations of their own. His seasonal cards were movable, opening like a fan, so that anyone could try combinations besides his. On this site, <a href="#create">Create</a> lays out your own as in the book.</p>
+        <ul>
+          <li><p><strong>Start from one hue,</strong> in its light and dark tones (like colours, above). It can hardly go wrong.</p>
+            <ul class="examples">
+              <li><a data-combination="139"></a> <p>One blue, the dark Deep Indigo and the light Salvia Blue, with Neutral Gray.</p></li>
+            </ul></li>
+          <li><p><strong>Then try different hues,</strong> with care. Where they touch, weigh each colour's lightness and strength, or the result turns coarse.</p></li>
+          <li><p><strong>Three or more colours</strong> (Hama). Choose hues that divide the hue circle about equally, such as red, yellow and blue, or red, green and blue, with one or two of them made lighter or darker.</p>
+            <ul class="examples">
+              <li><a data-combination="168"></a> <p>A blue, a yellow and a purplish red, about a third of the circle apart, the blue dark and the yellow light.</p></li>
+            </ul></li>
+          <li><p><strong>Even steps</strong> (Hama). Within one hue's series of tints, shades or greyed colours, colours at even steps, every second or every third, go well together. The <a href="#colors" data-layout="ostwald">Ostwald</a> view shows such series.</p></li>
+        </ul>
 
         <h3 id="guidance-neutrals">White, grey or black between colours</h3>
-        <p>Where two colours clash, put white, grey or black between them. Wada passed on the rules of the French chemist Michel-Eugène Chevreul, whom he called the leading authority on colour contrast and harmony, on which to use:</p>
+        <p>Where two colours clash side by side, put white, grey or black between them, minding each colour's saturation and lightness. Which to use follows the rules of Chevreul, to Wada the leading authority on colour contrast and harmony.</p>
         <ul>
           <li><strong>Red and yellow.</strong> White or grey, not black.</li>
           <li><strong>Red and blue.</strong> Grey or black, not white.</li>
@@ -1117,86 +1233,58 @@
           <li><strong>Orange and green.</strong> Black.</li>
           <li><strong>Purples.</strong> Grey.</li>
           <li><strong>Purple and green.</strong> White.</li>
-          <li><strong>Black</strong> never clashes with two bright colours, and suits dark purples and blues. <strong>Grey</strong> suits two bright colours, and never clashes with two dull ones.</li>
-          <li><strong>Outlines.</strong> On a pale ground, draw patterns in deep tones, outlined in black, grey or a colour deeper still. A pattern paler than its ground takes a white or grey outline.</li>
+          <li><strong>Black</strong> never clashes with two bright colours, and mostly suits dark purples and blues. With one bright colour and one dark, it pleases less.</li>
+          <li><strong>Grey</strong> suits two bright colours, and never clashes even with two dull ones. With dull, dark blues or purples, black is better. With a bright colour and a dark one, grey is better than white, and over large areas black also works.</li>
+          <li><strong>Outlines.</strong> On a pale ground, draw patterns in deep tones, outlined in black, grey or a colour deeper still. A pattern paler than its ground takes a white or grey outline. A pattern in light and dark steps of one colour takes a white or grey outline on a deep ground, and a deep one on a pale ground.</li>
         </ul>
         <ul class="examples">
-          <li><a data-combination="228"></a> <p>Grey between Carmine Red and Pale Lemon Yellow.</p></li>
-          <li><a data-combination="216"></a> <p>Black between Jasper Red and Green.</p></li>
-          <li><a data-combination="180"></a> <p>Grey between Light Mauve and Cinnamon Buff.</p></li>
+          <li><a data-combination="228"></a> <p>Grey between a red and a yellow, Carmine Red and Pale Lemon Yellow.</p></li>
+          <li><a data-combination="144"></a> <p>Black between two bright colours, Orange and Rosolane Purple.</p></li>
         </ul>
-        <p>But taste moves on, Wada added. By Chevreul's rules red with blue is pleasing, yet few would now agree. Brown beside black, long frowned on, is now well liked.</p>
-
-        <h3 id="guidance-using">Using a combination</h3>
-        <ul>
-          <li><strong>Give the colours different areas.</strong> The book shows every colour the same size only for convenience. Equal areas balance only when the colours are equally strong: otherwise, give the weak tones the large areas and the strong ones the small.
-            <ul class="examples">
-              <li><a data-season="7"></a> <p>A weak Light Glaucous Blue on the large area, a strong Red on a small one.</p></li>
-            </ul></li>
-          <li><strong>Try the amounts.</strong> Lay cut white or grey paper over a combination, to change each colour's shape and size: the book came with cut-out cards for it, a triangle, a rectangle and a wavy band. For a kimono, the triangle: its tip is the collar, the middle the kimono, the next part the obi.</li>
-          <li><strong>The main colour can be a small one.</strong> On the seasonal cards, the largest colour, on top, is the main one, holding the rest together. In actual dress, a small one often takes that role: the obi, the collar, a hat, gloves, a handbag. Where is the centre of the combination? That is the question (see <a href="#guidance/cards">his second card</a>).</li>
-          <li><strong>Large areas look paler.</strong> A combination that works in small swatches looks paler and weaker on a large object: clothes ordered from swatches can come out looking washed out.</li>
-        </ul>
+        <p>By Wada's own account, though, taste has moved on since Chevreul, so not every rule still holds (see <a href="#guidance/outlook">Taste changes</a>).</p>
+        <p class="remark"><strong>Since then:</strong> two colours that meet with nothing between them change each other by contrast along the edge, and a line or gap between them stops it, which may be one reason this works (see <a href="#theory/contrast">Contrast</a>).</p>
 
         <h3 id="guidance-cards">Wada reads two of his cards</h3>
-        <p>In his 1935 supplement, Wada read two of his seasonal cards, both for January, and compared them. On each, the top colour is the largest.</p>
+        <p>In his 1935 supplement, Wada read two of his seasonal cards from the first set and compared them. On each, the top colour is the largest.</p>
         <div class="card-reading">
           <a data-season="1"></a>
           <div>
             <p><button class="color-ref">Seashell Pink</button> with <button class="color-ref">White</button>, <button class="color-ref">Sulphur Yellow</button>, <button class="color-ref">Glaucous Green</button> and <button class="color-ref">Grayish Lavender - A</button>.</p>
-            <p>All are light and, apart from the white, about as strong as one another, with little difference in hue, lightness or saturation: none helps or sets off another, each just asserts itself. Ordinary, he said, though safe: the kind anyone makes.</p>
+            <p>All are light and, apart from the white, about as strong as one another, with little difference in hue, lightness or saturation. None helps or sets off another, and each just asserts itself, so it's hard to tell which is the main colour. Ordinary, though safe, the kind anyone makes. That is a reading in the abstract, though, and in use it might be judged otherwise.</p>
           </div>
         </div>
         <div class="card-reading">
           <a data-season="5"></a>
           <div>
             <p><button class="color-ref">Black</button> with <button class="color-ref">Spectrum Red</button>, <button class="color-ref">Ivory Buff</button>, <button class="color-ref">Dark Tyrian Blue</button>, <button class="color-ref">Cobalt Green</button> and <button class="color-ref">Warm Gray</button>.</p>
-            <p>Different in every way, and uneven in strength, yet natural, and full of change:</p>
+            <p>Different in every way, and uneven in strength, yet natural, and full of change.</p>
             <ul>
               <li>The black, darkest of colours, holds the others together.</li>
               <li>The red, a pure colour, would look coarse alone. The black's embrace and the Ivory Buff below it soften it.</li>
               <li>With the weak Cobalt Green below, the Dark Tyrian Blue tightens the whole.</li>
               <li>The grey, last, changes none of the others.</li>
             </ul>
-            <p>The black covers the most, but the eye goes first to the red: here, the red is the centre.</p>
+            <p>The black covers the most, but the eye goes first to the red. Here, the red is the centre.</p>
           </div>
         </div>
 
-        <h2 id="guidance-hama">Hama's advice</h2>
-        <p class="aside">This part is Hama Yaohiko's, not Wada's: from his commentary to the colour atlas they made together. Hama had written an outline of colour theory before it, and the atlas's publisher called him an authority on colour.</p>
-        <p>He treats combining colours only in outline, and sets no absolute laws: what we like depends on custom, age, upbringing and surroundings, and fashion changes it.</p>
-        <ul>
-          <li><strong>Good and poor pairs.</strong> Tests that averaged many people's judgements agree: complementary pairs, or pairs a little off them, are good. A colour with the hue halfway to its complement is poor.
-            <ul>
-              <li>Good: red and blue, red and blue-green, orange and green-blue (or blue), yellow and violet, yellow and blue, yellow-green and violet, green and red-purple. (Wada, by contrast, doubted that red with blue still pleased.)</li>
-              <li>Poor: red and orange, red and yellow, orange and yellow, yellow and green (or blue-green), yellow-green and orange (or green-blue), green and blue.</li>
-            </ul></li>
-          <li><strong>Three or more colours.</strong> Take hues that divide the hue circle about equally, such as red, yellow and blue, and make one or two of them lighter or darker.
-            <ul class="examples">
-              <li><a data-combination="168"></a> <p>A blue, a yellow and a purplish red, about a third of the circle apart, the blue dark and the yellow light.</p></li>
-            </ul></li>
-          <li><strong>Same and similar colours</strong> (one colour, deep and pale, light and dark, or neighbouring hues) are generally liked as mild and pleasant.
-            <ul class="examples">
-              <li><a data-combination="120"></a> <p>One red, deep and pale, Pompeian Red and Cameo Pink.</p></li>
-            </ul></li>
-          <li><strong>Variety and unity.</strong> Opposite colours give variety, and look beautiful at first, but tire with long looking: people come to prefer the plainer, milder combinations they first thought dull. So combining colours is balancing variety and unity, for the purpose in hand. Where there is too much variety, change some colours' lightness and saturation to unify them.</li>
-          <li><strong>One dominant colour.</strong> Many colours together easily look scattered: let one of them dominate, to hold the rest together.</li>
-          <li><strong>Tone, like a key in music.</strong> Colours of one tone (equally light, pale or greyed) sit together. Different tones, used well, add life and save a design from flatness. Used thoughtlessly, they are off-key.
-            <ul class="examples">
-              <li><a data-combination="153"></a> <p>Eosine Pink, Orange Yellow and Citron Yellow, of about the same lightness and saturation.</p></li>
-            </ul></li>
-          <li><strong>Even steps.</strong> Within one series of tints, shades or greyed colours, colours at even steps, every second or every third, go well together.</li>
-          <li><strong>Seen from afar.</strong> In earlier tests he cites, black on yellow read from furthest away, then green, red and blue on white. In a more recent one, lightness contrast decided most of it.</li>
-        </ul>
-
         <section class="sources">
           <h2 id="guidance-sources">Sources</h2>
+          <p>Wada's book, the <i>Haishoku Sōkan</i> (1933–34), shows 348 <a href="#combinations">combinations</a> of two, three and four colours, every colour at the same size. He also made 72 combinations as cards (1934–35), each with one large colour on top and smaller bands below, shown here as <a href="#seasons">Seasons</a>. He wrote two booklets on using them, one sent out with the book in 1934 and a longer supplement in 1935, and in 1935 he published a colour atlas with Hama Yaohiko, with Hama's commentary.</p>
           <ul>
             <li>Wada Sanzō, <span lang="ja">配色總鑑概説と其活用</span> (General remarks on the <i>Haishoku Sōkan</i> and how to use it), Hakubisha, 1934: <a href="https://dl.ndl.go.jp/pid/1911912">National Diet Library</a>. The reprint, <i>A Dictionary of Color Combinations</i>, has part of it.</li>
             <li>Wada Sanzō, <span lang="ja">配色總鑑附說</span> (Supplement to the <i>Haishoku Sōkan</i>), Hakubisha, 1935: <a href="https://dl.ndl.go.jp/pid/1903674">National Diet Library</a>.</li>
             <li>Hama Yaohiko, the commentary to Wada Sanzō and Hama Yaohiko, <span lang="ja">標準色彩圖集</span> (<i>Hyōjun shikisai zushū</i>, a standard colour atlas), 1935: <a href="https://dl.ndl.go.jp/pid/1014901">National Diet Library</a>.</li>
+            <li>Wada Sanzō, <span lang="ja">標準色の話</span> (A talk on standard colours), <i>Journal of the Illuminating Engineering Institute of Japan</i> 14 (1), 1930, pp. 5–9: <a href="https://doi.org/10.2150/jieij1917.14.5">J-STAGE</a>. The second half is by the technician at his studio.</li>
+            <li>Li-Chen Ou, M. Ronnier Luo, Andrée Woodcock and Angela Wright, "A study of colour emotion and colour preference. Part I: Colour emotions for single colours", <i>Color Research and Application</i> 29, 2004: <a href="https://doi.org/10.1002/col.20010">Wiley</a>.</li>
+            <li>Li-Chen Ou, M. Ronnier Luo and others, "A cross-cultural comparison of colour emotion for two-colour combinations", <i>Color Research and Application</i> 37, 2012: <a href="https://doi.org/10.1002/col.20648">Wiley</a>.</li>
+            <li>Karen B. Schloss and Stephen E. Palmer, "Aesthetic response to color combinations: preference, harmony, and similarity", <i>Attention, Perception, &amp; Psychophysics</i> 73, 2011: <a href="https://doi.org/10.3758/s13414-010-0027-0">Springer</a>.</li>
+            <li>Stephen E. Palmer and Karen B. Schloss, "An ecological valence theory of human color preference", <i>PNAS</i> 107, 2010: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2889342">PubMed Central</a>.</li>
+            <li>Karen B. Schloss, Rosa M. Poggesi and Stephen E. Palmer, "Effects of university affiliation and 'school spirit' on color preferences: Berkeley versus Stanford", <i>Psychonomic Bulletin &amp; Review</i> 18, 2011: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3098359">PubMed Central</a>.</li>
+            <li>W3C, <i>Web Content Accessibility Guidelines (WCAG) 2.2</i>, 2023: <a href="https://www.w3.org/TR/WCAG22/">W3C</a>. Their contrast for text is measured by luminance alone.</li>
+            <li>"Worst Color Combinations: 15 Color Combos That Clash": <a href="https://artincontext.org/worst-color-combinations/">Art in Context</a>. Among its clashes is baby pink with bright yellow.</li>
           </ul>
-          <p>The translations from the Japanese were made for this site.</p>
+          <p>The translations from the Japanese were made for this site. The notes marked <i>Since then</i>, and the research in Choosing a colour, are ours, from the works above.</p>
         </section>
       </article>
     </section>
@@ -1205,7 +1293,7 @@
       <article class="prose">
         <h1>Colour theory</h1>
         <p class="lead">Before combining colours, it helps to know what a colour is made of. This page is a short introduction to colour theory: what colour is, how to describe it, how colours mix and act on one another, and how they are ordered and named.</p>
-        <p class="lead">The aim is to help you understand Wada Sanzō's work: the basics of colour as he understood them, from the booklets that went with his combinations (1934 and 1935), and the system and names he wrote his colours in. Hama Yaohiko, who made a colour atlas with him in 1935, covered the same ground in more detail in its commentary, and fills in much of what follows. Where he saw something differently, the text says so. Colour science has moved on since the 1930s, so where it now says otherwise, a note explains what changed. The site also adds three other colour systems to Ostwald's.</p>
+        <p class="lead">The aim is to help you understand Wada Sanzō's work: the basics of colour as he understood them, from the booklets that went with his combinations (1934 and 1935), and the system and names he wrote his colours in. <a href="#about/hama">Hama Yaohiko</a>, who made a colour atlas with him in 1935, covered the same ground in more detail in its commentary, and fills in much of what follows. Where he saw something differently, the text says so. Colour science has moved on since the 1930s, so where it now says otherwise, a note explains what changed. The site also adds three other colour systems to Ostwald's.</p>
         <p class="lead">You don't need any of it to use the combinations, but it explains the words <a href="#guidance">Guidance</a> uses and how the <a href="#colors">Colors</a> views order the palette.</p>
         <nav aria-label="On this page"><ul class="contents">
           <li><a href="#theory">Introduction</a></li>
@@ -1335,7 +1423,9 @@
         <ul>
           <li><p><strong>Paints subtract.</strong> Each paint absorbs part of the light, and in a mix each also absorbs some of what the other reflects. As a rule of thumb, the mix's hue lies between the two on the hue circle, and it's darker than the two averaged. The further apart they are, the duller and darker the mix, until opposite colours give grey or near black. That's why painters often dull a colour with a touch of its complement rather than with black, for a softer result.</p>
             <figure class="paint-mixes"><div role="img" aria-label="Red mixed as paint with orange, yellow, green and blue-green, each mix beside the pair, getting duller and darker down to a near grey"><div><span style="--c: oklch(0.6207 0.2087 31.06)"></span><span style="--c: oklch(0.7381 0.1687 46.99)"></span><span class="result" style="--c: oklch(0.6671 0.2057 37.24)"></span></div><div><span style="--c: oklch(0.6207 0.2087 31.06)"></span><span style="--c: oklch(0.9145 0.1732 99.80)"></span><span class="result" style="--c: oklch(0.6856 0.1899 41.87)"></span></div><div><span style="--c: oklch(0.6207 0.2087 31.06)"></span><span style="--c: oklch(0.7391 0.1861 153.10)"></span><span class="result" style="--c: oklch(0.5053 0.0555 108.16)"></span></div><div><span style="--c: oklch(0.6207 0.2087 31.06)"></span><span style="--c: oklch(0.7562 0.1262 197.01)"></span><span class="result" style="--c: oklch(0.4950 0.0224 126.45)"></span></div></div><figcaption>Red mixed as paint with orange, yellow, green and blue-green (modelled). The further apart, the duller and darker the mix.</figcaption></figure>
-            <p>Some pairs break the rule, because a mix depends on all the light each paint reflects, not only on how it looks. The best known is yellow and blue. Mixed as light, they make white, as complements do. Mixed as paints, they make green. Yellow paint absorbs the blue end of the spectrum and blue paint the red end, and the green in the middle, which both reflect, is all that's left.</p></li>
+            <p>Some pairs break the rule, because a mix depends on all the light each paint reflects, not only on how it looks. The best known is yellow and blue. Mixed as light, they make white, as complements do. Mixed as paints, they make green. Yellow paint absorbs the blue end of the spectrum and blue paint the red end, and the green in the middle, which both reflect, is all that's left.</p>
+            <p>Printing inks subtract in the same way, each taking away one part of the light. Cyan absorbs red, magenta green and yellow blue. Printed over one another, cyan and magenta leave only blue, magenta and yellow red, and yellow and cyan green, the primaries of light. All three together absorb nearly everything, leaving a near black. Printers add black as a fourth ink, for deep blacks and sharp text.</p>
+            <figure class="lights inks"><svg viewBox="0 0 100 88" role="img" aria-label="Cyan, magenta and yellow inks printed over one another on white: cyan and magenta make blue, magenta and yellow red, yellow and cyan green, and all three a near black"><defs><clipPath id="ink-c"><circle cx="39" cy="34" r="22"/></clipPath><clipPath id="ink-m"><circle cx="61" cy="34" r="22"/></clipPath></defs><rect width="100" height="88" rx="4"/><circle cx="39" cy="34" r="22" fill="oklch(0.6279 0.2214 222.43)"/><circle cx="61" cy="34" r="22" fill="oklch(0.5969 0.2492 357.42)"/><circle cx="50" cy="53" r="22" fill="oklch(0.9458 0.2096 103.65)"/><g clip-path="url(#ink-c)"><circle cx="61" cy="34" r="22" fill="oklch(0.3693 0.1403 272.55)"/><circle cx="50" cy="53" r="22" fill="oklch(0.5543 0.2045 163.13)"/></g><g clip-path="url(#ink-m)"><circle cx="50" cy="53" r="22" fill="oklch(0.5914 0.2293 24.41)"/><g clip-path="url(#ink-c)"><circle cx="50" cy="53" r="22" fill="oklch(0.3346 0.0131 219.92)"/></g></g></svg><figcaption>Cyan, magenta and yellow inks printed over one another, as near as a screen can show them.</figcaption></figure></li>
           <li><strong>Light adds.</strong> Lights shone together add up, so a mix is lighter than either. Red and green light make yellow. The further apart two lights are on the circle, the paler the mix, and opposite colours make white.
             <figure class="lights"><svg viewBox="0 0 100 88" role="img" aria-label="Red, green and blue lights overlapping on black: red and green make yellow, green and blue cyan, blue and red magenta, and all three white"><rect width="100" height="88" rx="4"/><g><circle cx="39" cy="34" r="22" fill="#f00"/><circle cx="61" cy="34" r="22" fill="#0f0"/><circle cx="50" cy="53" r="22" fill="#00f"/></g></svg><figcaption>Red, green and blue lights. Two make yellow, cyan or magenta, and all three white.</figcaption></figure>
           </li>
@@ -1375,9 +1465,9 @@
           <li><p><strong>The material.</strong> Part of the light bounces off a surface as white before it reaches the colour, and the more it does, the whiter the colour looks. Water fills a rough surface and cuts this down, so a colour looks deeper wet than dry. For the same reason, pastels look light, oils dark and deep, and watercolours in between.</p>
             <figure class="surfaces"><div role="img" aria-label="The same blue wet and dry, and as oil, watercolour and pastel, lighter and greyer as more white light bounces off its surface"><div><div><span style="--c: oklch(0.5249 0.1494 250.37)"></span><small>Wet</small></div><div><span style="--c: oklch(0.5811 0.1336 255.57)"></span><small>Dry</small></div></div><div><div><span style="--c: oklch(0.5249 0.1494 250.37)"></span><small>Oil</small></div><div><span style="--c: oklch(0.5636 0.1423 254.14)"></span><small>Watercolour</small></div><div><span style="--c: oklch(0.6280 0.1123 258.75)"></span><small>Pastel</small></div></div></div><figcaption>The same blue with less or more white light bouncing off its surface (modelled).</figcaption></figure>
             <p>What the colour sits on matters too. The same dye looks different on silk, cotton or hemp, because their fibres reflect light differently. A colour thinned with water is transparent and lets the ground show through, while one thinned with white is opaque and hides it.</p></li>
-          <li><p><strong>The area.</strong> <a href="#guidance/using">Wada warned</a> that large areas look paler and weaker than small swatches.</p>
+          <li><p><strong>The area.</strong> <a href="#guidance/colour">Wada warned</a> that large areas look paler and weaker than small swatches.</p>
             <figure class="area-sizes"><div role="img" aria-label="The same blue-green as a small chip and as a large area"><span class="backdrop wide"><span style="--c: oklch(0.62 0.1 195)"></span></span><span class="backdrop wide"><span class="large" style="--c: oklch(0.62 0.1 195)"></span></span></div><figcaption>The same colour as a small chip and as a large area.</figcaption></figure>
-            <p class="remark"><strong>Since then:</strong> measurements mostly find that a large area looks lighter, as Wada said, but more vivid, not weaker. Decorators often choose a wall paint a step greyer than its sample for this reason.</p></li>
+            <p class="remark"><strong>Since then:</strong> measurements mostly find that a large area does look lighter, but more vivid, not weaker. Decorators often choose a wall paint a step greyer than its sample for this reason.</p></li>
           <li><p><strong>Time.</strong> Colours fade. Mineral pigments last, while plant dyes and coal-tar dyes change and fade far sooner, and white paper yellows in sunlight and air. Wada used only pigments that had passed a fading test.</p>
             <p class="remark"><strong>Since then:</strong> many synthetic pigments last as well as mineral ones, and paints now carry a lightfastness rating, pigment by pigment.</p></li>
         </ul>
@@ -1385,7 +1475,7 @@
         <h2 id="theory-character">Strong and weak, warm and cool</h2>
         <p>Colours also carry feelings. Some excite more than others, some feel warm or cool, and many carry meanings.</p>
         <ul>
-          <li><p><strong>Strength.</strong> Some colours excite the eye more than others. Wada put this down mostly to how strong a colour is, and partly to its hue. By hue, red excites most, then orange, yellow, green, blue and indigo, and violet least. People differ, he said, but this order is generally accepted, and red catches the eye so easily that it's used for danger signals. Strong combinations look splendid at first sight but tend to vulgarity and tire quickly, so they suit advertising, shop fronts and the stage better than the home (see <a href="#guidance/making">Making a combination</a>).</p>
+          <li><p><strong>Strength.</strong> Some colours excite the eye more than others, in Wada's view mostly by how strong they are, and partly by their hue. By hue, red excites most, then orange, yellow, green, blue and indigo, and violet least. People differ, but this order is generally accepted, and red catches the eye so easily that it's used for danger signals. Strong combinations look splendid at first sight but tend to vulgarity and tire quickly, so they suit advertising, shop fronts and the stage better than the home (see <a href="#guidance/using">Using a combination</a>).</p>
             <p class="remark"><strong>Since then:</strong> studies find that how strong a colour is, its saturation and lightness, matters far more than its hue, as Wada's first point says, and no fixed order by hue holds. Red for danger is partly convention.</p></li>
           <li><p><strong>Warm and cool.</strong> Red, orange and yellow are warm, and blue and green cool. Hama traced it to the flames of a fire and the clear water of a deep pool. Every hue has warmer and cooler kinds, though. For Wada, celadon (<button class="color-ref">Cobalt Green</button>) is a warm green and green bamboo (<button class="color-ref">Green Blue</button>) a cool one. Warm colours suggest warmth and intimacy. Cool ones, to Hama, suggest coolness, purity and quiet, where Europeans and Americans call them cold and chilly.</p>
             <figure class="warm-cool"><div><div class="row"><div class="group"><small>Warm</small><div class="items"><button class="color-ref" data-color="Night Green">Siskin yellow‑green</button><button class="color-ref" data-color="Cobalt Green">Celadon</button></div></div><div class="group"><small>Cool</small><div class="items"><button class="color-ref" data-color="Green Blue">Green bamboo</button><button class="color-ref" data-color="Diamine Green">Evergreen</button></div></div></div><div class="row"><div class="group"><small>Warmer</small><div class="items"><button class="color-ref" data-color="Apricot Yellow">Turmeric</button><button class="color-ref" data-color="Orange Yellow">Kerria</button></div></div><div class="group"><small>Cooler</small><div class="items"><button class="color-ref" data-color="Lemon Yellow">Canary</button></div></div></div></div><figcaption>Wada's own examples of warmer and cooler greens and yellows.</figcaption></figure></li>
@@ -1418,7 +1508,7 @@
             <li>Robert Ridgway, <i>Color Standards and Color Nomenclature</i>, Washington, 1912: where the English names come from.</li>
             <li>How this site places the colours in each system: the notes linked from the project's <a href="https://github.com/adrian729/wada-sanzo-colors">README</a>.</li>
           </ul>
-          <p>The translations from the Japanese were made for this site. The notes marked Since then are ours.</p>
+          <p>The translations from the Japanese were made for this site. The notes marked <i>Since then</i> are ours.</p>
         </section>
       </article>
     </section>
@@ -1438,6 +1528,19 @@
           <li><strong>Standard colours.</strong> He made Japan's first systematic colour samples, and founded the association that became the Japan Color Research Institute, which went on to make the country's standard colour charts: the first in Japan with steps that look even, and the first chips anywhere of Munsell's revised system. It also helped draft JIS Z 8721, Japan's industrial standard for writing a colour down by its hue, lightness and saturation. To tie names to colours, his association put some 600 colour names onto 171 samples, each with its Japanese, Chinese and English names and its code in Ostwald's notation.</li>
           <li><strong>Colour combinations.</strong> The <i>Haishoku Sōkan</i> sets out 348 combinations of two, three and four colours, painted by hand, with his advice on using them (see <a href="#guidance">Guidance</a>). It is a reference for choosing colours that work together, in clothes, interiors, crafts or advertising. It was the first of the many books of colour combinations since.</li>
         </ul>
+        <h2 id="about-hama">Hama Yaohiko</h2>
+        <p>Hama Yaohiko (<span lang="ja">濱八百彦</span>, 1866–1944) was a painter and teacher who made colour his study. He trained in painting under the Kyoto painter Mochizuki Gyokusen, and by 1918 he was a professor at the Gakushūin, the Peers' School in Tokyo.</p>
+        <p>Colour first puzzled him in the late 1890s, at the normal school in Kagoshima, a college for teachers. Testing new students for colour blindness, he met several who saw colours quite differently from him, and he began to ask why anyone sees red or blue at all. The books he found didn't answer it, so he studied colour in his spare time, reading foreign colour scientists and making experiments of his own. Twenty years on he published <i>Iro no kenkyū</i> (<span lang="ja">色の研究</span>, A study of colour, 1918), and later <i>Shikisai gairon</i> (<span lang="ja">色彩概論</span>, An outline of colour, 1928), not a summary of Western work, he wrote, but a colour science of his own.</p>
+        <p>In 1935 he and Wada made a standard colour atlas, the <i>Hyōjun shikisai zushū</i>, fifteen large wall charts, made to teach colour to a room. Technicians under Wada's supervision coloured most of the plates by hand, and Hama wrote the commentary, an introduction to colour from light and sight to mixing, contrast and harmony. His advice is part of <a href="#guidance">Guidance</a>, and his explanations fill in much of <a href="#theory">Colour theory</a>.</p>
+        <section class="sources">
+          <h3>Sources</h3>
+          <ul>
+            <li>Hama Yaohiko, <span lang="ja">色の研究</span> (A study of colour), Maruzen, 1918, with a preface by the psychologist Matsumoto Matatarō: <a href="https://dl.ndl.go.jp/pid/956632">National Diet Library</a>.</li>
+            <li>Hama Yaohiko, <span lang="ja">色彩概論</span> (An outline of colour), Maruzen, 1928: <a href="https://dl.ndl.go.jp/pid/1176772">National Diet Library</a>.</li>
+            <li>Wada Sanzō and Hama Yaohiko, <span lang="ja">標準色彩圖集</span> (<i>Hyōjun shikisai zushū</i>, a standard colour atlas), 1935, its commentary and the publisher's statement: <a href="https://dl.ndl.go.jp/pid/1014901">National Diet Library</a>.</li>
+          </ul>
+          <p>The translations from the Japanese were made for this site.</p>
+        </section>
         <h2>This site</h2>
         <p>This site is built on Wada's colours and colour combinations. It shows his 171 colours and his combinations on screen, to browse, compare and use in your own work.</p>
         <p>Wada's colours and combinations come from two books. Seigensha reprinted his <i>Haishoku Sōkan</i> as <i>A Dictionary of Color Combinations</i>, and a second volume adds his seasonal combinations.</p>
@@ -1455,7 +1558,7 @@
           <li><strong><a href="#combinations">Combinations</a>.</strong> The 348 combinations of the first volume, laid out as in the book.</li>
           <li><strong><a href="#seasons">Seasons</a>.</strong> The 72 seasonal combinations of the second volume, month by month.</li>
           <li><strong><a href="#create">Create</a>.</strong> A small tool to create your own combinations, from Wada's colours or any colour of the four systems.</li>
-          <li><strong><a href="#about">About</a>.</strong> This page, plus the colour theory behind combinations (<a href="#theory">Colour theory</a>) and Wada's and Hama Yaohiko's advice on making and using them (<a href="#guidance">Guidance</a>).</li>
+          <li><strong><a href="#about">About</a>.</strong> This page, plus the colour theory behind combinations (<a href="#theory">Colour theory</a>) and Wada's and Hama Yaohiko's advice on choosing colours and on making and using combinations (<a href="#guidance">Guidance</a>).</li>
         </ul>
         <p>Sources and more information are in the project's <a href="https://github.com/adrian729/wada-sanzo-colors">README</a>.</p>
       </article>
@@ -1876,7 +1979,7 @@
         if (y != null) scrollTo(0, y);
         else if (!afterLoad) scrollTo(0, 0);
       } else if (READING[name]) {
-        // Back where the reader was, else at the section the address names (#guidance/hama), else at the
+        // Back where the reader was, else at the section the address names (#guidance/pairs), else at the
         // top. Once the data is in (afterLoad), only to a section again (the cards above it have taken their
         // room), not to the top under a reader already scrolling.
         document.title = `${READING[name]} | Wada Sanzō`;
@@ -2480,6 +2583,18 @@
           keep.append(ref, mark[0]);
         }
       }
+      for (const sample of document.querySelectorAll(".prose .legibility [data-fg]")) {
+        const fg = byName.get(sample.dataset.fg), bg = byName.get(sample.dataset.bg);
+        if (!fg || !bg) {
+          console.error(`No colour named "${fg ? sample.dataset.bg : sample.dataset.fg}"`);
+          continue;
+        }
+        const text = Object.assign(document.createElement("span"), { className: "text", textContent: `${fg.name} on ${bg.name}` });
+        text.style.setProperty("--fg", fg.css);
+        text.style.setProperty("--bg", bg.css);
+        if (bg.oklch[0] > 0.9) text.classList.add("light");
+        sample.append(text, Object.assign(document.createElement("small"), { textContent: `L ${fg.oklch[0].toFixed(2)} on ${bg.oklch[0].toFixed(2)}` }));
+      }
       for (const slot of document.querySelectorAll(".prose :is(a[data-season], a[data-combination])")) {
         const season = "season" in slot.dataset, combo = season ? seasons[slot.dataset.season - 1] : combos[slot.dataset.combination - 1];
         if (!combo) {
@@ -2487,6 +2602,27 @@
           continue;
         }
         thumbOf(slot, combo).setAttribute("aria-label", `${season ? "Seasonal combination" : "Combination"} ${combo.number}`);
+        // A card as it's printed, since the text speaks of its large colour: the strip from about 0.06 to
+        // 0.875 of the card's height, each small band about 0.052 of it, the large colour on top taking the
+        // rest (measured on the scans: about 11 small bands' height with 5 colours, 10 with 6).
+        if (season) {
+          const n = combo.colors.length, blocks = slot.querySelector(".blocks");
+          blocks.classList.add("card");
+          blocks.style.gridTemplateRows = `${((0.815 - (n - 1) * 0.052) / 0.052).toFixed(2)}fr repeat(${n - 1}, 1fr)`;
+        }
+      }
+      // A combination made for the page to show what not to do (data-colors, its colours' names): drawn as
+      // the book's are, but with no number and no link (its caption says what it is).
+      for (const slot of document.querySelectorAll(".prose .examples [data-colors]")) {
+        const colors = slot.dataset.colors.split("|").map((name) => byName.get(name));
+        if (colors.includes(undefined)) {
+          console.error(`No colour among "${slot.dataset.colors}"`);
+          continue;
+        }
+        slot.className = "thumb made";
+        const blocks = blocksFor({ colors }, () => document.createElement("div"));
+        blocks.setAttribute("aria-hidden", "true");
+        slot.append(blocks);
       }
       for (const link of document.querySelectorAll(".prose a[data-layout]")) {
         link.addEventListener("click", () => document.querySelector(`.subnav[data-view="colors"] button[data-value="${link.dataset.layout}"]`).click());
@@ -2496,7 +2632,8 @@
         patch.addEventListener("click", () => patch.setAttribute("aria-pressed", String(patch.getAttribute("aria-pressed") !== "true")));
       }
       // A wrapped caption keeps the full width its box may take, so its lines, often shorter, sit left of centre:
-      // narrow each box to its longest line, so a caption of any length sits centred under its figure. Again
+      // narrow each box to its longest line, so a caption of any length sits centred under its figure (or, an
+      // example's caption, under its combination). Again
       // whenever its figure changes size (shown, resized, fonts loaded).
       const fitCaption = (caption) => {
         caption.style.width = "";
@@ -2508,9 +2645,9 @@
         if (width < caption.getBoundingClientRect().width - 1) caption.style.width = `${Math.ceil(width) + 1}px`;
       };
       const captions = new ResizeObserver((entries) => {
-        for (const entry of entries) for (const caption of entry.target.querySelectorAll(":scope > figcaption")) fitCaption(caption);
+        for (const entry of entries) for (const caption of entry.target.querySelectorAll(":scope > figcaption, :scope > p")) fitCaption(caption);
       });
-      for (const caption of document.querySelectorAll(".prose figure > figcaption")) captions.observe(caption.parentElement);
+      for (const caption of document.querySelectorAll(".prose figure > figcaption, .prose .examples > li > p")) captions.observe(caption.parentElement);
     }
 
     // Complementary colours' discs: pointing at one (a mouse), or pressing it (a tap, a key), spins it up, as a

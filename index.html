@@ -22,15 +22,26 @@
       --muted: #6e6e68;
       --line: #e3e3dd;
       --info: 26ch; /* widest info line: OKLCH 0.5579 0.1582 357.38 */
+      --mono: "DM Mono", "Noto Serif JP", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      --serif: "Source Serif 4", "Noto Serif JP", Georgia, serif;
     }
     /* DM Mono (SIL Open Font License, fonts/OFL.txt), from github.com/google/fonts/tree/main/ofl/dmmono,
        as WOFF2 (made with fontTools); the fallback shows until it's in (swap). It has no bold: Medium
        (500) is the heaviest weight. */
     @font-face { font-family: "DM Mono"; src: url("fonts/DMMono-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
     @font-face { font-family: "DM Mono"; src: url("fonts/DMMono-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+    /* Source Serif 4 (fonts/OFL-SourceSerif4.txt), for the reading pages' text, and Noto Serif JP
+       (fonts/OFL-NotoSerifJP.txt), for the Japanese everywhere: from github.com/google/fonts (ofl/sourceserif4,
+       ofl/notoserifjp), made static (Source Serif at its 16 px optical size) and cut down with fontTools to
+       the characters used: Latin for Source Serif, and for Noto Serif JP only the Japanese on the site (its
+       unicode-range, so it's fetched only for those). Re-cut it when new Japanese is added. */
+    @font-face { font-family: "Source Serif 4"; src: url("fonts/SourceSerif4-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Source Serif 4"; src: url("fonts/SourceSerif4-Italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+    @font-face { font-family: "Source Serif 4"; src: url("fonts/SourceSerif4-Semibold.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+    @font-face { font-family: "Noto Serif JP"; src: url("fonts/NotoSerifJP-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; unicode-range: U+3068, U+306E, U+30FB, U+4E01, U+4E09, U+4E39, U+4EAC, U+5176, U+51AC, U+5375, U+548C, U+5716, U+5B50, U+5B57, U+5E16, U+5F69, U+6236, U+6688, U+6728, U+673D, U+675C, U+67D1, U+6854, U+6885, U+6897, U+6982, U+6A19, U+6A59, U+6A9C, U+6B35, U+6D3B, U+6D77, U+6DE1, U+6DFA, U+6E96, U+6FC3, U+7070, U+7261, U+7528, U+7530, U+767D, U+76AE, U+78C1, U+7A7A, U+7AF9, U+7D05, U+7D0D, U+7D2B, U+7D3A, U+7DA0, U+7DD1, U+7E3D, U+7E5D, U+7FBD, U+8001, U+8272, U+82E5, U+8336, U+8349, U+83D6, U+8420, U+8449, U+8471, U+84B2, U+85E4, U+8AAA, U+8AAC, U+8D64, U+9020, U+914D, U+9451, U+9644, U+96C6, U+9751-9752, U+9CE9, U+9D3E, U+9DB8, U+9EC3-9EC4, U+9ED1-9ED2, U+FF0B; }
     * { box-sizing: border-box; margin: 0; }
     [hidden] { display: none !important; }
-    body { font-family: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: var(--bg); color: var(--fg); }
+    body { font-family: var(--mono); background: var(--bg); color: var(--fg); }
 
     /* Header: the main navigation, plus a sub-navigation row with the current view's options. */
     header {
@@ -644,33 +655,59 @@
 
     /* The reading pages (Guidance, Theory, About): one column of text, centred, as wide as reads well.
        Their sections can be linked (#guidance/hama): see showView. */
-    .prose { max-width: 68ch; margin: 0 auto; padding-bottom: 3rem; font-size: 0.9375rem; line-height: 1.65; }
-    .prose h1 { margin-top: 0.5rem; font-size: 1.25rem; font-weight: 500; line-height: 1.3; }
-    .prose h2 { margin-top: 2.75rem; font-size: 1rem; font-weight: 500; line-height: 1.4; }
-    .prose h3 { margin-top: 1.75rem; font-size: 0.9375rem; font-weight: 500; line-height: 1.4; }
+    /* The text in Source Serif, the headings and contents in DM Mono, as the rest of the site. 1rem of it
+       has about the x-height of 0.9375rem of DM Mono; the column is as wide as 68ch of that DM Mono. */
+    .prose { max-width: 38.25rem; margin: 0 auto; padding-bottom: 3rem; font-family: var(--serif); font-size: 1rem; line-height: 1.65; }
+    /* Captions: at most three quarters of a paragraph's width (longer ones wrap), centred, lines filled to
+       that width but no word left alone on the last one (pretty, not balance, which would narrow them). */
+    .prose figcaption { max-width: calc(38.25rem * 3 / 4); margin-inline: auto; text-wrap: pretty; }
+    .prose :is(h1, h2, h3, nav) { font-family: var(--mono); }
+    .prose h1 { margin-top: 0.5rem; font-size: 1.5rem; font-weight: 500; line-height: 1.3; }
+    /* A section: a rule above it, and room. Its parts (h3), smaller, without. */
+    .prose h2 { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: 1.125rem; font-weight: 500; line-height: 1.4; }
+    .prose h3 { margin-top: 2.25rem; font-size: 1rem; font-weight: 500; line-height: 1.4; }
     .prose :is(p, ul, ol, figure) { margin-top: 0.75rem; }
     .prose :is(h2, h3) + :is(p, ul, ol) { margin-top: 0.5rem; }
     .prose :is(ul, ol) { padding-left: 1.5rem; }
     .prose li + li, .prose li > :is(ul, ol) { margin-top: 0.375rem; }
-    .prose strong { font-weight: 500; }
+    .prose strong { font-weight: 600; }
     .prose a { color: inherit; text-underline-offset: 0.2em; text-decoration-color: var(--muted); }
     .prose a:is(:hover, :focus-visible) { text-decoration-color: currentColor; }
-    .prose .lead { color: var(--muted); }
     /* Where today's colour science differs from what the 1930s sources teach. */
-    .prose .today { padding-left: 1rem; border-left: 2px solid var(--line); color: var(--muted); font-size: 0.875rem; }
-    .prose .today strong { color: var(--fg); }
+    /* A note beside the text: where colour science has since moved on ("Since then:"), or where Hama saw
+       it otherwise than Wada ("Hama's view:"). */
+    .prose .remark { padding-left: 1rem; border-left: 2px solid var(--line); color: var(--muted); font-size: 0.9375rem; }
+    .prose .remark strong { color: var(--fg); }
     /* A note on whose words a part is, and the sources at the end: smaller, muted. */
-    .prose .aside { padding: 0.75rem 1rem; border: 1px solid var(--line); color: var(--muted); font-size: 0.875rem; }
-    .prose .sources { color: var(--muted); font-size: 0.8125rem; }
+    .prose .aside { padding: 0.75rem 1rem; border: 1px solid var(--line); color: var(--muted); font-size: 0.9375rem; }
+    .prose .sources { color: var(--muted); font-size: 0.875rem; }
     .prose .sources h2 { color: var(--fg); }
     /* The page's sections, under its title. A section linked to takes the focus (see showView), unmarked. */
-    .prose nav { display: block; padding: 0; }
+    .prose nav { display: block; margin-top: 1.75rem; padding: 1rem 1.25rem 1.125rem; border: 1px solid var(--line); }
     .prose [tabindex="-1"]:focus { outline: none; }
-    .prose .contents { padding: 0; list-style: none; font-size: 0.875rem; }
-    .prose .contents li + li { margin-top: 0.125rem; }
-    .prose .contents ul { padding-left: 2ch; list-style: none; }
-    .prose .contents a { color: var(--muted); text-decoration: none; }
-    .prose .contents a:is(:hover, :focus-visible) { color: var(--fg); text-decoration: underline; }
+    /* The contents: a rail down their left, marked beside the section being read (aria-current, see
+       markSection), and, lighter, beside the one under the pointer. */
+    .prose .contents { margin-top: 0; padding: 0; border-left: 1px solid var(--line); list-style: none; font-size: 0.875rem; line-height: 1.4; }
+    .prose .contents li + li, .prose .contents ul { margin-top: 0; }
+    .prose .contents ul { padding-left: 0; list-style: none; }
+    .prose .contents a { display: block; margin-left: -1px; padding: 0.25rem 0.5rem 0.25rem 0.875rem; border-left: 2px solid transparent; color: var(--fg); text-decoration: none; transition: color 0.15s, border-color 0.15s, background-color 0.15s; }
+    .prose .contents ul a { padding-left: calc(0.875rem + 2ch); color: var(--muted); }
+    .prose .contents a:is(:hover, :focus-visible) { border-left-color: var(--muted); background: color-mix(in oklab, var(--fg) 5%, transparent); color: var(--fg); }
+    .prose .contents a[aria-current] { border-left-color: var(--fg); color: var(--fg); font-weight: 500; }
+    /* Where there's room beside the text, the contents go to the page's left edge, in the middle of the
+       screen below the header, and stay there while it's read: the text keeps its column in the middle, as on About.
+       Too long for the screen, they scroll (margin-block: auto centres them, and lets them start at the top). */
+    @media (width >= 75rem) {
+      .prose:has(> nav) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 38.25rem) minmax(0, 1fr); column-gap: 2.5rem; align-items: start; max-width: none; }
+      .prose:has(> nav) > * { grid-column: 2; }
+      .prose > nav {
+        grid-column: 1; grid-row: 1 / span 400; justify-self: start; width: min(100%, 14rem);
+        position: sticky; top: calc(var(--header-height, 3.375rem) + 1.5rem);
+        display: flex; flex-direction: column; height: calc(100dvh - var(--header-height, 3.375rem) - 3rem); overflow-y: auto;
+        margin-top: 0.5rem; padding: 0; border: 0;
+      }
+      .prose > nav > .contents { margin-block: auto; }
+    }
     /* A colour named in the text: its name, then a square of it (as everywhere on the site); opens its
        dialog. Kept on one line with its square. */
     .prose .color-ref {
@@ -680,15 +717,136 @@
     .prose .color-ref:is(:hover, :focus-visible) { text-decoration-color: currentColor; }
     .prose .ref-keep { white-space: nowrap; }
     .prose .color-ref .chip { display: inline-block; margin-left: 0.75ch; vertical-align: -0.1em; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1); } /* (White too) */
+    /* A hue circle: the full colours of Ostwald's 24 hues as a ring, yellow at the top and red at the right
+       (as in the Ostwald view, the outer ring of its middle level).
+       Its colours are notes/ostwald.py's cell_xyz(sector, 15, 0), the system's own (as index.html's
+       ostwaldSystem makes them); a picture, not controls. */
+    .prose .hue-ring { margin: 1rem 0 1.25rem; }
+    .prose .hue-ring svg { display: block; width: min(100%, 12rem); height: auto; margin: 0 auto; }
+    .prose .hue-ring path { stroke: var(--bg); stroke-width: 0.012; }
+    /* Lightness: six hues of the hue circle (every fourth of its 24: the OKLCH hues of its full colours) and
+       grey, dark at the top to light at the bottom, each row one lightness (OKLCH's
+       L 0.35, 0.5, 0.65, 0.8 and 0.92, each colour's chroma as much as a screen shows, up to 0.10: more vivid, it would look lighter than its grey). */
+    .prose .lightness-steps { display: flex; justify-content: center; margin: 1rem 0 1.25rem; }
+    .prose .lightness-steps div { display: flex; flex-direction: column; }
+    .prose .lightness-steps span { width: 2.5rem; height: 1.5rem; background: var(--c); }
+    /* Saturation: one red (the hue circle's red, sector 6), first from grey to the full colour at one
+       lightness (chroma in four even steps), then as a paint in different amounts: thinned with water (a
+       quarter, a half), as it is, and laid over itself (twice, three times), each layer filtering the light
+       again (its linear sRGB to the power of the amount), its hue kept at the red's. */
+    /* Tone: the six hues of the lightness grid in three of Ostwald's tones, the same notation in every hue
+       (notes/ostwald.py cell_xyz): light and greyed (ec) and light and clear (ga), about as light as each
+       other, and dark and greyed (ni). */
+    /* Grey scales: six greys from Wada's white to his black, white in equal amounts (in Y), then falling
+       by a constant ratio (his scale, every third letter). */
+    .prose :is(.saturation-steps, .tone-rows, .grey-scales) { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin: 1rem 0 1.25rem; }
+    .prose :is(.saturation-steps, .tone-rows, .grey-scales) div { display: flex; }
+    .prose :is(.saturation-steps, .tone-rows, .grey-scales) span { width: 2.5rem; height: 2.5rem; background: var(--c); }
+    .prose :is(.saturation-steps, .tone-rows, .grey-scales) figure { display: flex; flex-direction: column; align-items: center; margin: 0; }
+    .prose :is(.saturation-steps, .tone-rows, .grey-scales) figcaption { margin-top: 0.375rem; color: var(--muted); font-size: 0.8125rem; text-align: center; }
+    /* One hue's triangle (Ostwald's): the red of the examples above, every third letter of Wada's scale
+       (a d g j m p, notes/ostwald.py cell_xyz), each cell a rhombus, white at the top, black at the bottom,
+       the full colour at the right corner. */
+    .prose .hue-triangle { margin: 1rem 0 1.25rem; }
+    .prose .hue-triangle svg { display: block; width: min(100%, 10rem); height: auto; margin: 0 auto; }
+    .prose .hue-triangle path { stroke: var(--bg); stroke-width: 0.03; }
+    /* Full colours against greys: every other hue of the circle, from the lightest to the darkest, each
+       over a grey of its own lightness (OKLCH L). */
+    .prose .full-lightness { margin: 1rem 0 1.25rem; }
+    .prose .full-lightness div { display: grid; grid-template-columns: repeat(12, 1fr); width: min(100%, 30rem); margin: 0 auto; }
+    .prose .full-lightness span { aspect-ratio: 1; background: var(--c); }
+    /* The twins: a schematic spectrum (red to violet, as Hama drew it, his yellow cut at the middle of
+       blue-green, 490 nm), whole, then what a yellow pigment reflects and what it absorbs, the rest hatched,
+       each with the colour its light makes (CIE 1931, Wyman et al.'s fit, an equal-energy spectrum scaled to
+       the page's white, shown as strong as the screen allows). */
+    .prose .twins { display: grid; grid-template-columns: auto; justify-content: center; margin: 1rem 0 1.25rem; }
+    .prose .twins > div { display: flex; gap: 0.75rem; }
+    .prose .twins .band { position: relative; width: min(15rem, 60vw); height: 1.75rem; background: var(--spectrum); }
+    .prose .twins .band[style]::after { content: ""; position: absolute; inset: 0 calc(100% - var(--to)) 0 var(--from); background: var(--bg) repeating-linear-gradient(-45deg, var(--line) 0 1px, transparent 1px 6px); }
+    .prose .twins span { width: 1.75rem; height: 1.75rem; background: var(--c); box-shadow: inset 0 0 0 1px var(--line); }
+    .prose .twins figcaption { margin-block: 0.375rem 0.875rem; color: var(--muted); font-size: 0.8125rem; text-align: center; }
+    .prose .twins figcaption:last-child { margin-bottom: 0; }
+    /* Spinning discs: four pairs of opposite full colours (Ostwald's, sectors 0, 4, 6 and 8 and their
+       opposites), each pair's shares set so that, averaged as light, they give a neutral grey, which is shown
+       under the disc. Turquoise and sea green lie outside the screen's colours (sRGB), so they're given white
+       light (which keeps their hue, and so the pair) and kept at their own lightness. Yellow and blue are
+       made as light as each other (yellow with less light, blue with as much as the screen gives, both keeping
+       their chromaticity): colours that differ in lightness flicker on a screen instead of blending. Pointing
+       at a disc (or tapping it) spins it up (spinDiscs). Then one pair that isn't complementary, red and
+       blue (sectors 6 and 12, as light as each other), half and half, over the purple they make, and red
+       and sea green (as above) half and half, not in their shares, over the reddish grey they make. */
+    .prose .discs { margin: 1rem 0 1.25rem; }
+    .prose .discs > div { display: flex; justify-content: center; gap: 1.5rem; }
+    .prose .discs > div > div { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .prose .discs .disc { width: 4rem; height: 4rem; padding: 0; border: 0; border-radius: 50%; background: conic-gradient(var(--a) 0 var(--w), var(--b) 0); cursor: pointer; }
+    .prose .discs .disc:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+    .prose .discs span { width: 2rem; height: 2rem; background: var(--c); }
+    .prose .discs figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: center; }
+    /* The note under both rows of discs: set apart from their captions, as wide as a paragraph. */
+    .prose .screen-note { margin: 1.25rem 0; color: var(--muted); font-size: 0.75rem; }
+    /* Mixing colours. Paint mixes: a simple model (each paint a smooth reflectance spectrum, as Hama drew
+       them, mixed by Kubelka-Munk, a third red), red with orange, yellow, green and blue-green, each pair then
+       its mix. Lights: red, green and blue added by the screen (plus-lighter) on black. Dots: the model's
+       yellow and blue in a 16 by 16 ordered dither (86 of 256 yellow), the blue then set so that the two as
+       shown (the model's are trimmed to the screen's colours) average to an exactly neutral grey,
+       one CSS pixel each, then red and green (the screen's own) in a checkerboard over the yellow they
+       average to, all enlarged on pointing or pressing (fillReading does the press). Each patch has its two colours
+       beside it, each as tall as its share of the dots. Three ways: that
+       yellow and blue as paint (the model), as light (white) and averaged (the grey). */
+    .prose :is(.paint-mixes, .lights, .dots, .three-ways) { margin: 1rem 0 1.25rem; }
+    .prose :is(.paint-mixes, .lights, .dots, .three-ways) figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.8125rem; text-align: center; }
+    .prose .paint-mixes > div { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .prose .paint-mixes > div > div { display: flex; }
+    .prose .paint-mixes span { width: 2rem; height: 2rem; background: var(--c); }
+    .prose .paint-mixes .result { margin-left: 1rem; }
+    .prose .lights svg { display: block; width: min(100%, 12rem); height: auto; margin: 0 auto; }
+    .prose .lights rect { fill: #000; }
+    .prose .lights g { isolation: isolate; }
+    .prose .lights circle { mix-blend-mode: plus-lighter; }
+    .prose .dots > div { display: flex; justify-content: center; gap: 2.5rem; }
+    .prose .dots > div + div { margin-top: 1.5rem; }
+    .prose .dot-patch { display: block; width: 96px; height: 64px; padding: 0; border: 0; overflow: hidden; background: none; cursor: zoom-in; }
+    .prose .dot-patch svg { display: block; transition: transform 0.3s; }
+    .prose .dot-patch:is(:hover, [aria-pressed="true"]) svg { transform: scale(6); }
+    .prose .dot-patch:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+    .prose .dots span { width: 64px; height: 64px; background: var(--c); }
+    .prose .dots .pair { display: flex; flex-direction: column; }
+    .prose .dots .pair span { width: 32px; height: calc(64px * var(--s)); }
+    .prose .three-ways > div { display: flex; justify-content: center; align-items: flex-start; gap: 1rem; }
+    .prose .three-ways > div > div { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+    .prose .three-ways .pair { flex-direction: row; margin-right: 1rem; }
+    .prose .three-ways span { width: 2.5rem; height: 2.5rem; background: var(--c); }
+    .prose .three-ways .light { box-shadow: inset 0 0 0 1px var(--line); }
+    .prose .three-ways small { color: var(--muted); font-size: 0.75rem; }
     /* Wada's reading of one of his cards: the card (a link to its page), its reading beside it. */
     .prose .card-reading { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 1.25rem; align-items: start; margin-top: 1.25rem; }
     .prose .card-reading > :first-child { margin-top: 0.3rem; }
     .prose .card-reading > div > :first-child { margin-top: 0; }
-    .prose .thumb { color: var(--muted); } /* as in the colour dialog */
+    .prose .thumb { color: var(--muted); font-family: var(--mono); } /* as in the colour dialog */
     .prose .thumb:is(:hover, :focus-visible) { color: var(--fg); }
     @media (width < 30rem) { .prose .card-reading { grid-template-columns: 4.5rem minmax(0, 1fr); gap: 1rem; } }
-    /* Wada's complementary pairs: one to a line. */
-    .prose .pairs { padding: 0; list-style: none; }
+    /* Wada's complementary pairs: each two squares side by side, as a two-colour combination, each colour's
+       name under its square. */
+    .prose .pairs { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: 1.25rem 1rem; margin-top: 1rem; padding: 0; list-style: none; font-family: var(--mono); font-size: 0.75rem; line-height: 1.35; }
+    .prose .pairs li { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; margin: 0; }
+    .prose .pairs .color-ref { display: flex; flex-direction: column; white-space: normal; text-align: left; text-decoration: none; }
+    .prose .pairs .color-ref:first-child { padding-right: 0.75rem; } /* (its square reaches over to the other's) */
+    .prose .pairs .color-ref:is(:hover, :focus-visible) { text-decoration: underline; }
+    .prose .pairs .color-ref .chip { order: -1; width: 100%; height: 3.5rem; margin: 0 0 0.375rem; box-shadow: none; }
+    .prose .pairs .color-ref:first-child .chip { width: calc(100% + 0.75rem); }
+    .prose .pairs .note { grid-column: 1 / -1; margin-top: 0.25rem; color: var(--muted); }
+    /* Combinations shown as examples: each drawn as in the book (a link to its page), its caption under it. */
+    .prose .examples { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1.25rem; margin-top: 1rem; padding: 0; list-style: none; }
+    .prose li > .examples { margin-bottom: 1.25rem; }
+    /* An item of more than one paragraph: the first flush with the item's start, the rest spaced as text. */
+    .prose li > p:first-child { margin-top: 0; }
+    .prose li > p + p { margin-top: 0.5rem; }
+    .prose .examples li { margin: 0; }
+    .prose .examples .blocks[data-size="2"] { width: 7.5rem; }
+    .prose .examples .blocks[data-size="3"] { width: 9rem; }
+    .prose .examples .blocks[data-size="4"] { width: 6rem; }
+    .prose .examples .blocks.stack { width: 4.5rem; }
+    .prose .examples p { margin-top: 0.375rem; color: var(--muted); font-size: 0.875rem; line-height: 1.45; }
   </style>
 </head>
 <body>
@@ -737,8 +895,8 @@
     </div>
     <nav class="subnav reading-subnav" aria-label="About" hidden>
       <a href="#about">Wada Sanzō</a>
-      <a href="#guidance">Guidance</a>
       <a href="#theory">Colour theory</a>
+      <a href="#guidance">Guidance</a>
     </nav>
     <nav class="subnav combo-subnav" aria-label="Combination" hidden>
       <div class="pager"></div>
@@ -793,8 +951,10 @@
     <section id="guidance-view" hidden>
       <article class="prose">
         <h1>Guidance</h1>
-        <p class="lead">How to make a combination and how to use one: first in Wada's words, from the booklets he wrote for his combinations, then in Hama Yaohiko's, from the colour atlas they made together.</p>
+        <p class="lead">How to make a colour combination and how to use one, in the words of Wada Sanzō, who made the combinations on this site, and of Hama Yaohiko, who made a colour atlas with him.</p>
         <nav aria-label="On this page"><ul class="contents">
+          <li><a href="#guidance">Introduction</a></li>
+          <li><a href="#guidance/origin">Where the advice comes from</a></li>
           <li><a href="#guidance/wada">Wada's advice</a>
             <ul>
               <li><a href="#guidance/making">Making a combination</a></li>
@@ -809,6 +969,12 @@
           <li><a href="#guidance/sources">Sources</a></li>
         </ul></nav>
 
+        <h2 id="guidance-origin">Where the advice comes from</h2>
+        <p>Wada's book, the <i>Haishoku Sōkan</i> (1933–34), shows 348 <a href="#combinations">combinations</a> of two, three and four colours, every colour at the same size. Wada also made 72 <a href="#seasons">seasonal combinations</a> (1934–35), six for each month, as cards: on each, one large colour on top and smaller bands below.</p>
+        <p>He wrote two booklets on how to use them: one in 1934, sent out with the book (today's reprint, <i>A Dictionary of Color Combinations</i>, has part of it), and a longer supplement in 1935. Wada's advice below comes from them. In 1935 he also published a colour atlas with Hama Yaohiko, and Hama's advice, at the end, comes from his commentary to it.</p>
+        <p>Wada didn't say which of his combinations show which advice. The examples here are combinations from the book that show each point, chosen for this site by their colours' lightness, saturation and hue. Each opens its page.</p>
+        <p>The ideas the advice builds on, such as hue, lightness, saturation and complementary colours, are explained in <a href="#theory">Colour theory</a>.</p>
+
         <h2 id="guidance-wada">Wada's advice</h2>
         <p>Wada didn't think combining colours could be taught like mathematics, where a formula gives the right answer: a combination always appeals to each person's feelings and taste. Taste in colour, he said, is like a singing voice, partly a gift, but it grows with practice. So he gave advice from what he had learnt as a painter: rules of thumb, not a science.</p>
 
@@ -820,8 +986,16 @@
               <li>Pale colours together feel lukewarm: they need a deep one, in a measured amount.</li>
               <li>Dark colours together are suffocating: some of them must be lighter.</li>
             </ul>
-            As in cooking, he said: a meal comes together through the balance of hot, sweet and sour.</li>
-          <li><strong>Don't make every colour as strong as the others.</strong> When no colour sets off another, the result is safe, but ordinary (see <a href="#guidance/cards">his first card</a>).</li>
+            As in cooking, he said: a meal comes together through the balance of hot, sweet and sour.
+            <ul class="examples">
+              <li><a data-combination="155"></a> <p>Vivid Benzol Green and Jasper Red, with a muted Deep Indigo.</p></li>
+              <li><a data-combination="246"></a> <p>Three pale colours, with a deep Brick Red.</p></li>
+              <li><a data-combination="145"></a> <p>Two dark colours, Dull Violet Black and Brown, with a lighter Citron Yellow.</p></li>
+            </ul></li>
+          <li><strong>Don't make every colour as strong as the others.</strong> When no colour sets off another, the result is safe, but ordinary (see <a href="#guidance/cards">his first card</a>).
+            <ul class="examples">
+              <li><a data-combination="176"></a> <p>Three pale colours, about as strong as one another.</p></li>
+            </ul></li>
           <li><strong>Start from one hue,</strong> in its light and dark tones: it can hardly go wrong. Set different hues against each other with care.</li>
           <li><strong>Where different hues touch,</strong> weigh each colour's lightness and strength, or the result turns coarse.</li>
           <li><strong>Calm colours for things you live with.</strong> Strong combinations catch the eye, which suits advertising, shop windows and the stage, but they tire quickly. Calm doesn't mean dull: neighbouring hues, their strengths well balanced.</li>
@@ -834,44 +1008,64 @@
           <li><strong>Complementary:</strong> opposite hues, whatever their lightness. Lively, but suited to fewer uses.</li>
           <li><strong>Graded bands</strong> (<i>ungen</i>, <span lang="ja">暈繝</span>): one hue in steps, from white through the full colour to black, or part of that scale. The calmest of all.</li>
         </ol>
-        <p>An earlier version has two kinds, same tone and different tone, each light, dark, pale, deep or free: ten in all. He called them a law and a standard, but not one you must obey: those with long experience of colour can merge them or break them. None of his plates says which kind it is.</p>
+        <ul class="examples">
+          <li><a data-combination="165"></a> <p>Like colours, one red from the deep Vistoris Lake to the pale Cameo Pink.</p></li>
+          <li><a data-combination="172"></a> <p>Different hues, Antwerp Blue, Red Violet and Cinnamon Rufous.</p></li>
+          <li><a data-combination="17"></a> <p>Complementary, Eugenia Red and Sea Green, close to his own pair of red and Sea Green (below).</p></li>
+        </ul>
+        <p>His 1934 booklet sorts them differently, into two kinds, same tone and different tone, each light, dark, pale, deep or free: ten in all. He called them a law and a standard, but not one you must obey: those with long experience of colour can merge them or break them. None of the book's combinations says which kind it is.</p>
 
         <h3 id="guidance-pairs">His complementary pairs</h3>
-        <p>Wada paired colours of his own palette by hue alone, so their lightness and saturation vary. Red's lighter and darker tones pair too: <button class="color-ref">Hermosa Pink</button> and <button class="color-ref">Pale Burnt Lake</button> go with <button class="color-ref">Sea Green</button>, as <button class="color-ref">Spectrum Red</button> does.</p>
+        <p>Wada drew up a table of complementary pairs from his own palette. He paired them by hue alone, so their lightness and saturation vary. Red's lighter and darker tones pair too: <button class="color-ref">Hermosa Pink</button> and <button class="color-ref">Pale Burnt Lake</button> go with <button class="color-ref">Sea Green</button>, as <button class="color-ref">Spectrum Red</button> does.</p>
         <ul class="pairs">
-          <li><button class="color-ref">Spectrum Red</button> ↔ <button class="color-ref">Sea Green</button></li>
-          <li><button class="color-ref">Red Orange</button> ↔ <button class="color-ref">Green Blue</button>, or one a little greener</li>
-          <li><button class="color-ref">Orange</button> ↔ <button class="color-ref">Peacock Blue</button></li>
-          <li><button class="color-ref">Yellow Orange</button> ↔ <button class="color-ref">Antwerp Blue</button></li>
-          <li><button class="color-ref">Apricot Yellow</button> ↔ <button class="color-ref">Blue</button></li>
-          <li><button class="color-ref">Yellow</button> ↔ <button class="color-ref">Deep Lyons Blue</button></li>
-          <li><button class="color-ref">Lemon Yellow</button> ↔ <button class="color-ref">Violet Ultramarine</button></li>
-          <li><button class="color-ref">Light Green Yellow</button> ↔ <button class="color-ref">Violet</button></li>
-          <li><button class="color-ref">Yellow Green</button> ↔ <button class="color-ref">Red Violet</button></li>
-          <li><button class="color-ref">Night Green</button> ↔ <button class="color-ref">Rosolane Purple</button></li>
+          <li><button class="color-ref">Spectrum Red</button> <button class="color-ref">Sea Green</button></li>
+          <li><button class="color-ref">Red Orange</button> <button class="color-ref">Green Blue</button> <span class="note">or one a little greener</span></li>
+          <li><button class="color-ref">Orange</button> <button class="color-ref">Peacock Blue</button></li>
+          <li><button class="color-ref">Yellow Orange</button> <button class="color-ref">Antwerp Blue</button></li>
+          <li><button class="color-ref">Apricot Yellow</button> <button class="color-ref">Blue</button></li>
+          <li><button class="color-ref">Yellow</button> <button class="color-ref">Deep Lyons Blue</button></li>
+          <li><button class="color-ref">Lemon Yellow</button> <button class="color-ref">Violet Ultramarine</button></li>
+          <li><button class="color-ref">Light Green Yellow</button> <button class="color-ref">Violet</button></li>
+          <li><button class="color-ref">Yellow Green</button> <button class="color-ref">Red Violet</button></li>
+          <li><button class="color-ref">Night Green</button> <button class="color-ref">Rosolane Purple</button></li>
         </ul>
-        <p>Only one of these pairs is a combination in the book: <a href="#combination/22">022</a>, Yellow with Deep Lyons Blue.</p>
+        <p>Only one of these pairs is a combination in the book:</p>
+        <ul class="examples">
+          <li><a data-combination="22"></a> <p>Deep Lyons Blue and Yellow.</p></li>
+        </ul>
 
         <h3 id="guidance-neutrals">White, grey or black between colours</h3>
         <p>Where two colours clash, put white, grey or black between them. Wada passed on the rules of the French chemist Michel-Eugène Chevreul, whom he called the leading authority on colour contrast and harmony, on which to use:</p>
         <ul>
-          <li>red and yellow: anything but black; red and blue: anything but white; blue and yellow: anything but grey; yellow and orange: anything but black; blue and purple: anything but grey;</li>
-          <li>orange and green: black; purples: grey; purple and green: white;</li>
-          <li>black never clashes with two bright colours, and suits dark purples and blues; grey suits two bright colours, and never clashes with two dull ones;</li>
-          <li>on a pale ground, draw patterns in deep tones, outlined in black, grey or a colour deeper still; a pattern paler than its ground takes a white or grey outline.</li>
+          <li><strong>Red and yellow:</strong> white or grey, not black.</li>
+          <li><strong>Red and blue:</strong> grey or black, not white.</li>
+          <li><strong>Blue and yellow:</strong> white or black, not grey.</li>
+          <li><strong>Yellow and orange:</strong> white or grey, not black.</li>
+          <li><strong>Blue and purple:</strong> white or black, not grey.</li>
+          <li><strong>Orange and green:</strong> black. <strong>Purples:</strong> grey. <strong>Purple and green:</strong> white.</li>
+          <li><strong>Black</strong> never clashes with two bright colours, and suits dark purples and blues. <strong>Grey</strong> suits two bright colours, and never clashes with two dull ones.</li>
+          <li><strong>Outlines:</strong> on a pale ground, draw patterns in deep tones, outlined in black, grey or a colour deeper still. A pattern paler than its ground takes a white or grey outline.</li>
         </ul>
-        <p>But taste moves on, Wada added. By Chevreul's rules red with blue is pleasing, yet few would now agree; brown beside black, long frowned on, is now well liked.</p>
+        <ul class="examples">
+          <li><a data-combination="228"></a> <p>Grey between Carmine Red and Pale Lemon Yellow.</p></li>
+          <li><a data-combination="216"></a> <p>Black between Jasper Red and Green.</p></li>
+          <li><a data-combination="180"></a> <p>Grey between Light Mauve and Cinnamon Buff.</p></li>
+        </ul>
+        <p>But taste moves on, Wada added. By Chevreul's rules red with blue is pleasing, yet few would now agree. Brown beside black, long frowned on, is now well liked.</p>
 
         <h3 id="guidance-using">Using a combination</h3>
         <ul>
-          <li><strong>Give the colours different areas.</strong> The plates show every colour the same size only for convenience. Equal areas balance only when the colours are equally strong: otherwise, give the weak tones the large areas and the strong ones the small.</li>
-          <li><strong>Try the amounts.</strong> Lay cut white or grey paper over a plate, to change each colour's shape and size. For a kimono, a triangle: its tip is the collar, the middle the kimono, the next part the obi.</li>
-          <li><strong>The main colour can be a small one.</strong> On a card, the largest colour is the main one, holding the rest together; in actual dress, a small one often takes that role: the obi, the collar, a hat, gloves, a handbag. Where is the centre of the combination? That is the question.</li>
+          <li><strong>Give the colours different areas.</strong> The book shows every colour the same size only for convenience. Equal areas balance only when the colours are equally strong: otherwise, give the weak tones the large areas and the strong ones the small.
+            <ul class="examples">
+              <li><a data-season="7"></a> <p>A weak Light Glaucous Blue on the large area, a strong Red on a small one.</p></li>
+            </ul></li>
+          <li><strong>Try the amounts.</strong> Lay cut white or grey paper over a combination, to change each colour's shape and size: the book came with cut-out cards for it, a triangle, a rectangle and a wavy band. For a kimono, the triangle: its tip is the collar, the middle the kimono, the next part the obi.</li>
+          <li><strong>The main colour can be a small one.</strong> On the seasonal cards, the largest colour, on top, is the main one, holding the rest together. In actual dress, a small one often takes that role: the obi, the collar, a hat, gloves, a handbag. Where is the centre of the combination? That is the question (see <a href="#guidance/cards">his second card</a>).</li>
           <li><strong>Large areas look paler.</strong> A combination that works in small swatches looks paler and weaker on a large object: clothes ordered from swatches can come out looking washed out.</li>
         </ul>
 
         <h3 id="guidance-cards">Wada reads two of his cards</h3>
-        <p>He explained two of his seasonal cards, both for January. On each, the top colour is the largest.</p>
+        <p>In his 1935 supplement, Wada read two of his seasonal cards, both for January, and compared them. On each, the top colour is the largest.</p>
         <div class="card-reading">
           <a data-season="1"></a>
           <div>
@@ -885,10 +1079,10 @@
             <p><button class="color-ref">Black</button> with <button class="color-ref">Spectrum Red</button>, <button class="color-ref">Ivory Buff</button>, <button class="color-ref">Dark Tyrian Blue</button>, <button class="color-ref">Cobalt Green</button> and <button class="color-ref">Warm Gray</button>.</p>
             <p>Different in every way, and uneven in strength, yet natural, and full of change:</p>
             <ul>
-              <li>the black, darkest of colours, holds the others together;</li>
-              <li>the red, a pure colour, would look coarse alone: the black's embrace and the Ivory Buff below it soften it;</li>
-              <li>with the weak Cobalt Green below, the Dark Tyrian Blue tightens the whole;</li>
-              <li>the grey, last, changes none of the others.</li>
+              <li>The black, darkest of colours, holds the others together.</li>
+              <li>The red, a pure colour, would look coarse alone. The black's embrace and the Ivory Buff below it soften it.</li>
+              <li>With the weak Cobalt Green below, the Dark Tyrian Blue tightens the whole.</li>
+              <li>The grey, last, changes none of the others.</li>
             </ul>
             <p>The black covers the most, but the eye goes first to the red: here, the red is the centre.</p>
           </div>
@@ -898,19 +1092,27 @@
         <p class="aside">This part is Hama Yaohiko's, not Wada's: from his commentary to the colour atlas they made together. Hama had written an outline of colour theory before it, and the atlas's publisher called him an authority on colour.</p>
         <p>He treats combining colours only in outline, and sets no absolute laws: what we like depends on custom, age, upbringing and surroundings, and fashion changes it.</p>
         <ul>
-          <li><strong>Good and poor pairs.</strong> Tests that averaged many people's judgements agree: complementary pairs, or pairs a little off them, are good; a colour with the hue halfway to its complement is poor.
+          <li><strong>Good and poor pairs.</strong> Tests that averaged many people's judgements agree: complementary pairs, or pairs a little off them, are good. A colour with the hue halfway to its complement is poor.
             <ul>
-              <li>Good: red and blue; red and blue-green; orange and green-blue or blue; yellow and violet; yellow and blue; yellow-green and violet; green and red-purple. (Wada, by contrast, doubted that red with blue still pleased.)</li>
-              <li>Poor: red and orange; red and yellow; orange and yellow; yellow and green or blue-green; yellow-green and orange or green-blue; green and blue.</li>
-            </ul>
-          </li>
-          <li><strong>Three or more colours.</strong> Take hues that divide the hue circle about equally, such as red, yellow and blue, and make one or two of them lighter or darker.</li>
-          <li><strong>Same and similar colours</strong> (one colour, deep and pale, light and dark, or neighbouring hues) are generally liked as mild and pleasant.</li>
+              <li>Good: red and blue, red and blue-green, orange and green-blue (or blue), yellow and violet, yellow and blue, yellow-green and violet, green and red-purple. (Wada, by contrast, doubted that red with blue still pleased.)</li>
+              <li>Poor: red and orange, red and yellow, orange and yellow, yellow and green (or blue-green), yellow-green and orange (or green-blue), green and blue.</li>
+            </ul></li>
+          <li><strong>Three or more colours.</strong> Take hues that divide the hue circle about equally, such as red, yellow and blue, and make one or two of them lighter or darker.
+            <ul class="examples">
+              <li><a data-combination="168"></a> <p>A blue, a yellow and a purplish red, about a third of the circle apart, the blue dark and the yellow light.</p></li>
+            </ul></li>
+          <li><strong>Same and similar colours</strong> (one colour, deep and pale, light and dark, or neighbouring hues) are generally liked as mild and pleasant.
+            <ul class="examples">
+              <li><a data-combination="120"></a> <p>One red, deep and pale, Pompeian Red and Cameo Pink.</p></li>
+            </ul></li>
           <li><strong>Variety and unity.</strong> Opposite colours give variety, and look beautiful at first, but tire with long looking: people come to prefer the plainer, milder combinations they first thought dull. So combining colours is balancing variety and unity, for the purpose in hand. Where there is too much variety, change some colours' lightness and saturation to unify them.</li>
           <li><strong>One dominant colour.</strong> Many colours together easily look scattered: let one of them dominate, to hold the rest together.</li>
-          <li><strong>Tone, like a key in music.</strong> Colours of one tone (equally light, pale or greyed) sit together; different tones, used well, add life and save a design from flatness; used thoughtlessly, they are off-key.</li>
+          <li><strong>Tone, like a key in music.</strong> Colours of one tone (equally light, pale or greyed) sit together. Different tones, used well, add life and save a design from flatness. Used thoughtlessly, they are off-key.
+            <ul class="examples">
+              <li><a data-combination="153"></a> <p>Eosine Pink, Orange Yellow and Citron Yellow, of about the same lightness and saturation.</p></li>
+            </ul></li>
           <li><strong>Even steps.</strong> Within one series of tints, shades or greyed colours, colours at even steps, every second or every third, go well together.</li>
-          <li><strong>Seen from afar.</strong> In earlier tests he cites, black on yellow read from furthest away, then green, red and blue on white; in a more recent one, lightness contrast decided most of it.</li>
+          <li><strong>Seen from afar.</strong> In earlier tests he cites, black on yellow read from furthest away, then green, red and blue on white. In a more recent one, lightness contrast decided most of it.</li>
         </ul>
 
         <section class="sources">
@@ -928,8 +1130,11 @@
     <section id="theory-view" hidden>
       <article class="prose">
         <h1>Colour theory</h1>
-        <p class="lead">The ideas behind the book and this site's views: how colour works, how it is described, and what changes it, as Wada and Hama taught them in the 1930s. Where today's colour science says otherwise, a note says so.</p>
+        <p class="lead">Before combining colours, it helps to know what a colour is made of. This page is a short introduction to colour theory: what colour is, how to describe it, how colours mix and act on one another, and how they are ordered and named.</p>
+        <p class="lead">The aim is to help you understand Wada Sanzō's work: the basics of colour as he understood them, from the booklets that went with his combinations (1934 and 1935), and the system and names he wrote his colours in. Hama Yaohiko, who made a colour atlas with him in 1935, covered the same ground in more detail in its commentary, and fills in much of what follows. Where he saw something differently, the text says so. Colour science has moved on since the 1930s, so where it now says otherwise, a note explains what changed. The site also adds three other colour systems to Ostwald's.</p>
+        <p class="lead">You don't need any of it to use the combinations, but it explains the words <a href="#guidance">Guidance</a> uses and how the <a href="#colors">Colors</a> views order the palette.</p>
         <nav aria-label="On this page"><ul class="contents">
+          <li><a href="#theory">Introduction</a></li>
           <li><a href="#theory/light">Light and colour</a></li>
           <li><a href="#theory/attributes">Describing a colour</a></li>
           <li><a href="#theory/complements">Complementary colours</a></li>
@@ -943,32 +1148,130 @@
         </ul></nav>
 
         <h2 id="theory-light">Light and colour</h2>
-        <p>White light is a mix of wavelengths: a prism spreads it into the spectrum, from red to violet. An object has a colour because it absorbs part of the light and sends back the rest: its colour is white light, less what it absorbs, and in the dark it has none. A red paint doesn't send back only red light, Hama pointed out: a pigment absorbs about half the spectrum, and one that sent back only red would look almost black.</p>
-        <p class="today"><strong>Today:</strong> the eye's three kinds of cone, which Hama doubted (none had been found), are established. The brain makes the colour from them, so the same light can look different in different surroundings, and different lights can look the same.</p>
+        <p>Colour needs light. In the dark, nothing has a colour. White light, such as sunlight, is a mix of all the colours, and a prism spreads it out into the spectrum, from red to violet.</p>
+        <p>An object absorbs part of the light that falls on it and reflects the rest, and the light it reflects is what we see as its colour. A pigment absorbs about half the spectrum and reflects the half around its own colour. A red that reflected only red light would look almost black, not bright red, because it would reflect so little light.</p>
+        <p>An object that absorbed all light would look black, and one that reflected all of it would look white. White, black and the greys between them are colours without hue. No material is perfectly white or perfectly black, so whites differ from one another, and so do blacks, just as other colours do.</p>
+        <p>The light itself isn't coloured, though. The colour is made in the eye and the brain. In the eye, cones see colour in daylight, and rods, which see only light and dark, take over in dim light.</p>
+        <p>So a colour is never quite fixed. It changes with the light, with the colours around it and with the material it's on. That is true of this site too, as Wada's colours are printed inks, which reflect light, while a screen gives off light of its own. The colours here are computed from the books' printing values. They come close to the printed page, but every screen shows them a little differently.</p>
 
         <h2 id="theory-attributes">Describing a colour</h2>
         <p>Wada and Hama both describe a colour by three attributes:</p>
         <ul>
-          <li><strong>Hue:</strong> red, yellow, green, blue and so on, round a circle that closes through the purples, which the spectrum lacks.</li>
-          <li><strong>Lightness:</strong> how light or dark it is, matched against a scale of greys.</li>
-          <li><strong>Saturation:</strong> how strong the colour is, against the pure one. Wada's earlier booklet treats it as depth: red thinned with water is paler, red laid over red deeper. Hama keeps depth apart: a colour laid over itself takes on black, and grows darker.</li>
+          <li><strong>Hue:</strong> the quality we call red, yellow, green, blue and so on, set by the part of the spectrum a colour reflects most. The purples, which mix the spectrum's two ends, red and violet, join those ends, so the hues run on with no start or end, and are often drawn as a circle.
+            <figure class="hue-ring">
+              <svg viewBox="-1.02 -1.02 2.04 2.04" role="img" aria-label="Ostwald's hue circle: the full colours of his 24 hues, from yellow through orange, red, violet, ultramarine, ice blue, sea green and leaf green, and back to yellow">
+                <path d="M -0.1305 -0.9914 A 1.0 1.0 0 0 1 0.1305 -0.9914 L 0.0809 -0.6147 A 0.62 0.62 0 0 0 -0.0809 -0.6147 Z" fill="oklch(0.8987 0.1855 105.11)"/>
+                <path d="M 0.1305 -0.9914 A 1.0 1.0 0 0 1 0.3827 -0.9239 L 0.2373 -0.5728 A 0.62 0.62 0 0 0 0.0809 -0.6147 Z" fill="oklch(0.8639 0.1704 95.21)"/>
+                <path d="M 0.3827 -0.9239 A 1.0 1.0 0 0 1 0.6088 -0.7934 L 0.3774 -0.4919 A 0.62 0.62 0 0 0 0.2373 -0.5728 Z" fill="oklch(0.8070 0.1520 82.59)"/>
+                <path d="M 0.6088 -0.7934 A 1.0 1.0 0 0 1 0.7934 -0.6088 L 0.4919 -0.3774 A 0.62 0.62 0 0 0 0.3774 -0.4919 Z" fill="oklch(0.7457 0.1437 65.09)"/>
+                <path d="M 0.7934 -0.6088 A 1.0 1.0 0 0 1 0.9239 -0.3827 L 0.5728 -0.2373 A 0.62 0.62 0 0 0 0.4919 -0.3774 Z" fill="oklch(0.6825 0.1536 45.28)"/>
+                <path d="M 0.9239 -0.3827 A 1.0 1.0 0 0 1 0.9914 -0.1305 L 0.6147 -0.0809 A 0.62 0.62 0 0 0 0.5728 -0.2373 Z" fill="oklch(0.6123 0.1890 25.19)"/>
+                <path d="M 0.9914 -0.1305 A 1.0 1.0 0 0 1 0.9914 0.1305 L 0.6147 0.0809 A 0.62 0.62 0 0 0 0.6147 -0.0809 Z" fill="oklch(0.6019 0.2044 6.25)"/>
+                <path d="M 0.9914 0.1305 A 1.0 1.0 0 0 1 0.9239 0.3827 L 0.5728 0.2373 A 0.62 0.62 0 0 0 0.6147 0.0809 Z" fill="oklch(0.5721 0.1860 349.81)"/>
+                <path d="M 0.9239 0.3827 A 1.0 1.0 0 0 1 0.7934 0.6088 L 0.4919 0.3774 A 0.62 0.62 0 0 0 0.5728 0.2373 Z" fill="oklch(0.5288 0.1505 336.27)"/>
+                <path d="M 0.7934 0.6088 A 1.0 1.0 0 0 1 0.6088 0.7934 L 0.3774 0.4919 A 0.62 0.62 0 0 0 0.4919 0.3774 Z" fill="oklch(0.5030 0.1290 322.36)"/>
+                <path d="M 0.6088 0.7934 A 1.0 1.0 0 0 1 0.3827 0.9239 L 0.2373 0.5728 A 0.62 0.62 0 0 0 0.3774 0.4919 Z" fill="oklch(0.4851 0.1160 306.36)"/>
+                <path d="M 0.3827 0.9239 A 1.0 1.0 0 0 1 0.1305 0.9914 L 0.0809 0.6147 A 0.62 0.62 0 0 0 0.2373 0.5728 Z" fill="oklch(0.4714 0.1116 289.01)"/>
+                <path d="M 0.1305 0.9914 A 1.0 1.0 0 0 1 -0.1305 0.9914 L -0.0809 0.6147 A 0.62 0.62 0 0 0 0.0809 0.6147 Z" fill="oklch(0.4721 0.1150 271.07)"/>
+                <path d="M -0.1305 0.9914 A 1.0 1.0 0 0 1 -0.3827 0.9239 L -0.2373 0.5728 A 0.62 0.62 0 0 0 -0.0809 0.6147 Z" fill="oklch(0.5141 0.1284 250.57)"/>
+                <path d="M -0.3827 0.9239 A 1.0 1.0 0 0 1 -0.6088 0.7934 L -0.3774 0.4919 A 0.62 0.62 0 0 0 -0.2373 0.5728 Z" fill="oklch(0.5855 0.1691 230.41)"/>
+                <path d="M -0.6088 0.7934 A 1.0 1.0 0 0 1 -0.7934 0.6088 L -0.4919 0.3774 A 0.62 0.62 0 0 0 -0.3774 0.4919 Z" fill="oklch(0.6186 0.1696 215.92)"/>
+                <path d="M -0.7934 0.6088 A 1.0 1.0 0 0 1 -0.9239 0.3827 L -0.5728 0.2373 A 0.62 0.62 0 0 0 -0.4919 0.3774 Z" fill="oklch(0.6067 0.1542 204.43)"/>
+                <path d="M -0.9239 0.3827 A 1.0 1.0 0 0 1 -0.9914 0.1305 L -0.6147 0.0809 A 0.62 0.62 0 0 0 -0.5728 0.2373 Z" fill="oklch(0.5984 0.1484 194.12)"/>
+                <path d="M -0.9914 0.1305 A 1.0 1.0 0 0 1 -0.9914 -0.1305 L -0.6147 -0.0809 A 0.62 0.62 0 0 0 -0.6147 0.0809 Z" fill="oklch(0.5914 0.1481 184.48)"/>
+                <path d="M -0.9914 -0.1305 A 1.0 1.0 0 0 1 -0.9239 -0.3827 L -0.5728 -0.2373 A 0.62 0.62 0 0 0 -0.6147 -0.0809 Z" fill="oklch(0.5813 0.1562 171.03)"/>
+                <path d="M -0.9239 -0.3827 A 1.0 1.0 0 0 1 -0.7934 -0.6088 L -0.4919 -0.3774 A 0.62 0.62 0 0 0 -0.5728 -0.2373 Z" fill="oklch(0.6080 0.1581 154.62)"/>
+                <path d="M -0.7934 -0.6088 A 1.0 1.0 0 0 1 -0.6088 -0.7934 L -0.3774 -0.4919 A 0.62 0.62 0 0 0 -0.4919 -0.3774 Z" fill="oklch(0.6830 0.1514 138.10)"/>
+                <path d="M -0.6088 -0.7934 A 1.0 1.0 0 0 1 -0.3827 -0.9239 L -0.2373 -0.5728 A 0.62 0.62 0 0 0 -0.3774 -0.4919 Z" fill="oklch(0.7591 0.1585 123.99)"/>
+                <path d="M -0.3827 -0.9239 A 1.0 1.0 0 0 1 -0.1305 -0.9914 L -0.0809 -0.6147 A 0.62 0.62 0 0 0 -0.2373 -0.5728 Z" fill="oklch(0.8300 0.1706 113.42)"/>
+              </svg>
+            </figure>
+          </li>
+          <li><strong>Lightness:</strong> how light or dark it is, matched against a scale of greys.
+            <div class="lightness-steps" role="img" aria-label="Six hues of the circle above, from yellow round to green, and grey, each from dark at the top to light at the bottom, each row at one lightness">
+              <div><span style="--c: oklch(0.35 0.068 105.11)"></span><span style="--c: oklch(0.5 0.098 105.11)"></span><span style="--c: oklch(0.65 0.1 105.11)"></span><span style="--c: oklch(0.8 0.1 105.11)"></span><span style="--c: oklch(0.92 0.1 105.11)"></span></div>
+              <div><span style="--c: oklch(0.35 0.092 45.28)"></span><span style="--c: oklch(0.5 0.1 45.28)"></span><span style="--c: oklch(0.65 0.1 45.28)"></span><span style="--c: oklch(0.8 0.1 45.28)"></span><span style="--c: oklch(0.92 0.041 45.28)"></span></div>
+              <div><span style="--c: oklch(0.35 0.1 336.27)"></span><span style="--c: oklch(0.5 0.1 336.27)"></span><span style="--c: oklch(0.65 0.1 336.27)"></span><span style="--c: oklch(0.8 0.1 336.27)"></span><span style="--c: oklch(0.92 0.054 336.27)"></span></div>
+              <div><span style="--c: oklch(0.35 0.1 271.07)"></span><span style="--c: oklch(0.5 0.1 271.07)"></span><span style="--c: oklch(0.65 0.1 271.07)"></span><span style="--c: oklch(0.8 0.092 271.07)"></span><span style="--c: oklch(0.92 0.035 271.07)"></span></div>
+              <div><span style="--c: oklch(0.35 0.055 204.43)"></span><span style="--c: oklch(0.5 0.078 204.43)"></span><span style="--c: oklch(0.65 0.1 204.43)"></span><span style="--c: oklch(0.8 0.1 204.43)"></span><span style="--c: oklch(0.92 0.078 204.43)"></span></div>
+              <div><span style="--c: oklch(0.35 0.08 154.62)"></span><span style="--c: oklch(0.5 0.1 154.62)"></span><span style="--c: oklch(0.65 0.1 154.62)"></span><span style="--c: oklch(0.8 0.1 154.62)"></span><span style="--c: oklch(0.92 0.1 154.62)"></span></div>
+              <div class="grey"><span style="--c: oklch(0.35 0 0)"></span><span style="--c: oklch(0.5 0 0)"></span><span style="--c: oklch(0.65 0 0)"></span><span style="--c: oklch(0.8 0 0)"></span><span style="--c: oklch(0.92 0 0)"></span></div>
+            </div>
+          </li>
+          <li><strong>Saturation:</strong> how strong the colour is, against the pure one. Wada's 1934 booklet treats it as depth, so red thinned with water is paler, and red laid over red deeper. Hama keeps depth apart, as a colour laid over itself takes on black and grows darker. Many colour systems today use a close relative, chroma, which measures how far a colour is from the grey of the same lightness.
+            <div class="saturation-steps">
+              <figure><div class="strength" role="img" aria-label="One red at one lightness, from grey on the left to the full colour on the right"><span style="--c: oklch(0.6019 0.0 6.25)"></span><span style="--c: oklch(0.6019 0.0511 6.25)"></span><span style="--c: oklch(0.6019 0.1022 6.25)"></span><span style="--c: oklch(0.6019 0.1533 6.25)"></span><span style="--c: oklch(0.6019 0.2044 6.25)"></span></div><figcaption>Saturation, from grey to the full colour at one lightness</figcaption></figure>
+              <figure><div class="depth" role="img" aria-label="One red paint, from thinned with water on the left, through the paint as it is in the middle, to laid over itself twice and three times on the right"><span style="--c: oklch(0.8328 0.0893 6.25)"></span><span style="--c: oklch(0.7215 0.1513 6.25)"></span><span style="--c: oklch(0.6019 0.2044 6.25)"></span><span style="--c: oklch(0.5089 0.2032 6.25)"></span><span style="--c: oklch(0.4531 0.1818 6.25)"></span></div><figcaption>Depth, from thinned with water to laid over itself</figcaption></figure>
+            </div>
+          </li>
         </ul>
-        <p>Adding white to a colour gives tints, adding black gives shades, adding grey gives greyed (broken) tones: from one hue, hundreds of colours. Hama drew them as a triangle, after Ostwald, with the full colour at one corner and white and black at the others; all the hues' triangles together make a solid, white at the top, black at the bottom, the full colours round the middle. He knew this was simplified: yellow's full colour should sit higher, and blue's lower.</p>
-        <p>Full colours aren't equally light. Matched against greys, yellow is lightest, then orange-yellow and yellow-green, then orange and green, red and blue-green, blue and red-purple, and purple darkest.</p>
-        <p>Nor do equal amounts of white look like equal steps: a little white lightens a dark grey far more than a light one. So Hama made his grey scale with its white falling by a constant ratio, not in tenths.</p>
-        <p class="today"><strong>Today:</strong> most colour systems still use these three attributes, now measured so that equal steps look equal (see <a href="#theory/systems">colour systems</a>), and the measured solid is lopsided, yellow's full colour far lighter than blue's. Greys that look evenly spaced follow roughly the cube root of how much light they send back (Munsell's value, CIE L*): a constant ratio crowds the dark steps.</p>
+        <p><strong>Tone</strong> brings the last two together. Colours of different hues with about the same lightness and saturation, all pale, say, or all dark and greyed, share a tone. Much of the advice in <a href="#guidance">Guidance</a> is about tones.</p>
+        <div class="tone-rows">
+          <figure><div role="img" aria-label="Six hues, from yellow round to green, all light and greyed"><span style="--c: oklch(0.8218 0.0431 101.43)"></span><span style="--c: oklch(0.7689 0.0298 34.02)"></span><span style="--c: oklch(0.7859 0.0188 335.60)"></span><span style="--c: oklch(0.7843 0.0135 279.43)"></span><span style="--c: oklch(0.7760 0.0221 211.19)"></span><span style="--c: oklch(0.7744 0.0232 155.44)"></span></div><figcaption>Light and greyed</figcaption></figure>
+          <figure><div role="img" aria-label="Six hues, from yellow round to green, all light and clear, about as light as the row above"><span style="--c: oklch(0.9233 0.1224 103.46)"></span><span style="--c: oklch(0.7767 0.0915 38.09)"></span><span style="--c: oklch(0.7649 0.0717 335.79)"></span><span style="--c: oklch(0.7545 0.0528 277.75)"></span><span style="--c: oklch(0.7600 0.0778 208.59)"></span><span style="--c: oklch(0.7588 0.0812 155.19)"></span></div><figcaption>Light and clear</figcaption></figure>
+          <figure><div role="img" aria-label="Six hues, from yellow round to green, all dark and greyed"><span style="--c: oklch(0.5237 0.0607 103.06)"></span><span style="--c: oklch(0.4505 0.0445 37.03)"></span><span style="--c: oklch(0.4520 0.0333 335.74)"></span><span style="--c: oklch(0.4482 0.0244 278.26)"></span><span style="--c: oklch(0.4464 0.0368 209.25)"></span><span style="--c: oklch(0.4452 0.0384 155.26)"></span></div><figcaption>Dark and greyed</figcaption></figure>
+        </div>
+        <p>Mixing a colour with white gives its tints, with black its shades, and with grey its greyed tones, so one hue gives hundreds of colours. Ostwald, whose system Wada used, drew them as a triangle, with the full colour at one corner and white and black at the other two. Stood round an axis of greys, the triangles of all the hues make a three-dimensional shape, two cones joined at their bases. This colour solid has white at the top, black at the bottom and the full colours round its widest part, the middle (see the <a href="#colors" data-layout="ostwald">Ostwald view</a>).</p>
+        <figure class="hue-triangle"><svg viewBox="-0.9 -0.54 6.1 6.08" role="img" aria-label="One red as Ostwald drew it, a triangle with white at the top, black at the bottom and the full colour at the right corner, its tints along the upper edge, its shades along the lower one and its greyed tones inside"><path d="M-0.866 0L0.000 -0.5L0.866 0L0.000 0.5Z" fill="oklch(0.9623 0.0000 0.00)"/><path d="M0.000 0.5L0.866 0L1.732 0.5L0.866 1Z" fill="oklch(0.8344 0.0593 5.31)"/><path d="M-0.866 1L0.000 0.5L0.866 1L0.000 1.5Z" fill="oklch(0.7762 0.0000 0.00)"/><path d="M0.866 1L1.732 0.5L2.598 1L1.732 1.5Z" fill="oklch(0.7355 0.1130 5.57)"/><path d="M0.000 1.5L0.866 1L1.732 1.5L0.866 2Z" fill="oklch(0.6730 0.0478 5.31)"/><path d="M-0.866 2L0.000 1.5L0.866 2L0.000 2.5Z" fill="oklch(0.6261 0.0000 0.00)"/><path d="M1.732 1.5L2.598 1L3.464 1.5L2.598 2Z" fill="oklch(0.6679 0.1556 5.84)"/><path d="M0.866 2L1.732 1.5L2.598 2L1.732 2.5Z" fill="oklch(0.5933 0.0912 5.57)"/><path d="M0.000 2.5L0.866 2L1.732 2.5L0.866 3Z" fill="oklch(0.5429 0.0386 5.31)"/><path d="M-0.866 3L0.000 2.5L0.866 3L0.000 3.5Z" fill="oklch(0.5051 0.0000 0.00)"/><path d="M2.598 2L3.464 1.5L4.330 2L3.464 2.5Z" fill="oklch(0.6262 0.1856 6.08)"/><path d="M1.732 2.5L2.598 2L3.464 2.5L2.598 3Z" fill="oklch(0.5388 0.1256 5.84)"/><path d="M0.866 3L1.732 2.5L2.598 3L1.732 3.5Z" fill="oklch(0.4786 0.0735 5.57)"/><path d="M0.000 3.5L0.866 3L1.732 3.5L0.866 4Z" fill="oklch(0.4380 0.0311 5.31)"/><path d="M-0.866 4L0.000 3.5L0.866 4L0.000 4.5Z" fill="oklch(0.4074 0.0000 0.00)"/><path d="M3.464 2.5L4.330 2L5.196 2.5L4.330 3Z" fill="oklch(0.6019 0.2044 6.25)"/><path d="M2.598 3L3.464 2.5L4.330 3L3.464 3.5Z" fill="oklch(0.5052 0.1497 6.08)"/><path d="M1.732 3.5L2.598 3L3.464 3.5L2.598 4Z" fill="oklch(0.4346 0.1013 5.84)"/><path d="M0.866 4L1.732 3.5L2.598 4L1.732 4.5Z" fill="oklch(0.3861 0.0593 5.57)"/><path d="M0.000 4.5L0.866 4L1.732 4.5L0.866 5Z" fill="oklch(0.3533 0.0251 5.31)"/><path d="M-0.866 5L0.000 4.5L0.866 5L0.000 5.5Z" fill="oklch(0.3287 0.0000 0.00)"/></svg></figure>
+        <p>Full colours aren't equally light, though. Matched against greys, yellow is the lightest, then orange-yellow and yellow-green, then orange and green, red and blue-green, blue and red-purple, and purple is the darkest.</p>
+        <figure class="full-lightness"><div role="img" aria-label="Twelve full colours from the lightest to the darkest, yellow first and blue-purple last, each over a grey as light as itself"><span style="--c: oklch(0.8987 0.1855 105.11)"></span><span style="--c: oklch(0.8070 0.1520 82.59)"></span><span style="--c: oklch(0.7591 0.1585 123.99)"></span><span style="--c: oklch(0.6825 0.1536 45.28)"></span><span style="--c: oklch(0.6080 0.1581 154.62)"></span><span style="--c: oklch(0.6067 0.1542 204.43)"></span><span style="--c: oklch(0.6019 0.2044 6.25)"></span><span style="--c: oklch(0.5914 0.1481 184.48)"></span><span style="--c: oklch(0.5855 0.1691 230.41)"></span><span style="--c: oklch(0.5288 0.1505 336.27)"></span><span style="--c: oklch(0.4851 0.1160 306.36)"></span><span style="--c: oklch(0.4721 0.1150 271.07)"></span><span style="--c: oklch(0.8987 0 0)"></span><span style="--c: oklch(0.8070 0 0)"></span><span style="--c: oklch(0.7591 0 0)"></span><span style="--c: oklch(0.6825 0 0)"></span><span style="--c: oklch(0.6080 0 0)"></span><span style="--c: oklch(0.6067 0 0)"></span><span style="--c: oklch(0.6019 0 0)"></span><span style="--c: oklch(0.5914 0 0)"></span><span style="--c: oklch(0.5855 0 0)"></span><span style="--c: oklch(0.5288 0 0)"></span><span style="--c: oklch(0.4851 0 0)"></span><span style="--c: oklch(0.4721 0 0)"></span></div></figure>
+        <p class="remark"><strong>Hama's view:</strong> in the colour solid, the higher a colour sits, the lighter it is, yet every full colour sits on the same ring round the middle, as if all were equally light. Hama noted that this simplifies things. Yellow's full colour is much lighter than blue's, so it should sit higher, nearer the white, and blue's lower, nearer the black.</p>
+        <p>Equal amounts of white don't give equal steps of lightness either. A little white lightens a dark grey far more than a light one, so the grey scale behind the system lets its white fall by a constant ratio, not in tenths.</p>
+        <div class="grey-scales">
+          <figure><div role="img" aria-label="Six greys from white to black, with white in equal amounts, the light greys close together and the dark ones far apart"><span style="--c: oklch(0.9623 0 0)"></span><span style="--c: oklch(0.8962 0 0)"></span><span style="--c: oklch(0.8187 0 0)"></span><span style="--c: oklch(0.7229 0 0)"></span><span style="--c: oklch(0.5912 0 0)"></span><span style="--c: oklch(0.3287 0 0)"></span></div><figcaption>White in equal amounts</figcaption></figure>
+          <figure><div role="img" aria-label="Six greys from white to black, with white falling by a constant ratio, the steps looking even"><span style="--c: oklch(0.9623 0 0)"></span><span style="--c: oklch(0.7762 0 0)"></span><span style="--c: oklch(0.6261 0 0)"></span><span style="--c: oklch(0.5051 0 0)"></span><span style="--c: oklch(0.4074 0 0)"></span><span style="--c: oklch(0.3287 0 0)"></span></div><figcaption>White falling by a constant ratio</figcaption></figure>
+        </div>
+        <p class="remark"><strong>Since then:</strong> many systems, such as Munsell's, PCCS and OKLCH, space lightness in steps that look equal (see <a href="#theory/systems">Colour systems</a>), so in their colour solids the full colours sit at different heights, as Hama said they should. Not all do, and the Swedish NCS, for one, keeps Ostwald's approach.</p>
 
         <h2 id="theory-complements">Complementary colours</h2>
-        <p>Two colours are complementary when, mixed as light or spun together on a disc, they make white or grey. Hama called them twins: the light a colour absorbs is its complement. The eye makes them too: stare at a red paper, take it away, and a blue-green after-image appears in its place. Wada paired colours of his own palette: see <a href="#guidance/pairs">his pairs</a>.</p>
-        <p class="today"><strong>Today:</strong> which colours are complements depends on the model. The painters' pairs (red and green, orange and blue, yellow and purple) differ from those of light (red and cyan, green and magenta, blue and yellow); Wada's and Hama's pairs, such as yellow and blue, or red and blue-green, are close to light's. After-images come from the eye adapting to a colour.</p>
+        <p>Two colours are complementary when, mixed as light or spun together on a disc, they make white or grey. They come in pairs because of how a colour is made. A pigment absorbs part of white light and reflects the rest, and the part it absorbs, seen as light on its own, is the complement of its colour. Together the two make up white light again, like twins born of the same light.</p>
+        <figure class="twins" style="--spectrum: linear-gradient(to right in oklch, oklch(0.5500 0.2130 27.00) 0.0%, oklch(0.6000 0.2324 27.00) 20.0%, oklch(0.7200 0.1809 50.00) 33.3%, oklch(0.9000 0.1814 105.00) 40.7%, oklch(0.8600 0.2137 128.00) 50.0%, oklch(0.7800 0.2331 145.00) 60.0%, oklch(0.7600 0.1232 195.00) 68.3%, oklch(0.5600 0.1753 255.00) 76.7%, oklch(0.4600 0.2748 275.00) 86.7%, oklch(0.4200 0.2132 300.00) 96.7%, oklch(0.3800 0.1929 300.00) 100.0%)">
+          <div><div class="band" role="img" aria-label="The spectrum of white light, from red to violet"></div><span style="--c: oklch(1 0 0)"></span></div>
+          <figcaption>White light</figcaption>
+          <div><div class="band" role="img" aria-label="The part of the spectrum a yellow pigment reflects, from red to blue-green" style="--from: 70.0%; --to: 100%"></div><span style="--c: oklch(0.9784 0.1110 109.42)"></span></div>
+          <figcaption>What a yellow pigment reflects</figcaption>
+          <div><div class="band" role="img" aria-label="The part it absorbs, from blue-green to violet" style="--from: 0%; --to: 70.0%"></div><span style="--c: oklch(0.3901 0.0950 244.30)"></span></div>
+          <figcaption>What it absorbs, its complement</figcaption>
+        </figure>
+        <p>The eye makes complements too. Stare for a while at a red paper on a grey ground, then take it away, and a blue-green after-image appears in its place.</p>
+        <p>On a hue circle, a colour's complement lies roughly opposite it. Ostwald built his so that it always does. To find a colour's exact complement, spin it together with another on a disc, changing how much of each shows. Complements give a neutral grey, and any other pair leaves a trace of colour.</p>
+        <figure class="discs">
+          <div>
+            <div><button type="button" class="disc" aria-pressed="false" aria-label="Spin a dark yellow and a light blue, 70 to 30" style="--a: oklch(0.6718 0.1387 105.11); --b: oklch(0.6831 0.1665 271.07); --w: 69.62%"></button><span style="--c: oklch(0.6753 0 0)"></span></div>
+            <div><button type="button" class="disc" aria-pressed="false" aria-label="Spin orange and turquoise, 33 to 67" style="--a: oklch(0.6825 0.1536 45.28); --b: oklch(0.6119 0.1048 206.54); --w: 33.45%"></button><span style="--c: oklch(0.6385 0 0)"></span></div>
+            <div><button type="button" class="disc" aria-pressed="false" aria-label="Spin red and sea green, 30 to 70" style="--a: oklch(0.6019 0.2044 6.25); --b: oklch(0.5966 0.1053 184.65); --w: 29.95%"></button><span style="--c: oklch(0.5998 0 0)"></span></div>
+            <div><button type="button" class="disc" aria-pressed="false" aria-label="Spin purple and leaf green, 54 to 46" style="--a: oklch(0.5288 0.1505 336.27); --b: oklch(0.6087 0.1515 154.66); --w: 53.55%"></button><span style="--c: oklch(0.5695 0 0)"></span></div>
+          </div>
+          <figcaption>Point at a disc, or tap it, to spin it. Under each, the grey it should make.*</figcaption>
+        </figure>
+        <figure class="discs">
+          <div>
+            <div><button type="button" class="disc" aria-pressed="false" aria-label="Spin red and blue, half and half" style="--a: oklch(0.6713 0.2280 6.25); --b: oklch(0.6492 0.1582 271.07); --w: 50.00%"></button><span style="--c: oklch(0.6620 0.1608 329.70)"></span></div>
+            <div><button type="button" class="disc" aria-pressed="false" aria-label="Spin red and sea green, half and half" style="--a: oklch(0.6019 0.2044 6.25); --b: oklch(0.5966 0.1053 184.65); --w: 50.00%"></button><span style="--c: oklch(0.6010 0.0634 5.43)"></span></div>
+          </div>
+          <figcaption>Red and blue aren't complements, so they make purple. Red and sea green are, but in the wrong shares they leave a reddish grey.*</figcaption>
+        </figure>
+        <p class="screen-note">* A screen shows the spin frame by frame, so how well the colours blend depends on the screen and its refresh rate.</p>
+        <p>Many painting books pair colours differently, from a circle built on red, yellow and blue paint. Each of the three is paired with the mix of the other two, so red with green, yellow with purple and blue with orange. Those pairs come from mixing paint, and paint doesn't mix like light. Yellow and blue paint make green (see <a href="#theory/mixing">Mixing colours</a>), while yellow and blue light make white. The pairs here are those of light.</p>
+        <p>A complement is a matter of hue alone, so a colour's lighter and darker tones share it. Pink and maroon have the same complement as red. Wada drew up a table of such pairs from his own palette (see <a href="#guidance/pairs">his pairs</a>).</p>
 
         <h2 id="theory-mixing">Mixing colours</h2>
+        <p>Colours can be mixed in three ways, and each gives different results.</p>
         <ul>
-          <li><strong>Paints subtract.</strong> Each absorbs part of the light, so a mix is darker than its colours, with a hue between theirs on the circle: the further apart they are, the duller the mix, and opposite colours make grey or near black. Painters and dyers often dull a colour with its complement rather than with black, for a softer result.</li>
-          <li><strong>Light adds.</strong> Red, green and blue lights make every hue: red and green make yellow, and all three make white. Spun on a disc, as Hama mixed them, or in fine dots, colours average instead: a complementary pair gives grey, not white.</li>
-          <li><strong>Yellow and blue paint make green,</strong> not grey: between them they absorb both ends of the spectrum, and leave its middle.</li>
+          <li><p><strong>Paints subtract.</strong> Each paint absorbs part of the light, and in a mix each also absorbs some of what the other reflects. As a rule of thumb, the mix's hue lies between the two on the hue circle, and it's darker than the two averaged. The further apart they are, the duller and darker the mix, until opposite colours give grey or near black. That's why painters often dull a colour with a touch of its complement rather than with black, for a softer result.</p>
+            <figure class="paint-mixes"><div role="img" aria-label="Red mixed as paint with orange, yellow, green and blue-green, each mix beside the pair, getting duller and darker down to a near grey"><div><span style="--c: oklch(0.6207 0.2087 31.06)"></span><span style="--c: oklch(0.7381 0.1687 46.99)"></span><span class="result" style="--c: oklch(0.6671 0.2057 37.24)"></span></div><div><span style="--c: oklch(0.6207 0.2087 31.06)"></span><span style="--c: oklch(0.9145 0.1732 99.80)"></span><span class="result" style="--c: oklch(0.6856 0.1899 41.87)"></span></div><div><span style="--c: oklch(0.6207 0.2087 31.06)"></span><span style="--c: oklch(0.7391 0.1861 153.10)"></span><span class="result" style="--c: oklch(0.5053 0.0555 108.16)"></span></div><div><span style="--c: oklch(0.6207 0.2087 31.06)"></span><span style="--c: oklch(0.7562 0.1262 197.01)"></span><span class="result" style="--c: oklch(0.4950 0.0224 126.45)"></span></div></div><figcaption>Red mixed as paint with orange, yellow, green and blue-green (modelled). The further apart, the duller and darker the mix.</figcaption></figure>
+            <p>Some pairs break the rule, because a mix depends on all the light each paint reflects, not only on how it looks. The best known is yellow and blue. Mixed as light, they make white, as complements do. Mixed as paints, they make green. Yellow paint absorbs the blue end of the spectrum and blue paint the red end, and the green in the middle, which both reflect, is all that's left.</p></li>
+          <li><strong>Light adds.</strong> Lights shone together add up, so a mix is lighter than either. Red and green light make yellow. The further apart two lights are on the circle, the paler the mix, and opposite colours make white.
+            <figure class="lights"><svg viewBox="0 0 100 88" role="img" aria-label="Red, green and blue lights overlapping on black: red and green make yellow, green and blue cyan, blue and red magenta, and all three white"><rect width="100" height="88" rx="4"/><g><circle cx="39" cy="34" r="22" fill="#f00"/><circle cx="61" cy="34" r="22" fill="#0f0"/><circle cx="50" cy="53" r="22" fill="#00f"/></g></svg><figcaption>Red, green and blue lights. Two make yellow, cyan or magenta, and all three white.</figcaption></figure>
+          </li>
+          <li><strong>Spinning and dots average.</strong> On a spinning disc, or in dots too small to see apart, colours neither subtract nor add but average. The mix is as light as the two averaged, so a complementary pair gives grey, not white.
+            <figure class="dots"><div><div class="pair"><span style="--c: oklch(0.9145 0.1732 99.80); --s: 0.3359"></span><span style="--c: oklch(0.5146 0.1498 257.66); --s: 0.6641"></span></div><button type="button" class="dot-patch" aria-pressed="false" aria-label="Enlarge the dots"><svg width="96" height="64" viewBox="0 0 96 64" shape-rendering="crispEdges" aria-hidden="true"><defs><pattern id="dots-yb" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="oklch(0.5146 0.1498 257.66)"/><g fill="oklch(0.9145 0.1732 99.80)"><rect x="0" y="0" width="1" height="1"/><rect x="2" y="0" width="1" height="1"/><rect x="4" y="0" width="1" height="1"/><rect x="6" y="0" width="1" height="1"/><rect x="8" y="0" width="1" height="1"/><rect x="10" y="0" width="1" height="1"/><rect x="12" y="0" width="1" height="1"/><rect x="14" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="5" y="1" width="1" height="1"/><rect x="9" y="1" width="1" height="1"/><rect x="13" y="1" width="1" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="8" y="2" width="1" height="1"/><rect x="10" y="2" width="1" height="1"/><rect x="12" y="2" width="1" height="1"/><rect x="14" y="2" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="11" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="6" y="4" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="12" y="4" width="1" height="1"/><rect x="14" y="4" width="1" height="1"/><rect x="1" y="5" width="1" height="1"/><rect x="5" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="13" y="5" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/><rect x="8" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="12" y="6" width="1" height="1"/><rect x="14" y="6" width="1" height="1"/><rect x="7" y="7" width="1" height="1"/><rect x="0" y="8" width="1" height="1"/><rect x="2" y="8" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="6" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="10" y="8" width="1" height="1"/><rect x="12" y="8" width="1" height="1"/><rect x="14" y="8" width="1" height="1"/><rect x="1" y="9" width="1" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="9" y="9" width="1" height="1"/><rect x="13" y="9" width="1" height="1"/><rect x="0" y="10" width="1" height="1"/><rect x="2" y="10" width="1" height="1"/><rect x="4" y="10" width="1" height="1"/><rect x="6" y="10" width="1" height="1"/><rect x="8" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/><rect x="12" y="10" width="1" height="1"/><rect x="14" y="10" width="1" height="1"/><rect x="3" y="11" width="1" height="1"/><rect x="11" y="11" width="1" height="1"/><rect x="0" y="12" width="1" height="1"/><rect x="2" y="12" width="1" height="1"/><rect x="4" y="12" width="1" height="1"/><rect x="6" y="12" width="1" height="1"/><rect x="8" y="12" width="1" height="1"/><rect x="10" y="12" width="1" height="1"/><rect x="12" y="12" width="1" height="1"/><rect x="14" y="12" width="1" height="1"/><rect x="1" y="13" width="1" height="1"/><rect x="5" y="13" width="1" height="1"/><rect x="9" y="13" width="1" height="1"/><rect x="13" y="13" width="1" height="1"/><rect x="0" y="14" width="1" height="1"/><rect x="2" y="14" width="1" height="1"/><rect x="4" y="14" width="1" height="1"/><rect x="6" y="14" width="1" height="1"/><rect x="8" y="14" width="1" height="1"/><rect x="10" y="14" width="1" height="1"/><rect x="12" y="14" width="1" height="1"/><rect x="14" y="14" width="1" height="1"/><rect x="15" y="15" width="1" height="1"/></g></pattern></defs><rect width="96" height="64" fill="url(#dots-yb)"/></svg></button><span style="--c: oklch(0.7033 0 0)"></span></div><div><div class="pair"><span style="--c: #f00; --s: 0.5"></span><span style="--c: #0f0; --s: 0.5"></span></div><button type="button" class="dot-patch" aria-pressed="false" aria-label="Enlarge the dots"><svg width="96" height="64" viewBox="0 0 96 64" shape-rendering="crispEdges" aria-hidden="true"><defs><pattern id="dots-rg" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#0f0"/><rect width="1" height="1" fill="#f00"/><rect x="1" y="1" width="1" height="1" fill="#f00"/></pattern></defs><rect width="96" height="64" fill="url(#dots-rg)"/></svg></button><span style="--c: oklch(0.7683 0.1675 109.77)"></span></div><figcaption>Dots of two colours, in the shares shown on their left. Seen from further away, each patch blends into the colour on its right. Point at the dots, or tap them, to enlarge them.</figcaption></figure>
+          </li>
         </ul>
-        <p class="today"><strong>Today:</strong> the painters' red, yellow and blue are a tradition, not a law. Printing mixes cyan, magenta and yellow (Hama's advice, to choose a greenish blue and a purplish red, already leads that way), and screens mix red, green and blue. Rules of proportion such as George Field's, 3 of yellow to 5 of red and 8 of blue, depend on the paints.</p>
+        <figure class="three-ways"><div><div class="pair"><span style="--c: oklch(0.9145 0.1732 99.80); --s: 0.3359"></span><span style="--c: oklch(0.5146 0.1498 257.66); --s: 0.6641"></span></div><div><span style="--c: oklch(0.5699 0.1239 150.80)"></span><small>Paint</small></div><div><span class="light" style="--c: oklch(1 0 0)"></span><small>Light</small></div><div><span style="--c: oklch(0.7033 0 0)"></span><small>Averaged</small></div></div><figcaption>Yellow and blue mixed three ways. As paint they make green (modelled), as light white, and averaged grey.</figcaption></figure>
+        <p>Each kind of mixing starts from a few colours, its primaries, chosen so that their mixes give as many colours as possible. For light they are red, green and blue. For paints, long practice settled on red, yellow and blue.</p>
+        <p>With paints, which red, yellow and blue you choose matters. The most colours come from a yellow leaning to neither orange nor green, a slightly greenish blue such as Prussian blue, and a purplish red such as carmine. Even so, no choice suits every mix. Primaries that give a clear green give dull purples, and the other way round.</p>
+        <p class="remark"><strong>Since then:</strong> the primaries for paints and inks are taken to be cyan, magenta and yellow, close to the greenish blue and purplish red above, and red, yellow and blue are seen as a painters' tradition. No three primaries, of paint or of light, mix every colour either. They give every hue, but not every hue at its strongest.</p>
 
         <h2 id="theory-contrast">Contrast</h2>
         <ul>
@@ -988,15 +1291,15 @@
           <li><strong>The material.</strong> The same colour differs as oil paint, watercolour or dye, and on silk, cotton or linen: oils look dark and deep, pastels light, watercolours between. A wet surface looks more saturated than a dry one.</li>
           <li><strong>The area.</strong> Large areas look paler and weaker than small swatches, as <a href="#guidance/using">Wada warned</a>.</li>
         </ul>
-        <p class="today"><strong>Today:</strong> the eye also adapts to the light, which hides much of its shift; and two colours that match in one light can differ in another.</p>
+        <p class="remark"><strong>Since then:</strong> the eye also adapts to the light, which hides much of its shift, and two colours that match in one light can differ in another.</p>
 
         <h2 id="theory-character">Strong and weak, warm and cool</h2>
         <ul>
           <li><strong>Strength.</strong> Wada ranked colours by how much they excite the eye: red most, then orange, yellow, green, blue and indigo, violet least. That is why danger signals are red. People differ, he said, but this order is generally accepted.</li>
           <li><strong>Warm and cool.</strong> Red, orange and yellow are warm, blue and green cool: Hama traced it to fire and to deep, clear water. But every hue has warmer and cooler kinds: for Wada, celadon is a warm green and evergreen a cool one, and canary a cooler yellow than turmeric.</li>
-          <li><strong>What colours stand for,</strong> in Hama's list, "a kind of code": white and black, purity and seriousness; red, power and passion; yellow, light and joy; green, peace and health; blue, calm and depth; purple, grace and nobility.</li>
+          <li><strong>What colours stand for,</strong> in Hama's list, "a kind of code": white and black for purity and seriousness, red for power and passion, yellow for light and joy, green for peace and health, blue for calm and depth, purple for grace and nobility.</li>
         </ul>
-        <p class="today"><strong>Today:</strong> no fixed order of strength by hue is established: how much a colour stands out depends on its saturation, lightness and surroundings, and red for danger is partly convention.</p>
+        <p class="remark"><strong>Since then:</strong> no fixed order of strength by hue is established: how much a colour stands out depends on its saturation, lightness and surroundings, and red for danger is partly convention.</p>
 
         <h2 id="theory-systems">Colour systems</h2>
         <p>A colour system orders colours by their attributes, so that any colour can be found and written down. This site places Wada's colours in four, each a view under <a href="#colors">Colors</a>:</p>
@@ -1009,31 +1312,31 @@
 
         <h2 id="theory-names">Colour names</h2>
         <p>Wada gathered colour names into books, and gave every colour of his combinations a Japanese name and an English one. The English names come from Robert Ridgway's <i>Color Standards and Color Nomenclature</i>, a few misspelled. Plate 8 of the atlas shows 12 hues, each as tint, full colour and shade, with Wada's names: 35 of them are colours here, and those colours' dialogs say so.</p>
-        <p>Hama adds notes on Japanese names: <i>ao</i> long meant both green and blue; the browns (<i>cha</i>) and the mouse greys (<i>nezumi</i>) were the two great families of colour names in the Edo period; and Kyoto's purple was redder than Edo's.</p>
+        <p>Hama adds notes on Japanese names. <i>Ao</i> long meant both green and blue. The browns (<i>cha</i>) and the mouse greys (<i>nezumi</i>) were the two great families of colour names in the Edo period. Kyoto's purple was redder than Edo's.</p>
 
         <section class="sources">
           <h2 id="theory-sources">Sources</h2>
           <ul>
-            <li>Hama Yaohiko, the commentary to Wada Sanzō and Hama Yaohiko, <span lang="ja">標準色彩圖集</span> (<i>Hyōjun shikisai zushū</i>, a standard colour atlas), 1935: <a href="https://dl.ndl.go.jp/pid/1014901">National Diet Library</a>; its plates, <a href="https://dl.ndl.go.jp/pid/1014903">part 2</a>.</li>
+            <li>Hama Yaohiko, the commentary to Wada Sanzō and Hama Yaohiko, <span lang="ja">標準色彩圖集</span> (<i>Hyōjun shikisai zushū</i>, a standard colour atlas), 1935: <a href="https://dl.ndl.go.jp/pid/1014901">National Diet Library</a>, and its plates, <a href="https://dl.ndl.go.jp/pid/1014903">part 2</a>.</li>
             <li>Wada Sanzō, <span lang="ja">配色總鑑概説と其活用</span> (General remarks on the <i>Haishoku Sōkan</i> and how to use it), Hakubisha, 1934: <a href="https://dl.ndl.go.jp/pid/1911912">National Diet Library</a>.</li>
             <li>Wada Sanzō, <span lang="ja">配色總鑑附說</span> (Supplement to the <i>Haishoku Sōkan</i>), Hakubisha, 1935: <a href="https://dl.ndl.go.jp/pid/1903674">National Diet Library</a>.</li>
             <li>How this site places the colours in each system: the notes linked from the project's <a href="https://github.com/adrian729/wada-sanzo-colors">README</a>.</li>
           </ul>
-          <p>The translations from the Japanese were made for this site. The notes marked Today are ours.</p>
+          <p>The translations from the Japanese were made for this site. The notes marked Since then are ours.</p>
         </section>
       </article>
     </section>
 
     <section id="about-view" hidden>
       <article class="prose">
-        <h1>Wada Sanzō</h1>
+        <h1>Wada Sanzō <span lang="ja">和田三造</span></h1>
         <p>Wada Sanzō (<span lang="ja">和田三造</span>, 1883–1967), a Japanese painter and designer, pioneered colour standards in Japan.</p>
         <p>He trained in Western-style painting under Kuroda Seiki from 1899, and at the Tokyo School of Fine Arts from 1901 to 1904. In 1909 the Ministry of Education sent him to study in Europe: he travelled mainly in France, studying craft design as well as painting. On his way home, in 1914, he studied Eastern art in India and Burma. In 1915 he went back to Japan.</p>
         <p>In 1927 he founded the Japan Standard Color Association, out of a concern that Japan needed standard colours.</p>
         <p>From 1932 to 1944 he taught design at the Tokyo School of Fine Arts, as a professor.</p>
         <p>His book, the <i>Haishoku Sōkan</i> (<span lang="ja">配色總鑑</span>), he wrote, was not scientific: it came from his sense of colour as a painter, who had learned, painting from nature, to take apart its complex tones and put them together again. He also drew on European colour work: Ostwald's system to write colours down, Chevreul's rules for harmony, Ridgway's colour names.</p>
         <h2>His work on colour</h2>
-        <p>He worked on two things: a common reference for colours, and how to combine them well.</p>
+        <p>Two parts of his work on colour lead to this site: a common reference for colours, and how to combine them well.</p>
         <ul>
           <li><strong>Standard colours:</strong> He made Japan's first systematic colour samples, and founded the association that became the Japan Color Research Institute, which went on to make the country's standard colour charts: the first in Japan with steps that look even, and the first chips anywhere of Munsell's revised system. It also helped draft JIS Z 8721, Japan's industrial standard for writing a colour down by its hue, lightness and saturation. To tie names to colours, his association put some 600 colour names onto 171 samples, each with its Japanese, Chinese and English names and its code in Ostwald's notation.</li>
           <li><strong>Colour combinations:</strong> The <i>Haishoku Sōkan</i> sets out 348 combinations of two, three and four colours, painted by hand, with his advice on using them (see <a href="#guidance">Guidance</a>). It is a reference for choosing colours that work together, in clothes, interiors, crafts or advertising. It was the first of the many books of colour combinations since.</li>
@@ -1055,7 +1358,7 @@
           <li><a href="#combinations"><strong>Combinations</strong></a>: the 348 combinations of the first volume, laid out as in the book.</li>
           <li><a href="#seasons"><strong>Seasons</strong></a>: the 72 seasonal combinations of the second volume, month by month.</li>
           <li><a href="#create"><strong>Create</strong></a>: a small tool to create your own combinations, from Wada's colours or any colour of the four systems.</li>
-          <li><a href="#about"><strong>About</strong></a>: this page, plus Wada's and Hama Yaohiko's advice on making and using combinations (<a href="#guidance">Guidance</a>) and the theory behind them (<a href="#theory">Colour theory</a>).</li>
+          <li><a href="#about"><strong>About</strong></a>: this page, plus the colour theory behind combinations (<a href="#theory">Colour theory</a>) and Wada's and Hama Yaohiko's advice on making and using them (<a href="#guidance">Guidance</a>).</li>
         </ul>
         <p>Sources and more information are in the project's <a href="https://github.com/adrian729/wada-sanzo-colors">README</a>.</p>
       </article>
@@ -1459,6 +1762,7 @@
     function showView(afterLoad = false) {
       const [, arg, tab] = location.hash.slice(1).split("/");
       const name = showHeader(); // the header's script (in the page, so as to show the header right from the start)
+      const stayed = views[name] && !views[name].hidden; // (the same view as before: a link within the page)
       for (const [key, el] of Object.entries(views)) el.hidden = key !== name;
       if (detail.open) detail.close();
       // Every view goes back where it was left (back, forward and reload: kept in the history entry, see
@@ -1480,16 +1784,20 @@
         // room), not to the top under a reader already scrolling.
         document.title = `${READING[name]} | Wada Sanzō`;
         const target = arg && views[name].querySelector(`[id="${name}-${arg}"]`);
+        const smooth = stayed && !afterLoad && !matchMedia("(prefers-reduced-motion: reduce)").matches;
         if (y != null) scrollTo(0, y);
         else if (target) {
           // By the header's height now (its subnav may have just been hidden, before --header-height
-          // follows), and 1rem of space. The keyboard's next Tab goes on from the section.
-          scrollTo(0, target.getBoundingClientRect().top + scrollY - document.querySelector("header").offsetHeight - 16);
+          // follows), and 1rem of space. The keyboard's next Tab goes on from the section. From elsewhere
+          // on the same page (its contents, a link in its text), smoothly, unless the reader asks for less
+          // motion: the reader sees where in the page they've gone.
+          scrollTo({ top: target.getBoundingClientRect().top + scrollY - document.querySelector("header").offsetHeight - 16, behavior: smooth ? "smooth" : "instant" });
           if (!afterLoad) {
             target.tabIndex = -1;
             target.focus({ preventScroll: true });
           }
-        } else if (!afterLoad) scrollTo(0, 0);
+        } else if (!afterLoad) scrollTo({ top: 0, behavior: smooth ? "smooth" : "instant" }); // (its contents' Introduction: smoothly too)
+        markSection();
       } else {
         document.title = "Wada Sanzō | A Dictionary of Color Combinations";
         if (name === "colors") showLayout();
@@ -1521,6 +1829,30 @@
     }
 
     addEventListener("hashchange", () => showView());
+    // The reading page's contents mark the section being read: the last whose heading is above a third of
+    // the way down the screen, the introduction (the page's own address) before them all and at the page's
+    // top, and at the page's end, the last.
+    function markSection() {
+      const nav = [...document.querySelectorAll(".prose > nav")].find((n) => !n.closest("[hidden]"));
+      if (!nav) return;
+      const links = [...nav.querySelectorAll("a")], line = innerHeight / 3;
+      const end = scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
+      let current = null;
+      for (const a of links) {
+        const section = a.hash.slice(1).split("/")[1], heading = section && document.getElementById(a.hash.slice(1).replace("/", "-"));
+        if (!section || (heading && (end || (scrollY >= 1 && heading.getBoundingClientRect().top <= line)))) current = a;
+      }
+      for (const a of links) {
+        if (a === current) a.setAttribute("aria-current", "location");
+        else a.removeAttribute("aria-current");
+      }
+    }
+    let marking = false;
+    for (const type of ["scroll", "resize"]) addEventListener(type, () => {
+      if (marking) return;
+      marking = true;
+      requestAnimationFrame(() => { marking = false; markSection(); });
+    }, { passive: true });
     // A reading page's link to the section the address already names (clicked again, after scrolling
     // away) changes no address: go there again, not back to where the reader was.
     document.addEventListener("click", (e) => {
@@ -1768,7 +2100,7 @@
       // (The Colors page's systems' views are made when first shown: see showLayout.)
       // Prepare the wheel background's hue table while the page is idle, so opening the wheel is quick.
       gamut("screen").prepare();
-      fillReading(colors, seasons);
+      fillReading(colors, combos, seasons);
       showView(true); // a #combination/<number> (or #season, #create) link opened directly needs the data
     } catch (error) {
       console.error(error);
@@ -2014,8 +2346,8 @@
     }
 
     // The reading pages, once the data is in: each colour named in their text (a .color-ref, by its name
-    // in colors.json, or its data-color) gets its square and opens its dialog; each card they show
-    // (data-season) is drawn, a link to its page; a link to one of the Colors layouts (data-layout)
+    // in colors.json, or its data-color) gets its square and opens its dialog; each combination or seasonal
+    // card they show (data-combination, data-season) is drawn, a link to its page; a link to one of the Colors layouts (data-layout)
     // chooses it there.
     // A combination's thumbnail, in the link a: its number over its colours.
     function thumbOf(a, combo) {
@@ -2028,7 +2360,7 @@
       return a;
     }
 
-    function fillReading(colors, seasons) {
+    function fillReading(colors, combos, seasons) {
       const byName = new Map(colors.map((c) => [c.name, c]));
       for (const ref of document.querySelectorAll(".prose .color-ref")) {
         const c = byName.get(ref.dataset.color ?? ref.textContent.trim());
@@ -2049,16 +2381,63 @@
           keep.append(ref, mark[0]);
         }
       }
-      for (const slot of document.querySelectorAll(".prose a[data-season]")) {
-        const combo = seasons[slot.dataset.season - 1];
+      for (const slot of document.querySelectorAll(".prose :is(a[data-season], a[data-combination])")) {
+        const season = "season" in slot.dataset, combo = season ? seasons[slot.dataset.season - 1] : combos[slot.dataset.combination - 1];
         if (!combo) {
-          console.error(`No seasonal combination ${slot.dataset.season}`);
+          console.error(`No ${season ? "seasonal " : ""}combination ${slot.dataset.season ?? slot.dataset.combination}`);
           continue;
         }
-        thumbOf(slot, combo).setAttribute("aria-label", `Seasonal combination ${combo.number}`);
+        thumbOf(slot, combo).setAttribute("aria-label", `${season ? "Seasonal combination" : "Combination"} ${combo.number}`);
       }
       for (const link of document.querySelectorAll(".prose a[data-layout]")) {
         link.addEventListener("click", () => document.querySelector(`.subnav[data-view="colors"] button[data-value="${link.dataset.layout}"]`).click());
+      }
+      spinDiscs();
+      for (const patch of document.querySelectorAll(".prose .dot-patch")) {
+        patch.addEventListener("click", () => patch.setAttribute("aria-pressed", String(patch.getAttribute("aria-pressed") !== "true")));
+      }
+    }
+
+    // Complementary colours' discs: pointing at one (a mouse), or pressing it (a tap, a key), spins it up, as a
+    // real disc spun fast enough for the eye to blend its two colours; letting go slows it down. With reduced
+    // motion only a press spins it.
+    // A screen shows the disc a frame at a time, so how far it turns each frame decides what each point of it
+    // shows over time. At full speed it turns, each frame, by its smaller colour's share of a turn: each point
+    // then shows the two colours as evenly spread over time as they can be, in their shares, and every point
+    // the same (a rotation by the length of the interval codes a balanced, Sturmian, sequence). Any other
+    // speed lets some points show one colour for many frames running, which the eye sees as patches.
+    function spinDiscs() {
+      const RISE = 1.5; // seconds to full speed, and back to rest
+      const still = matchMedia("(prefers-reduced-motion: reduce)");
+      const discs = [...document.querySelectorAll(".prose .disc")].map((el) => {
+        const w = parseFloat(el.style.getPropertyValue("--w")) / 100;
+        return { el, turn: 0, step: 0, top: Math.min(w, 1 - w), over: false }; // step and top: turns a frame
+      });
+      let last = 0, frame = 0;
+      const tick = (now) => {
+        const dt = last ? Math.min((now - last) / 1000, 0.1) : 0;
+        last = now;
+        let moving = false;
+        for (const d of discs) {
+          const on = (d.over && !still.matches) || d.el.getAttribute("aria-pressed") === "true";
+          const want = on ? d.top : 0, by = d.top * dt / RISE;
+          d.step = want > d.step ? Math.min(want, d.step + by) : Math.max(want, d.step - by);
+          d.turn = (d.turn + d.step) % 1;
+          d.el.style.transform = d.step ? `rotate(${d.turn}turn)` : "";
+          moving ||= d.step > 0 || on;
+        }
+        frame = moving ? requestAnimationFrame(tick) : 0;
+        if (!moving) last = 0;
+      };
+      const wake = () => { if (!frame) frame = requestAnimationFrame(tick); };
+      for (const d of discs) {
+        d.el.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") { d.over = true; wake(); } });
+        d.el.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") { d.over = false; wake(); } });
+        // A press keeps it spinning (after the pointer leaves, for a mouse), a second press lets it go.
+        d.el.addEventListener("click", () => {
+          d.el.setAttribute("aria-pressed", String(d.el.getAttribute("aria-pressed") !== "true"));
+          wake();
+        });
       }
     }
 

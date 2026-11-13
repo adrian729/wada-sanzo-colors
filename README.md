@@ -45,3 +45,4 @@ OKLCH is computed from CMYK through the Japan Color 2011 Coated profile (`script
 - PCCS's conversion from and to Munsell's notation, and its tones' representative colours and coordinates: Mituo Kobayasi and Kayoko Yosiki (小林光夫, 吉識香代子), "Mathematical Relation among PCCS Tones, PCCS Color Attributes and Munsell Color Attributes" (PCCSトーン, PCCS三属性値, およびマンセル三属性値間の数学的関係), *Journal of the Color Science Association of Japan* 25(4), 2001, pp. 249–261, from the National Diet Library's digital collections. PCCS is the Japan Color Research Institute's.
 - The Japan Color 2011 Coated ICC profile, from the ICC Profile Registry, shared unaltered under its licence (`profiles/`).
 - The DM Mono font, under the SIL Open Font License (`fonts/OFL.txt`).
+- The Source Serif 4 and Noto Serif JP fonts, under the SIL Open Font License (`fonts/OFL-SourceSerif4.txt`, `fonts/OFL-NotoSerifJP.txt`).

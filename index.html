@@ -667,7 +667,7 @@
     .prose .portrait { width: 11rem; margin: 1rem auto 1.25rem; }
     .prose .portrait img { display: block; width: 100%; height: auto; }
     .prose .portrait figcaption { margin-top: 0.5rem; color: var(--muted); font-size: 0.75rem; text-align: left; }
-    @media (min-width: 40rem) { .prose .portrait { float: right; margin: 0.375rem 0 1rem 1.5rem; } .prose .portrait ~ h2 { clear: right; } }
+    @media (min-width: 40rem) { .prose .portrait { float: right; margin: 0.375rem 0 1rem 1.5rem; } .prose .opening { display: flow-root; } /* the portrait floats within the opening (a grid item, with the contents beside it) */ }
     /* A section: a rule above it, and room. Its parts (h3), smaller, without. */
     .prose h2 { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: 1.125rem; font-weight: 500; line-height: 1.4; }
     .prose h3 { margin-top: 2.25rem; font-size: 1rem; font-weight: 500; line-height: 1.4; }
@@ -920,7 +920,6 @@
     .prose .pairs .color-ref:is(:hover, :focus-visible) { text-decoration: underline; }
     .prose .pairs .color-ref .chip { order: -1; width: 100%; height: 3.5rem; margin: 0 0 0.375rem; box-shadow: none; }
     .prose .pairs .color-ref:first-child .chip { width: calc(100% + 0.75rem); }
-    .prose .pairs .note { grid-column: 1 / -1; margin-top: 0.25rem; color: var(--muted); }
     /* Combinations shown as examples: each drawn as in the book (a link to its page), its caption under it,
        centred as the figures are, their captions styled as figures' captions. Each example spans two rows of
        the list's grid (subgrid), so in a row of them the captions start level whatever each drawing's height. */
@@ -1151,25 +1150,31 @@
         <h3 id="guidance-harmony">Kinds of harmony</h3>
         <p>Wada sorts harmony into four kinds.</p>
         <ol>
-          <li><strong>Like colours.</strong> One hue in its light and dark tones, such as orange with its browns and its pale, flesh-like tints. Gentle, and hard to get badly wrong, but seldom more than ordinary. The place for a beginner to start, and widely liked as mild and pleasant (Hama).</li>
-          <li><strong>Different hues.</strong> Colours of quite different hues, in any tone. More interesting, but where the hues touch, weigh each colour's lightness and strength, or the result turns coarse.</li>
-          <li><strong>Complementary.</strong> Opposite hues, whatever their lightness. Each sets the other off, and used well they give lively, excellent combinations.</li>
-          <li><strong>Graded bands</strong> (<i>ungen</i>, <span lang="ja">暈繝</span>). One hue in steps, from white through the full colour to black, as in the banded colouring of temple ornament, and a combination takes part of that scale. Calmer still than the others. The steps can also move gradually through neighbouring hues (Hama).</li>
+          <li><p><strong>Like colours.</strong> One hue in its light and dark tones, such as orange with its browns and its pale, flesh-like tints. Gentle, and hard to get badly wrong, but seldom more than ordinary. The place for a beginner to start. Widely liked as mild and pleasant (Hama).</p>
+            <ul class="examples">
+              <li><a data-combination="120"></a> <p>One red, strong and pale, Pompeian Red and Cameo Pink.</p></li>
+            </ul></li>
+          <li><p><strong>Different hues.</strong> Colours of quite different hues, light or dark alike. More interesting, but where the hues touch, weigh each colour's lightness and strength, or the result turns coarse.</p>
+            <ul class="examples">
+              <li><a data-combination="172"></a> <p>A blue, a purple and an orange, each at its own lightness, Antwerp Blue, Red Violet and the lighter Cinnamon Rufous.</p></li>
+            </ul></li>
+          <li><p><strong>Complementary.</strong> Opposite hues, whatever their lightness. Really a special case of different hues, but stronger than the others, so when to use them is debated. Each sets the other off (see <a href="#theory/complements">Complementary colours</a>), and used well they give lively, excellent combinations.</p>
+            <ul class="examples">
+              <li><a data-combination="22"></a> <p>Deep Lyons Blue and Yellow, one of the pairs in his own table (below).</p></li>
+            </ul></li>
+          <li><p><strong>Graded bands</strong> (<i>ungen</i>, <span lang="ja">暈繝</span>). One hue in steps, from white through the full colour to black, as in the banded colouring of temple ornament, and a combination takes part of that scale. Calmer still than the others. The steps can also move gradually through neighbouring hues (Hama).</p>
+            <ul class="examples">
+              <li><a data-combination="165"></a> <p>One red in three steps, from the dark Vistoris Lake through Spinel Red to the pale Cameo Pink.</p></li>
+            </ul></li>
         </ol>
-        <ul class="examples">
-          <li><a data-combination="120"></a> <p>Like colours, one red, strong and pale, Pompeian Red and Cameo Pink.</p></li>
-          <li><a data-combination="172"></a> <p>Different hues, Antwerp Blue, Red Violet and Cinnamon Rufous.</p></li>
-          <li><a data-combination="17"></a> <p>Complementary, Eugenia Red and Sea Green, near his own pair of red and Sea Green (below).</p></li>
-          <li><a data-combination="165"></a> <p>Graded bands, one red in three steps, from the dark Vistoris Lake through Spinel Red to the pale Cameo Pink.</p></li>
-        </ul>
-        <p>His 1934 booklet sorts them differently, into same tone and different tone, each light, dark, pale, deep or free, ten kinds in all. For clothes, interiors and furniture, colours of one family in free tones are the safe choice, and different tones the hardest but the most rewarding.</p>
+        <p>His 1934 booklet sorts them differently, into colours of one family, changing gradually, and colours wholly unlike, each light, dark, pale, deep or free, ten kinds in all. For clothes, interiors and furniture, one family, freely mixing light and dark, pale and deep, is the safe choice, and colours wholly unlike are the hardest but the most rewarding.</p>
         <p>The kinds are a standard, not rules to obey, and those with long experience of colour can merge them or break them. None of the book's combinations says which kind it is.</p>
 
         <h3 id="guidance-pairs">Opposite hues</h3>
         <p>Wada drew up a table of complementary pairs from his own palette. He paired them by hue alone, so their lightness and saturation vary. A colour's lighter and darker tones pair too. <button class="color-ref">Hermosa Pink</button> and <button class="color-ref">Pale Burnt Lake</button> go with <button class="color-ref">Sea Green</button>, as <button class="color-ref">Spectrum Red</button> does.</p>
         <ul class="pairs">
           <li><button class="color-ref">Spectrum Red</button> <button class="color-ref">Sea Green</button></li>
-          <li><button class="color-ref">Red Orange</button> <button class="color-ref">Green Blue</button> <span class="note">or one a little greener</span></li>
+          <li><button class="color-ref">Red Orange</button> <button class="color-ref">Green Blue</button></li>
           <li><button class="color-ref">Orange</button> <button class="color-ref">Peacock Blue</button></li>
           <li><button class="color-ref">Yellow Orange</button> <button class="color-ref">Antwerp Blue</button></li>
           <li><button class="color-ref">Apricot Yellow</button> <button class="color-ref">Blue</button></li>
@@ -1516,13 +1521,22 @@
     <section id="about-view" hidden>
       <article class="prose">
         <h1>Wada Sanzō <span lang="ja">和田三造</span></h1>
-        <figure class="portrait"><img src="images/wada-self-portrait-1904.jpg" width="476" height="640" alt="Wada's self-portrait at 21: a young man with short dark hair and a moustache, in a green kimono, one hand on his chest, against a green ground"><figcaption>Wada Sanzō, <i>Self-Portrait</i>, 1904. The University Art Museum, Tokyo University of the Arts.</figcaption></figure>
-        <p>Wada Sanzō (<span lang="ja">和田三造</span>, 1883–1967), a Japanese painter and designer, pioneered colour standards in Japan.</p>
-        <p>He trained in Western-style painting under Kuroda Seiki from 1899, and at the Tokyo School of Fine Arts from 1901 to 1904. In 1909 the Ministry of Education sent him to study in Europe: he travelled mainly in France, studying craft design as well as painting. On his way home, in 1914, he studied Eastern art in India and Burma. In 1915 he went back to Japan.</p>
-        <p>In 1927 he founded the Japan Standard Color Association, out of a concern that Japan needed standard colours.</p>
-        <p>From 1932 to 1944 he taught design at the Tokyo School of Fine Arts, as a professor.</p>
-        <p>His book, the <i>Haishoku Sōkan</i> (<span lang="ja">配色總鑑</span>), he wrote, was not scientific: it came from his sense of colour as a painter, who had learned, painting from nature, to take apart its complex tones and put them together again. He also drew on European colour work: Ostwald's system to write colours down, Chevreul's rules for harmony, Ridgway's colour names.</p>
-        <h2>His work on colour</h2>
+        <div class="opening">
+          <figure class="portrait"><img src="images/wada-self-portrait-1904.jpg" width="476" height="640" alt="Wada's self-portrait at 21: a young man with short dark hair and a moustache, in a green kimono, one hand on his chest, against a green ground"><figcaption>Wada Sanzō, <i>Self-Portrait</i>, 1904. The University Art Museum, Tokyo University of the Arts.</figcaption></figure>
+          <p>Wada Sanzō (<span lang="ja">和田三造</span>, 1883–1967), a Japanese painter and designer, pioneered colour standards in Japan.</p>
+          <p>He trained in Western-style painting under Kuroda Seiki from 1899, and at the Tokyo School of Fine Arts from 1901 to 1904. In 1909 the Ministry of Education sent him to study in Europe: he travelled mainly in France, studying craft design as well as painting. On his way home, in 1914, he studied Eastern art in India and Burma. In 1915 he went back to Japan.</p>
+          <p>In 1927 he founded the Japan Standard Color Association, out of a concern that Japan needed standard colours.</p>
+          <p>From 1932 to 1944 he taught design at the Tokyo School of Fine Arts, as a professor.</p>
+          <p>His book, the <i>Haishoku Sōkan</i> (<span lang="ja">配色總鑑</span>), he wrote, was not scientific: it came from his sense of colour as a painter, who had learned, painting from nature, to take apart its complex tones and put them together again. He also drew on European colour work: Ostwald's system to write colours down, Chevreul's rules for harmony, Ridgway's colour names.</p>
+        </div>
+        <nav aria-label="On this page"><ul class="contents">
+          <li><a href="#about">Introduction</a></li>
+          <li><a href="#about/work">His work on colour</a></li>
+          <li><a href="#about/hama">Hama Yaohiko</a></li>
+          <li><a href="#about/site">This site</a></li>
+          <li><a href="#about/sources">Sources</a></li>
+        </ul></nav>
+        <h2 id="about-work">His work on colour</h2>
         <p>Two parts of his work on colour lead to this site: a common reference for colours, and how to combine them well.</p>
         <ul>
           <li><strong>Standard colours.</strong> He made Japan's first systematic colour samples, and founded the association that became the Japan Color Research Institute, which went on to make the country's standard colour charts: the first in Japan with steps that look even, and the first chips anywhere of Munsell's revised system. It also helped draft JIS Z 8721, Japan's industrial standard for writing a colour down by its hue, lightness and saturation. To tie names to colours, his association put some 600 colour names onto 171 samples, each with its Japanese, Chinese and English names and its code in Ostwald's notation.</li>
@@ -1532,16 +1546,7 @@
         <p>Hama Yaohiko (<span lang="ja">濱八百彦</span>, 1866–1944) was a painter and teacher who made colour his study. He trained in painting under the Kyoto painter Mochizuki Gyokusen, and by 1918 he was a professor at the Gakushūin, the Peers' School in Tokyo.</p>
         <p>Colour first puzzled him in the late 1890s, at the normal school in Kagoshima, a college for teachers. Testing new students for colour blindness, he met several who saw colours quite differently from him, and he began to ask why anyone sees red or blue at all. The books he found didn't answer it, so he studied colour in his spare time, reading foreign colour scientists and making experiments of his own. Twenty years on he published <i>Iro no kenkyū</i> (<span lang="ja">色の研究</span>, A study of colour, 1918), and later <i>Shikisai gairon</i> (<span lang="ja">色彩概論</span>, An outline of colour, 1928), not a summary of Western work, he wrote, but a colour science of his own.</p>
         <p>In 1935 he and Wada made a standard colour atlas, the <i>Hyōjun shikisai zushū</i>, fifteen large wall charts, made to teach colour to a room. Technicians under Wada's supervision coloured most of the plates by hand, and Hama wrote the commentary, an introduction to colour from light and sight to mixing, contrast and harmony. His advice is part of <a href="#guidance">Guidance</a>, and his explanations fill in much of <a href="#theory">Colour theory</a>.</p>
-        <section class="sources">
-          <h3>Sources</h3>
-          <ul>
-            <li>Hama Yaohiko, <span lang="ja">色の研究</span> (A study of colour), Maruzen, 1918, with a preface by the psychologist Matsumoto Matatarō: <a href="https://dl.ndl.go.jp/pid/956632">National Diet Library</a>.</li>
-            <li>Hama Yaohiko, <span lang="ja">色彩概論</span> (An outline of colour), Maruzen, 1928: <a href="https://dl.ndl.go.jp/pid/1176772">National Diet Library</a>.</li>
-            <li>Wada Sanzō and Hama Yaohiko, <span lang="ja">標準色彩圖集</span> (<i>Hyōjun shikisai zushū</i>, a standard colour atlas), 1935, its commentary and the publisher's statement: <a href="https://dl.ndl.go.jp/pid/1014901">National Diet Library</a>.</li>
-          </ul>
-          <p>The translations from the Japanese were made for this site.</p>
-        </section>
-        <h2>This site</h2>
+        <h2 id="about-site">This site</h2>
         <p>This site is built on Wada's colours and colour combinations. It shows his 171 colours and his combinations on screen, to browse, compare and use in your own work.</p>
         <p>Wada's colours and combinations come from two books. Seigensha reprinted his <i>Haishoku Sōkan</i> as <i>A Dictionary of Color Combinations</i>, and a second volume adds his seasonal combinations.</p>
         <p>Each colour is computed from the books' CMYK, using the Japan Color 2011 Coated profile, the standard for offset printing on coated paper in Japan.</p>
@@ -1560,7 +1565,17 @@
           <li><strong><a href="#create">Create</a>.</strong> A small tool to create your own combinations, from Wada's colours or any colour of the four systems.</li>
           <li><strong><a href="#about">About</a>.</strong> This page, plus the colour theory behind combinations (<a href="#theory">Colour theory</a>) and Wada's and Hama Yaohiko's advice on choosing colours and on making and using combinations (<a href="#guidance">Guidance</a>).</li>
         </ul>
-        <p>Sources and more information are in the project's <a href="https://github.com/adrian729/wada-sanzo-colors">README</a>.</p>
+        <section class="sources">
+          <h2 id="about-sources">Sources</h2>
+          <ul>
+            <li>Wada Sanzō, <span lang="ja">配色總鑑概説と其活用</span> (General remarks on the <i>Haishoku Sōkan</i> and how to use it), Hakubisha, 1934: <a href="https://dl.ndl.go.jp/pid/1911912">National Diet Library</a>.</li>
+            <li>Wada Sanzō, <span lang="ja">配色總鑑附說</span> (Supplement to the <i>Haishoku Sōkan</i>), Hakubisha, 1935: <a href="https://dl.ndl.go.jp/pid/1903674">National Diet Library</a>.</li>
+            <li>Hama Yaohiko, <span lang="ja">色の研究</span> (A study of colour), Maruzen, 1918, with a preface by the psychologist Matsumoto Matatarō: <a href="https://dl.ndl.go.jp/pid/956632">National Diet Library</a>.</li>
+            <li>Hama Yaohiko, <span lang="ja">色彩概論</span> (An outline of colour), Maruzen, 1928: <a href="https://dl.ndl.go.jp/pid/1176772">National Diet Library</a>.</li>
+            <li>Wada Sanzō and Hama Yaohiko, <span lang="ja">標準色彩圖集</span> (<i>Hyōjun shikisai zushū</i>, a standard colour atlas), 1935, its commentary and the publisher's statement: <a href="https://dl.ndl.go.jp/pid/1014901">National Diet Library</a>.</li>
+          </ul>
+          <p>The translations from the Japanese were made for this site. More on the data and how the colours were computed is in the project's <a href="https://github.com/adrian729/wada-sanzo-colors">README</a>.</p>
+        </section>
       </article>
     </section>
   </main>
